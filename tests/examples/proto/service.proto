@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+option go_package = "kalisto/tests/service";
+
+package kalisto.tests.examples.service;
+
+service BookStore {
+    rpc GetBook(GetBookRequest) returns (GetBookResponse) {}
+}
+
+message GetBookRequest {
+    string id = 1;
+}
+
+message GetBookResponse {
+    string name = 1;
+}
