@@ -1,8 +1,8 @@
 package spec_test
 
 import (
-	"kalisto/src/internal/proto/compiler"
-	"kalisto/src/internal/proto/spec"
+	"kalisto/src/proto/compiler"
+	"kalisto/src/proto/spec"
 	"os"
 	"path"
 	"testing"
@@ -28,7 +28,7 @@ func (s *FactorySuite) SetupTest() {
 	s.Require().NoError(err)
 	s.wd = wd
 
-	protoPath := path.Join(s.wd, "..", "..", "..", "..", "tests/examples/proto/service.proto")
+	protoPath := path.Join(s.wd, "..", "..", "..", "tests/examples/proto/service.proto")
 
 	c := compiler.NewFileCompiler()
 	fileRegistry, err := c.Compile([]string{path.Dir(protoPath)}, []string{protoPath})

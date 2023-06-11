@@ -2,7 +2,7 @@ package client_test
 
 import (
 	"context"
-	"kalisto/src/internal/proto/client"
+	"kalisto/src/proto/client"
 	"testing"
 	"time"
 

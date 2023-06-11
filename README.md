@@ -17,3 +17,9 @@ to this in your browser, and you can call your Go code from devtools.
 ## Building
 
 To build a redistributable, production mode package, use `wails build`.
+
+
+## Tasks execution
+Page: https://pydoit.org/contents.html
+- install task manager doit: `pip3 install doit` or `pip install doit`
+- look at the commands: `doit` to show help or `doit list` to show available tasks 
