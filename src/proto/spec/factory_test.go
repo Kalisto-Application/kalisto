@@ -1,6 +1,7 @@
 package spec_test
 
 import (
+	"kalisto/src/models"
 	"kalisto/src/proto/compiler"
 	"kalisto/src/proto/spec"
 	"os"
@@ -39,20 +40,20 @@ func (s *FactorySuite) SetupTest() {
 func (s *FactorySuite) TestSingleFileWuthNoDeps() {
 	given, err := s.f.FromRegistry(s.r)
 	s.NoError(err)
-	s.EqualValues(spec.Spec{
-		Services: []spec.Service{
+	s.EqualValues(models.Spec{
+		Services: []models.Service{
 			{
 				Name: "BookStore",
-				Methods: []spec.Method{
+				Methods: []models.Method{
 					{
 						Name: "GetBook",
-						Kind: spec.CommunicationKindSimple,
-						RequestMessage: spec.Message{
+						Kind: models.CommunicationKindSimple,
+						RequestMessage: models.Message{
 							Name: "GetBookRequest",
-							Fields: []spec.Field{
+							Fields: []models.Field{
 								{
 									Name: "id",
-									Type: spec.DataTypeString,
+									Type: models.DataTypeString,
 								},
 							},
 						},
