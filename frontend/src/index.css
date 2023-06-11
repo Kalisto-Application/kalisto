@@ -1,0 +1,18 @@
+/* Fonts (Inter 400/500/600/900, Roboto Mono 400/500) */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;900&family=Roboto+Mono:wght@400;500&display=swap");
+/*
+CSS rules to specify families:
+    font-family: 'Inter', sans-serif;
+    font-family: 'Roboto Mono', monospace;
+*/
+/* TODO: Download fonts so they are available offline */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  /* TODO: Investigate best theming strategy with Tailwind */
+  background-color: #262837;
+  color: #ebebeb;
+}
