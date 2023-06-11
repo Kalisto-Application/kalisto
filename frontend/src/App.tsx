@@ -1,15 +1,8 @@
-import {useState} from 'react';
-import logo from './assets/images/logo-universal.png';
-import './App.css';
-import {SpecFromProto, SendGrpc} from "../wailsjs/go/api/Api";
+import { MainPage } from "./pages/MainPage";
 
 function App() {
-    return (
-        <div id="App">
-            <img src={logo} id="logo" alt="logo"/>
-            <div id="result" className="result">"hey dude"</div>
-        </div>
-    )
+  // In future we will have a router here to switch between pages
+  return <MainPage />;
 }
 
-export default App
+export default App;
