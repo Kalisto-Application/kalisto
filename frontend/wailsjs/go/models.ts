@@ -3,6 +3,7 @@ export namespace models {
 	export class Field {
 	    name: string;
 	    type: string;
+	    defaultValue: string;
 	    enum: string[];
 	    isCollection: boolean;
 	    collectionKey?: Field;
@@ -17,6 +18,7 @@ export namespace models {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.name = source["name"];
 	        this.type = source["type"];
+	        this.defaultValue = source["defaultValue"];
 	        this.enum = source["enum"];
 	        this.isCollection = source["isCollection"];
 	        this.collectionKey = this.convertValues(source["collectionKey"], Field);
