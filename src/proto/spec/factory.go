@@ -2,7 +2,7 @@ package spec
 
 import (
 	"fmt"
-	"kalisto/src/internal/models"
+	"kalisto/src/models"
 
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/reflect/protoregistry"

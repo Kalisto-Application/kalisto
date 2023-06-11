@@ -1,7 +1,7 @@
 package compiler_test
 
 import (
-	"kalisto/src/internal/proto/compiler"
+	"kalisto/src/proto/compiler"
 	"os"
 	"path"
 	"testing"
@@ -25,7 +25,7 @@ func (s *FileCompilerTestSuite) SetupTest() {
 }
 
 func (s *FileCompilerTestSuite) TestSingleFileWuthNoDeps() {
-	protoPath := path.Join(s.wd, "..", "..", "..", "..", "tests/examples/proto/service.proto")
+	protoPath := path.Join(s.wd, "..", "..", "..", "tests/examples/proto/service.proto")
 
 	c := compiler.NewFileCompiler()
 	fileRegistry, err := c.Compile([]string{path.Dir(protoPath)}, []string{protoPath})
