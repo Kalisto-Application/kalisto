@@ -15,22 +15,22 @@ func NewFactory() *Factory {
 	return &Factory{}
 }
 
-func (f *Factory) FromRegistry(reg *protoregistry.Files) (spec Spec, extErr error) {
+func (f *Factory) FromRegistry(reg *protoregistry.Files) (spec models.Spec, extErr error) {
 	reg.RangeFiles(func(fd protoreflect.FileDescriptor) bool {
 		services := fd.Services()
-		specServices := make([]Service, services.Len())
+		specServices := make([]models.Service, services.Len())
 
 		for i := 0; i < services.Len(); i++ {
 			service := services.Get(i)
 			methods := service.Methods()
-			specMethods := make([]Method, methods.Len())
+			specMethods := make([]models.Method, methods.Len())
 
 			for j := 0; j < methods.Len(); j++ {
 				method := methods.Get(j)
 
 				input := method.Input()
 				inputFields := input.Fields()
-				specInputFields := make([]Field, inputFields.Len())
+				specInputFields := make([]models.Field, inputFields.Len())
 
 				for k := 0; k < inputFields.Len(); k++ {
 					specField, err := f.newField(inputFields.Get(k))
@@ -42,17 +42,17 @@ func (f *Factory) FromRegistry(reg *protoregistry.Files) (spec Spec, extErr erro
 					specInputFields[k] = specField
 				}
 
-				specMethods[j] = Method{
+				specMethods[j] = models.Method{
 					Name: string(method.Name()),
-					RequestMessage: Message{
+					RequestMessage: models.Message{
 						Name:   string(input.Name()),
 						Fields: specInputFields,
 					},
-					Kind: NewCommunicationKind(method.IsStreamingClient(), method.IsStreamingServer()),
+					Kind: models.NewCommunicationKind(method.IsStreamingClient(), method.IsStreamingServer()),
 				}
 			}
 
-			specServices[i] = Service{
+			specServices[i] = models.Service{
 				Name:    string(service.Name()),
 				Methods: specMethods,
 			}
@@ -66,27 +66,27 @@ func (f *Factory) FromRegistry(reg *protoregistry.Files) (spec Spec, extErr erro
 	return spec, extErr
 }
 
-func (f *Factory) newField(fd protoreflect.FieldDescriptor) (_ Field, err error) {
-	var dataType DataType
+func (f *Factory) newField(fd protoreflect.FieldDescriptor) (_ models.Field, err error) {
+	var dataType models.DataType
 	var enum []string
-	var fields []Field
+	var fields []models.Field
 	var isCollection bool
-	var collectionKey *Field
-	var oneOf []Field
+	var collectionKey *models.Field
+	var oneOf []models.Field
 
 	switch fd.Kind() {
 	case protoreflect.BoolKind:
-		dataType = DataTypeBool
+		dataType = models.DataTypeBool
 	case protoreflect.Int32Kind, protoreflect.Sint32Kind, protoreflect.Uint32Kind,
 		protoreflect.Int64Kind, protoreflect.Sint64Kind, protoreflect.Uint64Kind,
 		protoreflect.Sfixed32Kind, protoreflect.Fixed32Kind, protoreflect.Sfixed64Kind, protoreflect.Fixed64Kind:
-		dataType = DataTypeInt
+		dataType = models.DataTypeInt
 	case protoreflect.FloatKind, protoreflect.DoubleKind:
-		dataType = DataTypeFloat
+		dataType = models.DataTypeFloat
 	case protoreflect.StringKind, protoreflect.BytesKind:
-		dataType = DataTypeString
+		dataType = models.DataTypeString
 	case protoreflect.EnumKind:
-		dataType = DataTypeEnum
+		dataType = models.DataTypeEnum
 		v := fd.Enum().Values()
 		enum = make([]string, v.Len())
 		for i := 0; i < v.Len(); i++ {
@@ -102,7 +102,7 @@ func (f *Factory) newField(fd protoreflect.FieldDescriptor) (_ Field, err error)
 			isCollection = true
 			key, err := f.newField(fd.MapKey())
 			if err != nil {
-				return Field{}, err
+				return models.Field{}, err
 			}
 			collectionKey = &key
 		}
@@ -113,7 +113,7 @@ func (f *Factory) newField(fd protoreflect.FieldDescriptor) (_ Field, err error)
 
 		message := fd.Message()
 		mFields := message.Fields()
-		fields = make([]Field, mFields.Len())
+		fields = make([]models.Field, mFields.Len())
 		for i := 0; i < mFields.Len(); i++ {
 			field, err := f.newField(mFields.Get(i))
 			if err != nil {
@@ -124,10 +124,10 @@ func (f *Factory) newField(fd protoreflect.FieldDescriptor) (_ Field, err error)
 		}
 
 	case protoreflect.GroupKind:
-		return Field{}, models.ErrProto2NotSupported
+		return models.Field{}, models.ErrProto2NotSupported
 	}
 
-	return Field{
+	return models.Field{
 		Name:          string(fd.Name()),
 		Type:          dataType,
 		Enum:          enum,

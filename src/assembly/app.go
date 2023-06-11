@@ -1,27 +1,26 @@
-package main
+package assembly
 
 import (
 	"context"
-	"fmt"
+	"kalisto/src/api"
 )
 
 // App struct
 type App struct {
 	ctx context.Context
+
+	Api *api.Api
 }
 
 // NewApp creates a new App application struct
 func NewApp() *App {
-	return &App{}
+	a := api.New()
+
+	return &App{Api: a}
 }
 
 // startup is called when the app starts. The context is saved
 // so we can call the runtime methods
-func (a *App) startup(ctx context.Context) {
+func (a *App) Start(ctx context.Context) {
 	a.ctx = ctx
-}
-
-// Greet returns a greeting for the given name
-func (a *App) Greet(name string) string {
-	return fmt.Sprintf("Hello %s, It's show time!", name)
 }

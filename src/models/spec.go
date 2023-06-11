@@ -1,12 +1,12 @@
-package spec
+package models
 
 type Spec struct {
-	Services []Service
+	Services []Service `json:"services"`
 }
 
 type Service struct {
-	Name    string
-	Methods []Method
+	Name    string   `json:"name"`
+	Methods []Method `json:"methods"`
 }
 
 type CommunicationKind string
@@ -32,14 +32,14 @@ func NewCommunicationKind(isStreamClient, isStreamServer bool) CommunicationKind
 }
 
 type Method struct {
-	Name           string
-	RequestMessage Message
-	Kind           CommunicationKind
+	Name           string            `json:"name"`
+	RequestMessage Message           `json:"requestMessage"`
+	Kind           CommunicationKind `json:"kind"`
 }
 
 type Message struct {
-	Name   string
-	Fields []Field
+	Name   string  `json:"name"`
+	Fields []Field `json:"fields"`
 }
 
 type DataType string
@@ -59,12 +59,12 @@ const (
 )
 
 type Field struct {
-	Name string
-	Type DataType
+	Name string   `json:"name"`
+	Type DataType `json:"type"`
 
-	Enum          []string
-	IsCollection  bool
-	CollectionKey *Field
-	OneOf         []Field
-	Fields        []Field
+	Enum          []string `json:"enum"`
+	IsCollection  bool     `json:"isCollection"`
+	CollectionKey *Field   `json:"collectionKey"`
+	OneOf         []Field  `json:"oneOf"`
+	Fields        []Field  `json:"fields"`
 }
