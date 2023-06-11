@@ -73,33 +73,40 @@ func (f *Factory) newField(fd protoreflect.FieldDescriptor) (_ models.Field, err
 	var isCollection bool
 	var collectionKey *models.Field
 	var oneOf []models.Field
+	var defaultValue string
 
 	switch fd.Kind() {
 	case protoreflect.BoolKind:
 		dataType = models.DataTypeBool
+		defaultValue = "false"
 	case protoreflect.Int32Kind, protoreflect.Sint32Kind, protoreflect.Uint32Kind,
 		protoreflect.Int64Kind, protoreflect.Sint64Kind, protoreflect.Uint64Kind,
 		protoreflect.Sfixed32Kind, protoreflect.Fixed32Kind, protoreflect.Sfixed64Kind, protoreflect.Fixed64Kind:
 		dataType = models.DataTypeInt
+		defaultValue = "0"
 	case protoreflect.FloatKind, protoreflect.DoubleKind:
 		dataType = models.DataTypeFloat
+		defaultValue = "0.0"
 	case protoreflect.StringKind, protoreflect.BytesKind:
 		dataType = models.DataTypeString
+		defaultValue = `""`
 	case protoreflect.EnumKind:
 		dataType = models.DataTypeEnum
 		v := fd.Enum().Values()
 		enum = make([]string, v.Len())
 		for i := 0; i < v.Len(); i++ {
 			enum[i] = string(v.Get(i).Name())
-
 		}
+		defaultValue = string(v.Get(0).Name())
 	case protoreflect.MessageKind:
 		if fd.IsList() {
 			isCollection = true
+			defaultValue = "[]"
 		}
 
 		if fd.IsMap() {
 			isCollection = true
+			defaultValue = "{}"
 			key, err := f.newField(fd.MapKey())
 			if err != nil {
 				return models.Field{}, err
@@ -122,6 +129,7 @@ func (f *Factory) newField(fd protoreflect.FieldDescriptor) (_ models.Field, err
 
 			fields[i] = field
 		}
+		defaultValue = "{}"
 
 	case protoreflect.GroupKind:
 		return models.Field{}, models.ErrProto2NotSupported
@@ -130,6 +138,7 @@ func (f *Factory) newField(fd protoreflect.FieldDescriptor) (_ models.Field, err
 	return models.Field{
 		Name:          string(fd.Name()),
 		Type:          dataType,
+		DefaultValue:  defaultValue,
 		Enum:          enum,
 		IsCollection:  isCollection,
 		CollectionKey: collectionKey,

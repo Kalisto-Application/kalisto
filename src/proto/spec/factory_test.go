@@ -52,8 +52,9 @@ func (s *FactorySuite) TestSingleFileWuthNoDeps() {
 							Name: "GetBookRequest",
 							Fields: []models.Field{
 								{
-									Name: "id",
-									Type: models.DataTypeString,
+									Name:         "id",
+									Type:         models.DataTypeString,
+									DefaultValue: `""`,
 								},
 							},
 						},

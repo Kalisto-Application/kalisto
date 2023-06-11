@@ -59,8 +59,9 @@ const (
 )
 
 type Field struct {
-	Name string   `json:"name"`
-	Type DataType `json:"type"`
+	Name         string   `json:"name"`
+	Type         DataType `json:"type"`
+	DefaultValue string   `json:"defaultValue"`
 
 	Enum          []string `json:"enum"`
 	IsCollection  bool     `json:"isCollection"`
