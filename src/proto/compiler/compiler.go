@@ -6,8 +6,6 @@ import (
 
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/protoparse"
-	"google.golang.org/protobuf/reflect/protodesc"
-	"google.golang.org/protobuf/reflect/protoregistry"
 
 	"google.golang.org/protobuf/types/descriptorpb"
 )
@@ -24,7 +22,7 @@ func NewFileCompiler() *FileCompiler {
 	return &FileCompiler{seen: make(map[string]struct{})}
 }
 
-func (c *FileCompiler) Compile(paths, filenames []string) (*protoregistry.Files, error) {
+func (c *FileCompiler) Compile(paths, filenames []string) (*Registry, error) {
 	if len(filenames) == 0 {
 		return nil, ErrNoFiles
 	}
@@ -40,12 +38,13 @@ func (c *FileCompiler) Compile(paths, filenames []string) (*protoregistry.Files,
 		return nil, fmt.Errorf("compiler: failed to parse files: %w", err)
 	}
 
-	fdset := &descriptorpb.FileDescriptorSet{}
-	for _, fd := range descriptors {
-		fdset.File = append(fdset.File, c.walk(fd)...)
-	}
+	return &Registry{Descriptors: descriptors}, nil
+	// fdset := &descriptorpb.FileDescriptorSet{}
+	// for _, fd := range descriptors {
+	// 	fdset.File = append(fdset.File, c.walk(fd)...)
+	// }
 
-	return protodesc.NewFiles(fdset)
+	// return protodesc.NewFiles(fdset)
 }
 
 func (c *FileCompiler) walk(fd *desc.FileDescriptor) []*descriptorpb.FileDescriptorProto {

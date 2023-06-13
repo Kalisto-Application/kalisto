@@ -9,7 +9,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/suite"
-	"google.golang.org/protobuf/reflect/protoregistry"
 )
 
 type FactorySuite struct {
@@ -18,7 +17,7 @@ type FactorySuite struct {
 	c  *compiler.FileCompiler
 	f  *spec.Factory
 	wd string
-	r  *protoregistry.Files
+	r  *compiler.Registry
 }
 
 func (s *FactorySuite) SetupTest() {
@@ -31,8 +30,7 @@ func (s *FactorySuite) SetupTest() {
 
 	protoPath := path.Join(s.wd, "..", "..", "..", "tests/examples/proto/service.proto")
 
-	c := compiler.NewFileCompiler()
-	fileRegistry, err := c.Compile([]string{path.Dir(protoPath)}, []string{protoPath})
+	fileRegistry, err := s.c.Compile([]string{path.Dir(protoPath)}, []string{protoPath})
 	s.Require().NoError(err)
 	s.r = fileRegistry
 }
@@ -43,16 +41,21 @@ func (s *FactorySuite) TestSingleFileWuthNoDeps() {
 	s.EqualValues(models.Spec{
 		Services: []models.Service{
 			{
-				Name: "BookStore",
+				Name:     "BookStore",
+				FullName: "kalisto.tests.examples.service.BookStore",
+				Package:  "kalisto.tests.examples.service",
 				Methods: []models.Method{
 					{
-						Name: "GetBook",
-						Kind: models.CommunicationKindSimple,
+						Name:     "GetBook",
+						FullName: "kalisto.tests.examples.service.BookStore.GetBook",
+						Kind:     models.CommunicationKindSimple,
 						RequestMessage: models.Message{
-							Name: "GetBookRequest",
+							Name:     "GetBookRequest",
+							FullName: "kalisto.tests.examples.service.GetBookRequest",
 							Fields: []models.Field{
 								{
 									Name:         "id",
+									FullName:     "kalisto.tests.examples.service.GetBookRequest.id",
 									Type:         models.DataTypeString,
 									DefaultValue: `""`,
 								},
