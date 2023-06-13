@@ -3,9 +3,10 @@ package spec
 import (
 	"fmt"
 	"kalisto/src/models"
+	"kalisto/src/proto/compiler"
 
-	"google.golang.org/protobuf/reflect/protoreflect"
-	"google.golang.org/protobuf/reflect/protoregistry"
+	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/types/descriptorpb"
 )
 
 type Factory struct {
@@ -15,58 +16,58 @@ func NewFactory() *Factory {
 	return &Factory{}
 }
 
-func (f *Factory) FromRegistry(reg *protoregistry.Files) (spec models.Spec, extErr error) {
-	reg.RangeFiles(func(fd protoreflect.FileDescriptor) bool {
-		services := fd.Services()
-		specServices := make([]models.Service, services.Len())
+func (f *Factory) FromRegistry(reg *compiler.Registry) (spec models.Spec, err error) {
+	for _, fd := range reg.Descriptors {
+		services := fd.GetServices()
+		specServices := make([]models.Service, len(services))
 
-		for i := 0; i < services.Len(); i++ {
-			service := services.Get(i)
-			methods := service.Methods()
-			specMethods := make([]models.Method, methods.Len())
+		for i, service := range services {
+			methods := service.GetMethods()
+			specMethods := make([]models.Method, len(methods))
 
-			for j := 0; j < methods.Len(); j++ {
-				method := methods.Get(j)
+			for j, method := range methods {
 
-				input := method.Input()
-				inputFields := input.Fields()
-				specInputFields := make([]models.Field, inputFields.Len())
+				input := method.GetInputType()
+				inputFields := input.GetFields()
+				specInputFields := make([]models.Field, len(inputFields))
 
-				for k := 0; k < inputFields.Len(); k++ {
-					specField, err := f.newField(inputFields.Get(k))
+				for k, inputField := range inputFields {
+					specField, err := f.newField(inputField)
 					if err != nil {
-						extErr = fmt.Errorf("proto spec: failed to create new field: %w", err)
-						return false
+						return spec, fmt.Errorf("proto spec: failed to create new field: %w", err)
 					}
 
 					specInputFields[k] = specField
 				}
 
 				specMethods[j] = models.Method{
-					Name: string(method.Name()),
+					Name:     method.GetName(),
+					FullName: method.GetFullyQualifiedName(),
 					RequestMessage: models.Message{
-						Name:   string(input.Name()),
-						Fields: specInputFields,
+						Name:     input.GetName(),
+						FullName: input.GetFullyQualifiedName(),
+						Fields:   specInputFields,
 					},
-					Kind: models.NewCommunicationKind(method.IsStreamingClient(), method.IsStreamingServer()),
+					Kind: models.NewCommunicationKind(method.IsClientStreaming(), method.IsServerStreaming()),
 				}
 			}
 
 			specServices[i] = models.Service{
-				Name:    string(service.Name()),
-				Methods: specMethods,
+				Name:     service.GetName(),
+				FullName: service.GetFullyQualifiedName(),
+				Methods:  specMethods,
+				Package:  service.GetFile().GetPackage(),
 			}
 
 		}
 
 		spec.Services = append(spec.Services, specServices...)
-		return true
-	})
+	}
 
-	return spec, extErr
+	return spec, err
 }
 
-func (f *Factory) newField(fd protoreflect.FieldDescriptor) (_ models.Field, err error) {
+func (f *Factory) newField(fd *desc.FieldDescriptor) (_ models.Field, err error) {
 	var dataType models.DataType
 	var enum []string
 	var fields []models.Field
@@ -75,31 +76,33 @@ func (f *Factory) newField(fd protoreflect.FieldDescriptor) (_ models.Field, err
 	var oneOf []models.Field
 	var defaultValue string
 
-	switch fd.Kind() {
-	case protoreflect.BoolKind:
+	switch fd.GetType() {
+	case descriptorpb.FieldDescriptorProto_TYPE_BOOL:
 		dataType = models.DataTypeBool
 		defaultValue = "false"
-	case protoreflect.Int32Kind, protoreflect.Sint32Kind, protoreflect.Uint32Kind,
-		protoreflect.Int64Kind, protoreflect.Sint64Kind, protoreflect.Uint64Kind,
-		protoreflect.Sfixed32Kind, protoreflect.Fixed32Kind, protoreflect.Sfixed64Kind, protoreflect.Fixed64Kind:
+	case descriptorpb.FieldDescriptorProto_TYPE_INT32, descriptorpb.FieldDescriptorProto_TYPE_SINT32,
+		descriptorpb.FieldDescriptorProto_TYPE_UINT32, descriptorpb.FieldDescriptorProto_TYPE_INT64,
+		descriptorpb.FieldDescriptorProto_TYPE_SINT64, descriptorpb.FieldDescriptorProto_TYPE_UINT64,
+		descriptorpb.FieldDescriptorProto_TYPE_SFIXED32, descriptorpb.FieldDescriptorProto_TYPE_FIXED32,
+		descriptorpb.FieldDescriptorProto_TYPE_FIXED64, descriptorpb.FieldDescriptorProto_TYPE_SFIXED64:
 		dataType = models.DataTypeInt
 		defaultValue = "0"
-	case protoreflect.FloatKind, protoreflect.DoubleKind:
+	case descriptorpb.FieldDescriptorProto_TYPE_FLOAT, descriptorpb.FieldDescriptorProto_TYPE_DOUBLE:
 		dataType = models.DataTypeFloat
 		defaultValue = "0.0"
-	case protoreflect.StringKind, protoreflect.BytesKind:
+	case descriptorpb.FieldDescriptorProto_TYPE_STRING, descriptorpb.FieldDescriptorProto_TYPE_BYTES:
 		dataType = models.DataTypeString
 		defaultValue = `""`
-	case protoreflect.EnumKind:
+	case descriptorpb.FieldDescriptorProto_TYPE_ENUM:
 		dataType = models.DataTypeEnum
-		v := fd.Enum().Values()
-		enum = make([]string, v.Len())
-		for i := 0; i < v.Len(); i++ {
-			enum[i] = string(v.Get(i).Name())
+		v := fd.GetEnumType().GetValues()
+		enum = make([]string, len(v))
+		for i := range v {
+			enum[i] = v[i].GetName()
 		}
-		defaultValue = string(v.Get(0).Name())
-	case protoreflect.MessageKind:
-		if fd.IsList() {
+		defaultValue = v[0].GetName()
+	case descriptorpb.FieldDescriptorProto_TYPE_MESSAGE:
+		if fd.IsRepeated() {
 			isCollection = true
 			defaultValue = "[]"
 		}
@@ -107,22 +110,22 @@ func (f *Factory) newField(fd protoreflect.FieldDescriptor) (_ models.Field, err
 		if fd.IsMap() {
 			isCollection = true
 			defaultValue = "{}"
-			key, err := f.newField(fd.MapKey())
+			key, err := f.newField(fd.GetMapKeyType())
 			if err != nil {
 				return models.Field{}, err
 			}
 			collectionKey = &key
 		}
 
-		if oneOf := fd.ContainingOneof(); oneOf != nil {
+		if oneOf := fd.GetOneOf(); oneOf != nil {
 			panic("not implemented")
 		}
 
-		message := fd.Message()
-		mFields := message.Fields()
-		fields = make([]models.Field, mFields.Len())
-		for i := 0; i < mFields.Len(); i++ {
-			field, err := f.newField(mFields.Get(i))
+		message := fd.GetMessageType()
+		mFields := message.GetFields()
+		fields = make([]models.Field, len(mFields))
+		for i := range mFields {
+			field, err := f.newField(mFields[i])
 			if err != nil {
 				return field, err
 			}
@@ -131,12 +134,13 @@ func (f *Factory) newField(fd protoreflect.FieldDescriptor) (_ models.Field, err
 		}
 		defaultValue = "{}"
 
-	case protoreflect.GroupKind:
+	case descriptorpb.FieldDescriptorProto_TYPE_GROUP:
 		return models.Field{}, models.ErrProto2NotSupported
 	}
 
 	return models.Field{
-		Name:          string(fd.Name()),
+		Name:          fd.GetName(),
+		FullName:      fd.GetFullyQualifiedJSONName(),
 		Type:          dataType,
 		DefaultValue:  defaultValue,
 		Enum:          enum,

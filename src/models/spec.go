@@ -5,8 +5,10 @@ type Spec struct {
 }
 
 type Service struct {
-	Name    string   `json:"name"`
-	Methods []Method `json:"methods"`
+	Name     string   `json:"name"`
+	Package  string   `json:"package"`
+	FullName string   `json:"fullName"`
+	Methods  []Method `json:"methods"`
 }
 
 type CommunicationKind string
@@ -33,13 +35,15 @@ func NewCommunicationKind(isStreamClient, isStreamServer bool) CommunicationKind
 
 type Method struct {
 	Name           string            `json:"name"`
+	FullName       string            `json:"fullName"`
 	RequestMessage Message           `json:"requestMessage"`
 	Kind           CommunicationKind `json:"kind"`
 }
 
 type Message struct {
-	Name   string  `json:"name"`
-	Fields []Field `json:"fields"`
+	Name     string  `json:"name"`
+	FullName string  `json:"fullName"`
+	Fields   []Field `json:"fields"`
 }
 
 type DataType string
@@ -60,6 +64,7 @@ const (
 
 type Field struct {
 	Name         string   `json:"name"`
+	FullName     string   `json:"fullName"`
 	Type         DataType `json:"type"`
 	DefaultValue string   `json:"defaultValue"`
 

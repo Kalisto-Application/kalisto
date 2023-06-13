@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/suite"
-	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 type FileCompilerTestSuite struct {
@@ -30,17 +29,15 @@ func (s *FileCompilerTestSuite) TestSingleFileWuthNoDeps() {
 	c := compiler.NewFileCompiler()
 	fileRegistry, err := c.Compile([]string{path.Dir(protoPath)}, []string{protoPath})
 	s.NoError(err)
+	descs := fileRegistry.Descriptors
 
-	s.EqualValues(fileRegistry.NumFiles(), 1)
-	fileRegistry.RangeFiles(func(fd protoreflect.FileDescriptor) bool {
-		s.EqualValues(fd.Package(), "kalisto.tests.examples.service")
-		s.EqualValues(fd.Services().Len(), 1)
-		s.EqualValues(fd.Services().Get(0).Name(), "BookStore")
-		s.EqualValues(fd.Services().Get(0).Methods().Len(), 1)
-		s.EqualValues(fd.Services().Get(0).Methods().Get(0).Name(), "GetBook")
-
-		return true
-	})
+	s.EqualValues(len(descs), 1)
+	fd := descs[0]
+	s.EqualValues(fd.GetPackage(), "kalisto.tests.examples.service")
+	s.EqualValues(len(fd.GetServices()), 1)
+	s.EqualValues(fd.GetServices()[0].GetName(), "BookStore")
+	s.EqualValues(len(fd.GetServices()[0].GetMethods()), 1)
+	s.EqualValues(fd.GetServices()[0].GetMethods()[0].GetName(), "GetBook")
 }
 
 func (s *FileCompilerTestSuite) TestMutipleFilesWithNoDeps() {
