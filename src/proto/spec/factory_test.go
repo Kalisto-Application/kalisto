@@ -30,12 +30,13 @@ func (s *FactorySuite) SetupTest() {
 
 	protoPath := path.Join(s.wd, "..", "..", "..", "tests/examples/proto/service.proto")
 
-	fileRegistry, err := s.c.Compile([]string{path.Dir(protoPath)}, []string{protoPath})
+	c := compiler.NewFileCompiler()
+	fileRegistry, err := c.Compile([]string{path.Dir(protoPath)}, []string{"service.proto"})
 	s.Require().NoError(err)
 	s.r = fileRegistry
 }
 
-func (s *FactorySuite) TestSingleFileWuthNoDeps() {
+func (s *FactorySuite) TestSingleFileWithNoDeps() {
 	given, err := s.f.FromRegistry(s.r)
 	s.NoError(err)
 	s.EqualValues(models.Spec{

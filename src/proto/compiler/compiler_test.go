@@ -23,11 +23,11 @@ func (s *FileCompilerTestSuite) SetupTest() {
 	s.wd = wd
 }
 
-func (s *FileCompilerTestSuite) TestSingleFileWuthNoDeps() {
+func (s *FileCompilerTestSuite) TestSingleFileWithNoDeps() {
 	protoPath := path.Join(s.wd, "..", "..", "..", "tests/examples/proto/service.proto")
 
 	c := compiler.NewFileCompiler()
-	fileRegistry, err := c.Compile([]string{path.Dir(protoPath)}, []string{protoPath})
+	fileRegistry, err := c.Compile([]string{path.Dir(protoPath)}, []string{"service.proto"})
 	s.NoError(err)
 	descs := fileRegistry.Descriptors
 
@@ -40,43 +40,43 @@ func (s *FileCompilerTestSuite) TestSingleFileWuthNoDeps() {
 	s.EqualValues(fd.GetServices()[0].GetMethods()[0].GetName(), "GetBook")
 }
 
-func (s *FileCompilerTestSuite) TestMutipleFilesWithNoDeps() {
+func (s *FileCompilerTestSuite) TestMultipleFilesWithNoDeps() {
 
 }
 
-func (s *FileCompilerTestSuite) TestMutipleFilesWithSameLevelDep() {
+func (s *FileCompilerTestSuite) TestMultipleFilesWithSameLevelDep() {
 
 }
 
-func (s *FileCompilerTestSuite) TestMutipleFilesWithInnerLevelDep() {
+func (s *FileCompilerTestSuite) TestMultipleFilesWithInnerLevelDep() {
 
 }
 
-func (s *FileCompilerTestSuite) TestMutipleFilesWithUpLevelDep() {
+func (s *FileCompilerTestSuite) TestMultipleFilesWithUpLevelDep() {
 
 }
 
-func (s *FileCompilerTestSuite) TestMutipleFilesWithExternalDep() {
+func (s *FileCompilerTestSuite) TestMultipleFilesWithExternalDep() {
 
 }
 
-func (s *FileCompilerTestSuite) TestMutipleFilesWithCyclicDep() {
+func (s *FileCompilerTestSuite) TestMultipleFilesWithCyclicDep() {
 
 }
 
-func (s *FileCompilerTestSuite) TestMutipleDirectories() {
+func (s *FileCompilerTestSuite) TestMultipleDirectories() {
 
 }
 
-func (s *FileCompilerTestSuite) TestMutipleDirectoriesWithInnerLevelDep() {
+func (s *FileCompilerTestSuite) TestMultipleDirectoriesWithInnerLevelDep() {
 
 }
 
-func (s *FileCompilerTestSuite) TestMutipleDirectoriesWithUpLevelDep() {
+func (s *FileCompilerTestSuite) TestMultipleDirectoriesWithUpLevelDep() {
 
 }
 
-func (s *FileCompilerTestSuite) TestMutipleDirectoriesWithCyclicDep() {
+func (s *FileCompilerTestSuite) TestMultipleDirectoriesWithCyclicDep() {
 
 }
 
