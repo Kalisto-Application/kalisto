@@ -1,9 +1,22 @@
 package models
 
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
+
+type Workspace struct {
+	ID        uuid.UUID `json:"id"`
+	Name      string    `json:"workspace"`
+	Spec      Spec      `json:"spec"`
+	LastUsage time.Time `json:"lastUsage"`
+	BasePath  string    `json:"basePath"`
+}
+
 type Spec struct {
 	Services []Service `json:"services"`
 }
-
 type Service struct {
 	Name     string   `json:"name"`
 	Package  string   `json:"package"`

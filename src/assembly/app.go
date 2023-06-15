@@ -3,8 +3,11 @@ package assembly
 import (
 	"context"
 	"kalisto/src/api"
+	"kalisto/src/db"
 	"kalisto/src/proto/compiler"
 	"kalisto/src/proto/spec"
+	"kalisto/src/workspace"
+	"log"
 )
 
 // App struct
@@ -16,10 +19,19 @@ type App struct {
 
 // NewApp creates a new App application struct
 func NewApp() *App {
+	store, err := db.New()
+	if err != nil {
+		log.Fatal("failed to init db: ", err)
+	}
+
+	ws, err := workspace.New(store)
+	if err != nil {
+		log.Fatal("failed to init workspace")
+	}
 	protoCompiler := compiler.NewFileCompiler()
 	specFactory := spec.NewFactory()
 
-	a := api.New(protoCompiler, specFactory)
+	a := api.New(protoCompiler, specFactory, ws)
 
 	return &App{Api: a}
 }

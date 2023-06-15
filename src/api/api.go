@@ -6,20 +6,24 @@ import (
 	"kalisto/src/models"
 	"kalisto/src/proto/compiler"
 	"kalisto/src/proto/spec"
+	"kalisto/src/workspace"
 )
 
 type Api struct {
 	compiler    *compiler.FileCompiler
 	specFactory *spec.Factory
+	workspace   *workspace.Workspace
 }
 
 func New(
 	compiler *compiler.FileCompiler,
 	specFactory *spec.Factory,
+	workspace *workspace.Workspace,
 ) *Api {
 	return &Api{
 		compiler:    compiler,
 		specFactory: specFactory,
+		workspace:   workspace,
 	}
 }
 
@@ -37,6 +41,14 @@ func (a *Api) SpecFromProto(path string) (models.Spec, error) {
 	spc, err := a.specFactory.FromRegistry(registry)
 	if err != nil {
 		return models.Spec{}, fmt.Errorf("api: failed to create spec from registry: %w", err)
+	}
+
+	if _, err := a.workspace.Save(models.Workspace{
+		Name:     "New workspace",
+		Spec:     spc,
+		BasePath: path,
+	}); err != nil {
+		return spc, fmt.Errorf("api: failed to save workspace: %w", err)
 	}
 
 	return spc, nil

@@ -36,6 +36,14 @@ func (db *DB) Envs() (map[models.EnvKind]models.Envs, error) {
 	return read[map[models.EnvKind]models.Envs](db.d, "envs")
 }
 
+func (db *DB) SaveWorkspaces(w []models.Workspace) error {
+	return write[[]models.Workspace](db.d, "workspaces", w)
+}
+
+func (db *DB) Workspace() ([]models.Workspace, error) {
+	return read[[]models.Workspace](db.d, "workspaces")
+}
+
 func read[T any](d *diskv.Diskv, key string) (data T, err error) {
 	b, err := d.Read(key)
 	if err != nil {
