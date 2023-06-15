@@ -23,3 +23,6 @@ To build a redistributable, production mode package, use `wails build`.
 Page: https://pydoit.org/contents.html
 - install task manager doit: `pip3 install doit` or `pip install doit`
 - look at the commands: `doit` to show help or `doit list` to show available tasks 
+
+## Generate mocks
+Install mockery: `go install github.com/vektra/mockery/v2@v2.29.0`

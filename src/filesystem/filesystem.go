@@ -3,6 +3,7 @@ package filesystem
 import (
 	"errors"
 	"io/fs"
+	"kalisto/src/models"
 	"os"
 	"path/filepath"
 	"strings"
@@ -62,7 +63,7 @@ func SearchProtoFiles(path string) (ProtoSearchResult, error) {
 	}
 
 	if len(result.RelativeProtoPaths) == 0 {
-		return result, errors.New("no proto files found")
+		return result, models.ErrNoProtoFilesFound
 	}
 
 	return result, nil
