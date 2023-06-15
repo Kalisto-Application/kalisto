@@ -2,6 +2,7 @@ build/bin
 node_modules
 frontend/dist
 .doit.db.db
+.DS_Store
 
 # IDE-specific files
 .idea/

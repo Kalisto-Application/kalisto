@@ -10,5 +10,10 @@ def task_print():
 
 def task_test():
     return dict(
-        actions=[' go test -v -race ./...'],
+        actions=['go test -v -race ./...'],
+    )
+
+def task_mocks():
+    return dict(
+        actions=['mockery']
     )
