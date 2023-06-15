@@ -3,6 +3,8 @@ package assembly
 import (
 	"context"
 	"kalisto/src/api"
+	"kalisto/src/proto/compiler"
+	"kalisto/src/proto/spec"
 )
 
 // App struct
@@ -14,7 +16,10 @@ type App struct {
 
 // NewApp creates a new App application struct
 func NewApp() *App {
-	a := api.New()
+	protoCompiler := compiler.NewFileCompiler()
+	specFactory := spec.NewFactory()
+
+	a := api.New(protoCompiler, specFactory)
 
 	return &App{Api: a}
 }
