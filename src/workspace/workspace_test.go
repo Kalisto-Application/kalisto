@@ -1,7 +1,6 @@
 package workspace
 
 import (
-	"fmt"
 	"kalisto/src/models"
 	"testing"
 
@@ -83,8 +82,6 @@ func (s *WorkspaceSuite) TestWorkspace() {
 	list = s.w.List()
 	s.EqualValues(list[0].ID, w3.ID)
 	s.EqualValues(list[1].ID, w2.ID)
-	fmt.Println(list[0].LastUsage.String())
-	fmt.Println(list[1].LastUsage.String())
 }
 
 func TestWorkspace(t *testing.T) {
