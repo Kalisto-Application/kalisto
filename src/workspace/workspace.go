@@ -6,6 +6,7 @@ import (
 	"sort"
 	"time"
 
+	"github.com/bobg/go-generics/v2/slices"
 	"github.com/google/uuid"
 )
 
@@ -28,17 +29,13 @@ func New(s Store) (*Workspace, error) {
 }
 
 func (w *Workspace) Save(workspace models.Workspace) (models.Workspace, error) {
-	id, err := uuid.NewUUID()
-	if err != nil {
-		return workspace, fmt.Errorf("failed to generate workspace uuid: %w", err)
-	}
-	workspace.ID = id
+	workspace.ID = uuid.NewString()
 	workspace.LastUsage = time.Now()
 	w.cache = append(w.cache, workspace)
 	return workspace, w.s.SaveWorkspaces(w.cache)
 }
 
-func (w *Workspace) Rename(id uuid.UUID, name string) (err error) {
+func (w *Workspace) Rename(id string, name string) (err error) {
 	for i, workspace := range w.cache {
 		if workspace.ID == id {
 			workspace.Name = name
@@ -54,18 +51,18 @@ func (w *Workspace) Rename(id uuid.UUID, name string) (err error) {
 	return models.ErrWorkspaceNotFound
 }
 
-func (w *Workspace) Delete(id uuid.UUID) error {
+func (w *Workspace) Delete(id string) error {
 	for i, workspace := range w.cache {
 		if workspace.ID == id {
-			w.cache = append(w.cache[:i], w.cache[i+1:]...)
+			w.cache = slices.RemoveN[[]models.Workspace](w.cache, i, 1)
 			return w.s.SaveWorkspaces(w.cache)
 		}
 	}
 
-	return models.ErrWorkspaceNotFound
+	return nil
 }
 
-func (w *Workspace) Find(id uuid.UUID) (models.Workspace, error) {
+func (w *Workspace) Find(id string) (models.Workspace, error) {
 	for i, workspace := range w.cache {
 		if workspace.ID == id {
 			workspace.LastUsage = time.Now()

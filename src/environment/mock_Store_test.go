@@ -22,19 +22,19 @@ func (_m *MockStore) EXPECT() *MockStore_Expecter {
 }
 
 // Envs provides a mock function with given fields:
-func (_m *MockStore) Envs() (map[models.EnvKind]models.Envs, error) {
+func (_m *MockStore) Envs() (map[string]models.Envs, error) {
 	ret := _m.Called()
 
-	var r0 map[models.EnvKind]models.Envs
+	var r0 map[string]models.Envs
 	var r1 error
-	if rf, ok := ret.Get(0).(func() (map[models.EnvKind]models.Envs, error)); ok {
+	if rf, ok := ret.Get(0).(func() (map[string]models.Envs, error)); ok {
 		return rf()
 	}
-	if rf, ok := ret.Get(0).(func() map[models.EnvKind]models.Envs); ok {
+	if rf, ok := ret.Get(0).(func() map[string]models.Envs); ok {
 		r0 = rf()
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(map[models.EnvKind]models.Envs)
+			r0 = ret.Get(0).(map[string]models.Envs)
 		}
 	}
 
@@ -64,22 +64,22 @@ func (_c *MockStore_Envs_Call) Run(run func()) *MockStore_Envs_Call {
 	return _c
 }
 
-func (_c *MockStore_Envs_Call) Return(_a0 map[models.EnvKind]models.Envs, _a1 error) *MockStore_Envs_Call {
+func (_c *MockStore_Envs_Call) Return(_a0 map[string]models.Envs, _a1 error) *MockStore_Envs_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *MockStore_Envs_Call) RunAndReturn(run func() (map[models.EnvKind]models.Envs, error)) *MockStore_Envs_Call {
+func (_c *MockStore_Envs_Call) RunAndReturn(run func() (map[string]models.Envs, error)) *MockStore_Envs_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // SaveEnvs provides a mock function with given fields: _a0
-func (_m *MockStore) SaveEnvs(_a0 map[models.EnvKind]models.Envs) error {
+func (_m *MockStore) SaveEnvs(_a0 map[string]models.Envs) error {
 	ret := _m.Called(_a0)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(map[models.EnvKind]models.Envs) error); ok {
+	if rf, ok := ret.Get(0).(func(map[string]models.Envs) error); ok {
 		r0 = rf(_a0)
 	} else {
 		r0 = ret.Error(0)
@@ -94,14 +94,14 @@ type MockStore_SaveEnvs_Call struct {
 }
 
 // SaveEnvs is a helper method to define mock.On call
-//   - _a0 map[models.EnvKind]models.Envs
+//   - _a0 map[string]models.Envs
 func (_e *MockStore_Expecter) SaveEnvs(_a0 interface{}) *MockStore_SaveEnvs_Call {
 	return &MockStore_SaveEnvs_Call{Call: _e.mock.On("SaveEnvs", _a0)}
 }
 
-func (_c *MockStore_SaveEnvs_Call) Run(run func(_a0 map[models.EnvKind]models.Envs)) *MockStore_SaveEnvs_Call {
+func (_c *MockStore_SaveEnvs_Call) Run(run func(_a0 map[string]models.Envs)) *MockStore_SaveEnvs_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(map[models.EnvKind]models.Envs))
+		run(args[0].(map[string]models.Envs))
 	})
 	return _c
 }
@@ -111,7 +111,7 @@ func (_c *MockStore_SaveEnvs_Call) Return(_a0 error) *MockStore_SaveEnvs_Call {
 	return _c
 }
 
-func (_c *MockStore_SaveEnvs_Call) RunAndReturn(run func(map[models.EnvKind]models.Envs) error) *MockStore_SaveEnvs_Call {
+func (_c *MockStore_SaveEnvs_Call) RunAndReturn(run func(map[string]models.Envs) error) *MockStore_SaveEnvs_Call {
 	_c.Call.Return(run)
 	return _c
 }

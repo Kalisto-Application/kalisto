@@ -4,6 +4,7 @@ import (
 	"kalisto/src/models"
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 )
@@ -24,6 +25,9 @@ func (s *EnvironmentTestSuite) SetupTest() {
 }
 
 func (s *EnvironmentTestSuite) TestEnvironment() {
+	w1 := uuid.NewString()
+	w2 := uuid.NewString()
+
 	// create env with 2 vars
 	e1 := models.Env{
 		Kind: models.EnvKindProfile,
@@ -35,60 +39,51 @@ func (s *EnvironmentTestSuite) TestEnvironment() {
 			Name:  "v2",
 			Value: "qwer",
 		}},
+		WorkspaceID: w1,
 	}
 
-	err := s.e.Save(e1)
+	e1, err := s.e.Save(e1)
 	s.NoError(err)
 
-	envs := s.e.Get()
-	s.EqualValues(map[models.EnvKind]models.Envs{"profile": {
-		e1,
-	}}, envs)
+	envs := s.e.GetByWorkspace(w1)
+	s.EqualValues(models.Envs{e1}, envs)
 
-	// add a var and update a var to the existing env
-	e1 = models.Env{
+	// add a var and update env 1
+	e1.Vars = []models.Var{{
+		Name:  "v1",
+		Value: "asdf",
+	}, {
+		Name:  "v2",
+		Value: "asdf",
+	}, {
+		Name:  "v3",
+		Value: "asdf",
+	}}
+	e1, err = s.e.Save(e1)
+	s.NoError(err)
+
+	envs = s.e.GetByWorkspace(w1)
+	s.EqualValues(models.Envs{e1}, envs)
+
+	// add new env 2 to workspace 1
+	e2 := models.Env{
 		Kind: models.EnvKindProfile,
 		Name: "global",
 		Vars: []models.Var{{
 			Name:  "v1",
-			Value: "asdf",
-		}, {
-			Name:  "v2",
-			Value: "asdf",
-		}, {
-			Name:  "v3",
-			Value: "asdf",
-		}},
-	}
-
-	err = s.e.Save(e1)
-	s.NoError(err)
-
-	envs = s.e.Get()
-	s.EqualValues(map[models.EnvKind]models.Envs{"profile": {
-		e1,
-	}}, envs)
-
-	// add new env to global
-	e2 := models.Env{
-		Kind: models.EnvKindProfile,
-		Name: "anotherName",
-		Vars: []models.Var{{
-			Name:  "v1",
 			Value: "qwer",
 		}, {
 			Name:  "v2",
 			Value: "qwer",
 		}},
+		WorkspaceID: w1,
 	}
 
-	err = s.e.Save(e2)
+	e2, err = s.e.Save(e2)
 	s.NoError(err)
 
-	envs = s.e.Get()
-	s.EqualValues(map[models.EnvKind]models.Envs{"profile": {
-		e1, e2,
-	}}, envs)
+	envs = s.e.GetByWorkspace(w1)
+	s.EqualValues(models.Envs{e2, e1}, envs)
 
 	// add env with the same name, but another kind
 
@@ -102,15 +97,35 @@ func (s *EnvironmentTestSuite) TestEnvironment() {
 			Name:  "v2",
 			Value: "zxcv",
 		}},
+		WorkspaceID: w1,
 	}
-
-	err = s.e.Save(e3)
+	e3, err = s.e.Save(e3)
 	s.NoError(err)
 
-	envs = s.e.Get()
-	s.EqualValues(map[models.EnvKind]models.Envs{"profile": {
-		e1, e2,
-	}, "global": {e3}}, envs)
+	envs = s.e.GetByWorkspace(w1)
+	s.EqualValues(models.Envs{e3, e2, e1}, envs)
+
+	// create env to workspace 2
+
+	e4 := models.Env{
+		Kind: models.EnvKindGlobal,
+		Name: "global",
+		Vars: []models.Var{{
+			Name:  "v1",
+			Value: "ffff",
+		}, {
+			Name:  "v2",
+			Value: "ffff",
+		}},
+		WorkspaceID: w2,
+	}
+	e4, err = s.e.Save(e4)
+	s.NoError(err)
+
+	envs = s.e.GetByWorkspace(w1)
+	s.EqualValues(models.Envs{e3, e2, e1}, envs)
+	envs = s.e.GetByWorkspace(w2)
+	s.EqualValues(models.Envs{e4}, envs)
 }
 
 func TestEnvironment(t *testing.T) {

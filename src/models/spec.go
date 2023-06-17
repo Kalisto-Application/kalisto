@@ -2,12 +2,10 @@ package models
 
 import (
 	"time"
-
-	"github.com/google/uuid"
 )
 
 type Workspace struct {
-	ID        uuid.UUID `json:"id"`
+	ID        string    `json:"id"`
 	Name      string    `json:"workspace"`
 	Spec      Spec      `json:"spec"`
 	LastUsage time.Time `json:"lastUsage"`

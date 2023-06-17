@@ -28,12 +28,12 @@ func New() (*DB, error) {
 	return &DB{d: d}, nil
 }
 
-func (db *DB) SaveEnvs(d map[models.EnvKind]models.Envs) error {
-	return write[map[models.EnvKind]models.Envs](db.d, "envs", d)
+func (db *DB) SaveEnvs(d map[string]models.Envs) error {
+	return write[map[string]models.Envs](db.d, "envs", d)
 }
 
-func (db *DB) Envs() (map[models.EnvKind]models.Envs, error) {
-	return read[map[models.EnvKind]models.Envs](db.d, "envs")
+func (db *DB) Envs() (map[string]models.Envs, error) {
+	return read[map[string]models.Envs](db.d, "envs")
 }
 
 func (db *DB) SaveWorkspaces(w []models.Workspace) error {
