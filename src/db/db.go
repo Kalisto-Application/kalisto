@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"kalisto/src/models"
 	"os"
+	"path"
 
 	"github.com/peterbourgon/diskv/v3"
 )
@@ -13,14 +14,22 @@ type DB struct {
 	d *diskv.Diskv
 }
 
-func New() (*DB, error) {
-	wd, err := os.Getwd()
+func New(wd string) (*DB, error) {
+	os.MkdirAll(path.Join(wd, "db"), os.ModePerm)
+
+	f, err := os.Create(path.Join(wd, "db", "workspaces"))
 	if err != nil {
-		return nil, fmt.Errorf("failed to get wd: %w", err)
+		return nil, fmt.Errorf("failed to create worksapce db: %w", err)
 	}
+	f.Close()
+	f, err = os.Create(path.Join(wd, "db", "envs"))
+	if err != nil {
+		return nil, fmt.Errorf("failed to create envs db: %w", err)
+	}
+	f.Close()
 
 	d := diskv.New(diskv.Options{
-		BasePath:  wd,
+		BasePath:  path.Join(wd, "db"),
 		Transform: func(s string) []string { return []string{} },
 		// CacheSizeMax 10MB
 		CacheSizeMax: 10 * 1024 * 1024,
@@ -48,6 +57,9 @@ func read[T any](d *diskv.Diskv, key string) (data T, err error) {
 	b, err := d.Read(key)
 	if err != nil {
 		return data, fmt.Errorf("failed to read %s from disk: %w", key, err)
+	}
+	if len(b) == 0 {
+		return data, nil
 	}
 
 	if err := json.Unmarshal(b, &data); err != nil {

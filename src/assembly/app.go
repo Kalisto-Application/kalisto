@@ -9,6 +9,7 @@ import (
 	"kalisto/src/proto/spec"
 	"kalisto/src/workspace"
 	"log"
+	"os"
 )
 
 // App struct
@@ -20,7 +21,8 @@ type App struct {
 
 // NewApp creates a new App application struct
 func NewApp() *App {
-	store, err := db.New()
+	wd, _ := os.Getwd()
+	store, err := db.New(wd)
 	if err != nil {
 		log.Fatal("failed to init db: ", err)
 	}
