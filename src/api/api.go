@@ -2,32 +2,36 @@ package api
 
 import (
 	"fmt"
+	"kalisto/src/environment"
 	"kalisto/src/filesystem"
 	"kalisto/src/models"
 	"kalisto/src/proto/compiler"
 	"kalisto/src/proto/spec"
 	"kalisto/src/workspace"
-
-	"github.com/google/uuid"
 )
 
 type Api struct {
 	compiler    *compiler.FileCompiler
 	specFactory *spec.Factory
 	workspace   *workspace.Workspace
+	env         *environment.Environment
 }
 
 func New(
 	compiler *compiler.FileCompiler,
 	specFactory *spec.Factory,
 	workspace *workspace.Workspace,
+	env *environment.Environment,
 ) *Api {
 	return &Api{
 		compiler:    compiler,
 		specFactory: specFactory,
 		workspace:   workspace,
+		env:         env,
 	}
 }
+
+// WORKSPACE API
 
 func (a *Api) NewWorkspace(path string) (models.Workspace, error) {
 	protoFiles, err := filesystem.SearchProtoFiles(path)
@@ -57,13 +61,30 @@ func (a *Api) NewWorkspace(path string) (models.Workspace, error) {
 	return ws, nil
 }
 
-func (s *Api) RenameWorkspace(id uuid.UUID, name string) error {
+func (s *Api) RenameWorkspace(id string, name string) error {
 	return s.workspace.Rename(id, name)
 }
 
-func (s *Api) DeleteWorkspace(id uuid.UUID) error {
+func (s *Api) DeleteWorkspace(id string) error {
 	return s.workspace.Delete(id)
 }
+
+// ENVIRONMENT API
+
+func (s *Api) SaveEnvironment(env models.EnvRaw) (models.Env, error) {
+	vars := []models.Var{}
+	return s.env.Save(models.EnvFromRaw(env, vars))
+}
+
+func (s *Api) DeleteEnvivonment(id string, workspaceID string) error {
+	return s.env.Delete(id, workspaceID)
+}
+
+func (s *Api) EnvironmentsByWorkspace(id string) models.Envs {
+	return s.env.GetByWorkspace(id)
+}
+
+// GRPC API
 
 func (a *Api) SendGrpc(request models.Request) (models.Response, error) {
 	return models.Response{

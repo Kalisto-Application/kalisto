@@ -2,16 +2,21 @@ package environment
 
 import (
 	"kalisto/src/models"
+	"sort"
+	"time"
+
+	"github.com/bobg/go-generics/v2/slices"
+	"github.com/google/uuid"
 )
 
 type Store interface {
-	SaveEnvs(map[models.EnvKind]models.Envs) error
-	Envs() (map[models.EnvKind]models.Envs, error)
+	SaveEnvs(map[string]models.Envs) error
+	Envs() (map[string]models.Envs, error)
 }
 
 type Environment struct {
 	s     Store
-	cache map[models.EnvKind]models.Envs
+	cache map[string]models.Envs
 }
 
 func NewEnvironment(s Store) (*Environment, error) {
@@ -20,7 +25,7 @@ func NewEnvironment(s Store) (*Environment, error) {
 		return nil, err
 	}
 	if cache == nil {
-		cache = make(map[models.EnvKind]models.Envs)
+		cache = make(map[string]models.Envs)
 	}
 
 	return &Environment{
@@ -29,13 +34,35 @@ func NewEnvironment(s Store) (*Environment, error) {
 	}, nil
 }
 
-func (e *Environment) Save(env models.Env) error {
-	envs := e.cache[env.Kind]
+func (e *Environment) Save(env models.Env) (models.Env, error) {
+	if env.ID == "" {
+		env.ID = uuid.NewString()
+		env.CreatedAt = time.Now()
+	}
+	envs := e.cache[env.WorkspaceID]
 	envs.Save(env)
-	e.cache[env.Kind] = envs
-	return e.s.SaveEnvs(e.cache)
+	e.cache[env.WorkspaceID] = envs
+	return env, e.s.SaveEnvs(e.cache)
 }
 
-func (e *Environment) Get() map[models.EnvKind]models.Envs {
-	return e.cache
+func (e *Environment) GetByWorkspace(id string) models.Envs {
+	envs := e.cache[id]
+	sort.Slice(envs, func(i, j int) bool {
+		return envs[i].CreatedAt.After(envs[j].CreatedAt)
+	})
+	return envs
+}
+
+func (s *Environment) Delete(id string, workspaceID string) error {
+	envs := s.cache[workspaceID]
+	for i, env := range envs {
+		if env.ID == id {
+			envs = slices.RemoveN[models.Envs](envs, i, 1)
+			s.cache[workspaceID] = envs
+			s.s.SaveEnvs(s.cache)
+			return nil
+		}
+	}
+
+	return nil
 }
