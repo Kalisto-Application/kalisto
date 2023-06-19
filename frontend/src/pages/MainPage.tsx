@@ -1,5 +1,6 @@
 import React from "react";
 import MainLayout from "../layout/MainLayout";
+import { UrlInput } from "../components/UrlInput";
 
 // TODO: use cases
 // import { SpecFromProto, SendGrpc } from "../../wailsjs/go/api/Api";
@@ -13,18 +14,13 @@ export const MainPage: React.FC = () => {
 };
 
 const Content = () => {
-  function greet() {
-    alert("hey dude");
-  }
+  const sendRequest = (event: React.SyntheticEvent, data: string) => {
+    alert(data);
+  };
 
   return (
-    <div className="p-8">
-      <button
-        className="rounded bg-buttonPrimary px-4 py-2 font-bold"
-        onClick={greet}
-      >
-        Hey Dude
-      </button>
+    <div className="p-4">
+      <UrlInput onClick={sendRequest} />
     </div>
   );
 };
