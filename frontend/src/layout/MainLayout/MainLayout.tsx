@@ -2,6 +2,7 @@ import React from "react";
 
 import Header from "../Header";
 import Sidebar from "../Sidebar";
+import { UrlInput } from "../../components/UrlInput";
 
 type MainLayoutProps = {
   children?: React.ReactNode;
