@@ -14,6 +14,7 @@ type server struct {
 }
 
 func (s *server) GetBook(ctx context.Context, in *pb.GetBookRequest) (*pb.GetBookResponse, error) {
+	log.Printf("Received: %v", in.Id)
 	return &pb.GetBookResponse{Name: "Chuk und Gek"}, nil
 }
 

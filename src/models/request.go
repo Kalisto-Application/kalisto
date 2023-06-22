@@ -1,8 +1,11 @@
 package models
 
 type Request struct {
-	Body     string `json:"body"`
-	MetaData string `json:"metaData"`
+	Addr            string `json:"addr"`
+	ProtoPath       string `json:"protoPath"`
+	FullServiceName string `json:"fullServiceName"`
+	MethodName      string `json:"methodName"`
+	Script          string `json:"script"`
 }
 
 type Response struct {

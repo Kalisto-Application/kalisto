@@ -5,6 +5,7 @@ import (
 	"kalisto/src/api"
 	"kalisto/src/db"
 	"kalisto/src/environment"
+	"kalisto/src/proto/client"
 	"kalisto/src/proto/compiler"
 	"kalisto/src/proto/spec"
 	"kalisto/src/workspace"
@@ -38,7 +39,13 @@ func NewApp() *App {
 	protoCompiler := compiler.NewFileCompiler()
 	specFactory := spec.NewFactory()
 
-	a := api.New(protoCompiler, specFactory, ws, env)
+	newClient := func(ctx context.Context, addr string) (api.Client, error) {
+		return client.NewClient(ctx, client.Config{
+			Addr: addr,
+		})
+	}
+
+	a := api.New(protoCompiler, specFactory, ws, env, newClient)
 
 	return &App{Api: a}
 }

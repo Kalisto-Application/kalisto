@@ -6,7 +6,6 @@ import (
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"google.golang.org/protobuf/proto"
 )
 
 type Client struct {
@@ -29,7 +28,7 @@ func NewClient(ctx context.Context, c Config) (*Client, error) {
 	}, nil
 }
 
-func (c *Client) Invoke(ctx context.Context, method string, req, resp proto.Message) error {
+func (c *Client) Invoke(ctx context.Context, method string, req, resp interface{}) error {
 	return c.conn.Invoke(ctx, method, req, resp)
 }
 
