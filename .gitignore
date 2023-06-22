@@ -3,6 +3,7 @@ node_modules
 frontend/dist
 .doit.db.db
 .DS_Store
+db/
 
 # IDE-specific files
 .idea/

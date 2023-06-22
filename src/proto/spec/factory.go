@@ -10,13 +10,18 @@ import (
 )
 
 type Factory struct {
+	links map[string]*models.Message
 }
 
 func NewFactory() *Factory {
-	return &Factory{}
+	return &Factory{links: make(map[string]*models.Message)}
 }
 
 func (f *Factory) FromRegistry(reg *compiler.Registry) (spec models.Spec, err error) {
+	if err := f.linkMessages(reg); err != nil {
+		return spec, err
+	}
+
 	for _, fd := range reg.Descriptors {
 		services := fd.GetServices()
 		specServices := make([]models.Service, len(services))
@@ -28,27 +33,16 @@ func (f *Factory) FromRegistry(reg *compiler.Registry) (spec models.Spec, err er
 			for j, method := range methods {
 
 				input := method.GetInputType()
-				inputFields := input.GetFields()
-				specInputFields := make([]models.Field, len(inputFields))
-
-				for k, inputField := range inputFields {
-					specField, err := f.newField(inputField)
-					if err != nil {
-						return spec, fmt.Errorf("proto spec: failed to create new field: %w", err)
-					}
-
-					specInputFields[k] = specField
+				msg := f.links[input.GetFullyQualifiedName()]
+				if msg == nil {
+					return spec, fmt.Errorf("type %s not found: %w", input.GetFullyQualifiedName(), err)
 				}
 
 				specMethods[j] = models.Method{
-					Name:     method.GetName(),
-					FullName: method.GetFullyQualifiedName(),
-					RequestMessage: models.Message{
-						Name:     input.GetName(),
-						FullName: input.GetFullyQualifiedName(),
-						Fields:   specInputFields,
-					},
-					Kind: models.NewCommunicationKind(method.IsClientStreaming(), method.IsServerStreaming()),
+					Name:           method.GetName(),
+					FullName:       method.GetFullyQualifiedName(),
+					RequestMessage: *msg,
+					Kind:           models.NewCommunicationKind(method.IsClientStreaming(), method.IsServerStreaming()),
 				}
 			}
 
@@ -58,23 +52,23 @@ func (f *Factory) FromRegistry(reg *compiler.Registry) (spec models.Spec, err er
 				Methods:  specMethods,
 				Package:  service.GetFile().GetPackage(),
 			}
-
 		}
 
 		spec.Services = append(spec.Services, specServices...)
 	}
 
+	spec.Links = f.links
 	return spec, err
 }
 
 func (f *Factory) newField(fd *desc.FieldDescriptor) (_ models.Field, err error) {
 	var dataType models.DataType
 	var enum []string
-	var fields []models.Field
 	var isCollection bool
 	var collectionKey *models.Field
 	var oneOf []models.Field
 	var defaultValue string
+	var link *models.Message
 
 	switch fd.GetType() {
 	case descriptorpb.FieldDescriptorProto_TYPE_BOOL:
@@ -102,51 +96,88 @@ func (f *Factory) newField(fd *desc.FieldDescriptor) (_ models.Field, err error)
 		}
 		defaultValue = v[0].GetName()
 	case descriptorpb.FieldDescriptorProto_TYPE_MESSAGE:
-		if fd.IsRepeated() {
-			isCollection = true
-			defaultValue = "[]"
-		}
-
-		if fd.IsMap() {
-			isCollection = true
-			defaultValue = "{}"
-			key, err := f.newField(fd.GetMapKeyType())
-			if err != nil {
+		defaultValue = "{}"
+		message := fd.GetMessageType()
+		linkKey := message.GetFullyQualifiedName()
+		if f.links[linkKey] == nil {
+			if err := f.linkMessageFields(message, linkKey); err != nil {
 				return models.Field{}, err
 			}
-			collectionKey = &key
 		}
 
-		if oneOf := fd.GetOneOf(); oneOf != nil {
-			panic("not implemented")
-		}
-
-		message := fd.GetMessageType()
-		mFields := message.GetFields()
-		fields = make([]models.Field, len(mFields))
-		for i := range mFields {
-			field, err := f.newField(mFields[i])
-			if err != nil {
-				return field, err
-			}
-
-			fields[i] = field
-		}
-		defaultValue = "{}"
+		link = f.links[linkKey]
 
 	case descriptorpb.FieldDescriptorProto_TYPE_GROUP:
 		return models.Field{}, models.ErrProto2NotSupported
 	}
 
-	return models.Field{
+	if fd.IsRepeated() {
+		isCollection = true
+		defaultValue = "[]"
+	}
+
+	if fd.IsMap() {
+		isCollection = true
+		defaultValue = "{}"
+		key, err := f.newField(fd.GetMapKeyType())
+		if err != nil {
+			return models.Field{}, err
+		}
+		collectionKey = &key
+	}
+
+	if oneOf := fd.GetOneOf(); oneOf != nil {
+		return models.Field{}, nil
+		panic("not implemented")
+	}
+
+	specField := models.Field{
 		Name:          fd.GetName(),
-		FullName:      fd.GetFullyQualifiedJSONName(),
+		FullName:      fd.GetFullyQualifiedName(),
 		Type:          dataType,
 		DefaultValue:  defaultValue,
 		Enum:          enum,
 		IsCollection:  isCollection,
 		CollectionKey: collectionKey,
 		OneOf:         oneOf,
-		Fields:        fields,
-	}, nil
+		Message:       link,
+	}
+	return specField, nil
+}
+
+func (f *Factory) linkMessages(reg *compiler.Registry) (err error) {
+	for _, fd := range reg.Descriptors {
+		mTypes := fd.GetMessageTypes()
+		for _, mt := range mTypes {
+			fullName := mt.GetFullyQualifiedName()
+			if _, ok := f.links[fullName]; ok {
+				continue
+			}
+
+			if err := f.linkMessageFields(mt, fullName); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
+func (f *Factory) linkMessageFields(mt *desc.MessageDescriptor, key string) error {
+	mFields := mt.GetFields()
+	f.links[key] = &models.Message{
+		Name:     mt.GetName(),
+		FullName: mt.GetFullyQualifiedName(),
+		Fields:   make([]models.Field, len(mFields)),
+	}
+
+	for i, mf := range mFields {
+		mField, err := f.newField(mf)
+		if err != nil {
+			return err
+		}
+		f.links[key].Fields[i] = mField
+	}
+
+	return nil
 }

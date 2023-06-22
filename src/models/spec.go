@@ -13,7 +13,8 @@ type Workspace struct {
 }
 
 type Spec struct {
-	Services []Service `json:"services"`
+	Services []Service           `json:"services"`
+	Links    map[string]*Message `json:"links"`
 }
 type Service struct {
 	Name     string   `json:"name"`
@@ -83,5 +84,5 @@ type Field struct {
 	IsCollection  bool     `json:"isCollection"`
 	CollectionKey *Field   `json:"collectionKey"`
 	OneOf         []Field  `json:"oneOf"`
-	Fields        []Field  `json:"fields"`
+	Message       *Message `json:"message"`
 }
