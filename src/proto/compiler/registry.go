@@ -32,7 +32,7 @@ func (r *Registry) FindMethod(full models.MethodName) (*desc.ServiceDescriptor, 
 		}
 	}
 
-	return nil, nil, fmt.Errorf("message not found")
+	return nil, nil, fmt.Errorf("method not found")
 }
 
 type Descritors struct {

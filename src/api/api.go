@@ -62,12 +62,7 @@ func (a *Api) NewWorkspace() (models.Workspace, error) {
 		return models.Workspace{}, err
 	}
 
-	protoFiles, err := filesystem.SearchProtoFiles(path)
-	if err != nil {
-		return models.Workspace{}, fmt.Errorf("api: failed to search proto files: %w", err)
-	}
-
-	registry, err := a.compiler.Compile([]string{protoFiles.AbsoluteDirPath}, protoFiles.RelativeProtoPaths)
+	registry, err := a.protoRegistryFromPath(path)
 	if err != nil {
 		return models.Workspace{}, fmt.Errorf("api: failed to compile proto files: %w", err)
 	}
@@ -100,11 +95,32 @@ func (s *Api) DeleteWorkspace(id string) error {
 }
 
 func (s *Api) FindWorkspaces() ([]models.Workspace, error) {
-	return s.workspace.List(), nil
+	list := s.workspace.List()
+	for _, w := range list {
+		registry, err := s.protoRegistryFromPath(w.BasePath)
+		if err != nil {
+			// TODO: MARK AS INVALID
+			continue
+		}
+		s.protoRegistry.Add(w.ID, registry)
+	}
+	return list, nil
 }
 
 func (s *Api) GetWorkspace(id string) (models.Workspace, error) {
-	return s.workspace.Find(id)
+	ws, err := s.workspace.Find(id)
+	if err != nil {
+		return ws, err
+	}
+
+	registry, err := s.protoRegistryFromPath(ws.BasePath)
+	if err != nil {
+		// TODO: MARK AS INVALID
+		return ws, err
+	}
+	s.protoRegistry.Add(ws.ID, registry)
+
+	return ws, nil
 }
 
 // ENVIRONMENT API
@@ -168,4 +184,18 @@ func (a *Api) SendGrpc(request models.Request) (models.Response, error) {
 	return models.Response{
 		Body: string(b),
 	}, nil
+}
+
+func (s *Api) protoRegistryFromPath(path string) (*compiler.Registry, error) {
+	protoFiles, err := filesystem.SearchProtoFiles(path)
+	if err != nil {
+		return nil, fmt.Errorf("api: failed to search proto files: %w", err)
+	}
+
+	registry, err := s.compiler.Compile([]string{protoFiles.AbsoluteDirPath}, protoFiles.RelativeProtoPaths)
+	if err != nil {
+		return nil, fmt.Errorf("api: failed to compile proto files: %w", err)
+	}
+
+	return registry, nil
 }

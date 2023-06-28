@@ -10,8 +10,6 @@ import (
 )
 
 func CreateMessageFromScript(script string, desc *desc.MessageDescriptor, spec models.Spec, serviceName, methodName string) (*dynamic.Message, error) {
-	script = `{id: "yo", double: 2}`
-
 	script = fmt.Sprintf(`(() => {
 		return %s
 	  })()`, script)

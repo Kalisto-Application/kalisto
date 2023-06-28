@@ -17,7 +17,7 @@ export const MainPageContent: React.FC<ContentProps> = ({workspaceId, methodItem
   
     const sendRequest = (event: React.SyntheticEvent) => {
       const body = `{id: "yoba"}`
-      SendGrpc({addr: url, workspaceId: workspaceId, method: methodItems[0].fullName, body: body, meta: ""}).then(res => {
+      SendGrpc({addr: url, workspaceId: workspaceId, method: methodItems[0].methods[0].fullName, body: body, meta: ""}).then(res => {
         setOutText(res.body)
       }).catch(err => {
         setOutText(err)

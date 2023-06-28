@@ -25,24 +25,23 @@ export const MainLayout: React.FC = () => {;
         return
       }
 
-      let latestId = res[0].id
-      let latest = res[0].lastUsage
+      let latest = res[0]
       res.forEach(it => {
-        if (it.lastUsage > latest) {
+        if (it.lastUsage > latest.lastUsage) {
           latest = it.lastUsage
-          latestId = it.id
         }
       })
 
-      setWorkspaceItems(items.map(it => ({id: it.id, name: it.name, active: it.id == latestId})))
-      setMethodItems(res.find(it => it.id == latestId)!.spec.services.map(s => ({name: s.name, fullName: s.fullName, methods: s.methods.map(met => ({name: met.name, fullName: met.fullName}))})));
+      setWorkspaceId(latest.id)
+      setWorkspaceItems(items.map(it => ({id: it.id, name: it.name, active: it.id == latest.id})))
+      setMethodItems(res.find(it => it.id == latest.id)!.spec.services.map(s => ({name: s.name, fullName: s.fullName, methods: s.methods.map(met => ({name: met.name, fullName: met.fullName}))})));
     })
     .catch(err => console.log('error on find workspaces: ', err))
   }, [])
 
   const setActiveWorkspace = (id: string) => {
     setWorkspaceId(id);
-    setWorkspaceItems(items => items.map(it => ({id: it.id, name: it.name, active: it.id == workspaceId})))
+    setWorkspaceItems(items => items.map(it => ({id: it.id, name: it.name, active: it.id == id})))
     GetWorkspace(id).then(res => {
       setMethodItems(res.spec.services.map(s => ({name: s.name, fullName: s.fullName, methods: s.methods.map(met => ({name: met.name, fullName: met.fullName}))})));
     }).catch(err => console.log(`error on get workspace by id==${id}: `, err))

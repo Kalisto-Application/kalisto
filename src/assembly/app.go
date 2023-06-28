@@ -28,6 +28,7 @@ func NewApp() *App {
 		log.Fatal("failed to init db: ", err)
 	}
 
+	protoRegistry := compiler.NewProtoRegistry()
 	ws, err := workspace.New(store)
 	if err != nil {
 		log.Fatal("failed to init workspace: ", err)
@@ -38,7 +39,6 @@ func NewApp() *App {
 	}
 	protoCompiler := compiler.NewFileCompiler()
 	specFactory := spec.NewFactory()
-	protoRegistry := compiler.NewProtoRegistry()
 
 	newClient := func(ctx context.Context, addr string) (api.Client, error) {
 		return client.NewClient(ctx, client.Config{

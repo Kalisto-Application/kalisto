@@ -2,6 +2,7 @@ package db
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"kalisto/src/models"
 	"os"
@@ -17,16 +18,23 @@ type DB struct {
 func New(wd string) (*DB, error) {
 	os.MkdirAll(path.Join(wd, "db"), os.ModePerm)
 
-	f, err := os.Create(path.Join(wd, "db", "workspaces"))
-	if err != nil {
-		return nil, fmt.Errorf("failed to create worksapce db: %w", err)
+	workspaceFile := path.Join(wd, "db", "workspaces")
+	if _, err := os.Stat(workspaceFile); errors.Is(err, os.ErrNotExist) {
+		f, err := os.Create(workspaceFile)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create worksapce db: %w", err)
+		}
+		f.Close()
 	}
-	f.Close()
-	f, err = os.Create(path.Join(wd, "db", "envs"))
-	if err != nil {
-		return nil, fmt.Errorf("failed to create envs db: %w", err)
+
+	envsFile := path.Join(wd, "db", "envs")
+	if _, err := os.Stat(envsFile); errors.Is(err, os.ErrNotExist) {
+		f, err := os.Create(envsFile)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create envs db: %w", err)
+		}
+		f.Close()
 	}
-	f.Close()
 
 	d := diskv.New(diskv.Options{
 		BasePath:  path.Join(wd, "db"),

@@ -17,45 +17,6 @@ export type MethodItem = {
   }[];
 }
 
-type TreeItemRecord = Record<TreeItemIndex, TreeItem<string>>
-
-class DataProvider<TreeItemRecord> implements TreeDataProvider {
-  private data: ExplicitDataSource;
-  private onDidChangeTreeDataEmitter = new EventEmitter<TreeItemIndex[]>();
-
-  constructor(
-    items: Record<TreeItemIndex, TreeItem<TreeItemRecord>>
-  ) {
-    this.data = { items };
-  }
-
-  public async getTreeItem(itemId: TreeItemIndex): Promise<TreeItem> {
-    return this.data.items[itemId];
-  }
-
-  public async onChangeItemChildren(
-    itemId: TreeItemIndex,
-    newChildren: TreeItemIndex[]
-  ): Promise<void> {
-    this.data.items[itemId].children = newChildren;
-    this.onDidChangeTreeDataEmitter.emit([itemId]);
-  }
-
-  public onDidChangeTreeData(
-    listener: (changedItemIds: TreeItemIndex[]) => void
-  ): Disposable {
-    const handlerId = this.onDidChangeTreeDataEmitter.on(payload =>
-      listener(payload)
-    );
-    return { dispose: () => this.onDidChangeTreeDataEmitter.off(handlerId) };
-  }
-
-  public async onRenameItem(item: TreeItem<TreeItemRecord>, name: string): Promise<void> {
-      this.data.items[item.index].data = name;
-      this.onDidChangeTreeDataEmitter.emit([item.index]);
-  }
-}
-
 export const MethodCollection: React.FC<MethodCollectionProps> = ({ onClick, items }) => {
   const itemsData: Record<TreeItemIndex, TreeItem<string>> = {root: {
     index: 'root',
@@ -83,13 +44,9 @@ export const MethodCollection: React.FC<MethodCollectionProps> = ({ onClick, ite
     defaultFocusedItem = items[0].methods[0].fullName
   }
 
-  console.log('tree: ', itemsData);
-
   return(
     <div>
-      <UncontrolledTreeEnvironment dataProvider={new DataProvider(itemsData)} getItemTitle={item => item.data} viewState={{}}>
-      {/* <UncontrolledTreeEnvironment dataProvider={new StaticTreeDataProvider(itemsData, (item, data) => ({ ...item, data }))} getItemTitle={item => item.data} viewState={{}}> */}
-    {/* <ControlledTreeEnvironment 
+    <ControlledTreeEnvironment 
       items={itemsData}
       getItemTitle={item => item.data}
       viewState={{
@@ -98,10 +55,9 @@ export const MethodCollection: React.FC<MethodCollectionProps> = ({ onClick, ite
           focusedItem: defaultFocusedItem,
         }
       }}
-    > */}
+    >
         <Tree treeId="tree1" rootItem="root" treeLabel="methods collection" />
-      </UncontrolledTreeEnvironment>
-    {/* </ControlledTreeEnvironment> */}
+    </ControlledTreeEnvironment>
     </div>
     );
 };
