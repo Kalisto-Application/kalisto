@@ -4,20 +4,24 @@ import (
 	"fmt"
 	"kalisto/src/models"
 	"kalisto/src/proto/compiler"
+	"sync"
 
 	"github.com/jhump/protoreflect/desc"
 	"google.golang.org/protobuf/types/descriptorpb"
 )
 
 type Factory struct {
-	links map[string]*models.Message
+	mx    sync.RWMutex
+	links map[string]models.Message
 }
 
 func NewFactory() *Factory {
-	return &Factory{links: make(map[string]*models.Message)}
+	return &Factory{links: make(map[string]models.Message)}
 }
 
 func (f *Factory) FromRegistry(reg *compiler.Registry) (spec models.Spec, err error) {
+	f.mx.Lock()
+	defer f.mx.Unlock()
 	if err := f.linkMessages(reg); err != nil {
 		return spec, err
 	}
@@ -33,15 +37,15 @@ func (f *Factory) FromRegistry(reg *compiler.Registry) (spec models.Spec, err er
 			for j, method := range methods {
 
 				input := method.GetInputType()
-				msg := f.links[input.GetFullyQualifiedName()]
-				if msg == nil {
+				msg, ok := f.links[input.GetFullyQualifiedName()]
+				if !ok {
 					return spec, fmt.Errorf("type %s not found: %w", input.GetFullyQualifiedName(), err)
 				}
 
 				specMethods[j] = models.Method{
 					Name:           method.GetName(),
 					FullName:       method.GetFullyQualifiedName(),
-					RequestMessage: *msg,
+					RequestMessage: msg,
 					Kind:           models.NewCommunicationKind(method.IsClientStreaming(), method.IsServerStreaming()),
 				}
 			}
@@ -68,7 +72,7 @@ func (f *Factory) newField(fd *desc.FieldDescriptor) (_ models.Field, err error)
 	var collectionKey *models.Field
 	var oneOf []models.Field
 	var defaultValue string
-	var link *models.Message
+	var link string
 
 	switch fd.GetType() {
 	case descriptorpb.FieldDescriptorProto_TYPE_BOOL:
@@ -99,13 +103,13 @@ func (f *Factory) newField(fd *desc.FieldDescriptor) (_ models.Field, err error)
 		defaultValue = "{}"
 		message := fd.GetMessageType()
 		linkKey := message.GetFullyQualifiedName()
-		if f.links[linkKey] == nil {
+		if _, ok := f.links[linkKey]; !ok {
 			if err := f.linkMessageFields(message, linkKey); err != nil {
 				return models.Field{}, err
 			}
 		}
 
-		link = f.links[linkKey]
+		link = linkKey
 
 	case descriptorpb.FieldDescriptorProto_TYPE_GROUP:
 		return models.Field{}, models.ErrProto2NotSupported
@@ -165,7 +169,7 @@ func (f *Factory) linkMessages(reg *compiler.Registry) (err error) {
 
 func (f *Factory) linkMessageFields(mt *desc.MessageDescriptor, key string) error {
 	mFields := mt.GetFields()
-	f.links[key] = &models.Message{
+	f.links[key] = models.Message{
 		Name:     mt.GetName(),
 		FullName: mt.GetFullyQualifiedName(),
 		Fields:   make([]models.Field, len(mFields)),

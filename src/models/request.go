@@ -1,11 +1,11 @@
 package models
 
 type Request struct {
-	Addr            string `json:"addr"`
-	ProtoPath       string `json:"protoPath"`
-	FullServiceName string `json:"fullServiceName"`
-	MethodName      string `json:"methodName"`
-	Script          string `json:"script"`
+	Addr        string `json:"addr"`
+	WorkspaceID string `json:"workspaceId"`
+	Method      string `json:"method"`
+	Body        string `json:"body"`
+	Meta        string `json:"meta"`
 }
 
 type Response struct {

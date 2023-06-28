@@ -38,6 +38,7 @@ func NewApp() *App {
 	}
 	protoCompiler := compiler.NewFileCompiler()
 	specFactory := spec.NewFactory()
+	protoRegistry := compiler.NewProtoRegistry()
 
 	newClient := func(ctx context.Context, addr string) (api.Client, error) {
 		return client.NewClient(ctx, client.Config{
@@ -45,7 +46,7 @@ func NewApp() *App {
 		})
 	}
 
-	a := api.New(protoCompiler, specFactory, ws, env, newClient)
+	a := api.New(protoCompiler, specFactory, ws, env, newClient, protoRegistry)
 
 	return &App{Api: a}
 }
@@ -54,4 +55,6 @@ func NewApp() *App {
 // so we can call the runtime methods
 func (a *App) Start(ctx context.Context) {
 	a.ctx = ctx
+
+	api.SetContext(a.Api, ctx)
 }

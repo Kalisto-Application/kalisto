@@ -2,31 +2,19 @@ package api_test
 
 import (
 	"context"
+	"kalisto/src/api"
+	"kalisto/src/models"
+	"testing"
+
 	"github.com/jhump/protoreflect/dynamic"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
-	"kalisto/src/api"
-	"kalisto/src/models"
-	"os"
-	"path"
-	"testing"
 
 	. "github.com/onsi/gomega"
 )
 
 func TestApi_SendGrpc(t *testing.T) {
-	wd, err := os.Getwd()
-	require.NoError(t, err)
-
-	req := models.Request{
-		ProtoPath:       path.Join(wd, "..", "..", "tests/examples/proto/service.proto"),
-		FullServiceName: "kalisto.tests.examples.service.BookStore",
-		MethodName:      "GetBook",
-		Script: `
-			a = "1"
- 			request = {id: a}
-			`,
-	}
+	req := models.Request{}
 
 	// Create a new mock client
 	mockClient := new(api.MockClient)
@@ -46,7 +34,7 @@ func TestApi_SendGrpc(t *testing.T) {
 	// Initialize API with mock client
 	a := api.New(nil, nil, nil, nil, func(ctx context.Context, addr string) (api.Client, error) {
 		return mockClient, nil
-	})
+	}, nil)
 
 	// Call SendGrpc
 	got, err := a.SendGrpc(req)

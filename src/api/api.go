@@ -7,12 +7,13 @@ import (
 	"kalisto/src/filesystem"
 	"kalisto/src/models"
 	"kalisto/src/proto/compiler"
-	"kalisto/src/proto/interpretator"
+	"kalisto/src/proto/interpreter"
 	"kalisto/src/proto/spec"
 	"kalisto/src/workspace"
 	"time"
 
 	"github.com/jhump/protoreflect/dynamic"
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 type Client interface {
@@ -21,11 +22,14 @@ type Client interface {
 }
 
 type Api struct {
-	compiler    *compiler.FileCompiler
-	specFactory *spec.Factory
-	workspace   *workspace.Workspace
-	env         *environment.Environment
-	newClient   func(ctx context.Context, addr string) (Client, error)
+	ctx context.Context
+
+	compiler      *compiler.FileCompiler
+	specFactory   *spec.Factory
+	workspace     *workspace.Workspace
+	env           *environment.Environment
+	newClient     func(ctx context.Context, addr string) (Client, error)
+	protoRegistry *compiler.Descritors
 }
 
 func New(
@@ -34,19 +38,30 @@ func New(
 	workspace *workspace.Workspace,
 	env *environment.Environment,
 	newClient func(ctx context.Context, addr string) (Client, error),
+	protoRegistry *compiler.Descritors,
 ) *Api {
 	return &Api{
-		compiler:    compiler,
-		specFactory: specFactory,
-		workspace:   workspace,
-		env:         env,
-		newClient:   newClient,
+		compiler:      compiler,
+		specFactory:   specFactory,
+		workspace:     workspace,
+		env:           env,
+		newClient:     newClient,
+		protoRegistry: protoRegistry,
 	}
+}
+
+func SetContext(a *Api, ctx context.Context) {
+	a.ctx = ctx
 }
 
 // WORKSPACE API
 
-func (a *Api) NewWorkspace(path string) (models.Workspace, error) {
+func (a *Api) NewWorkspace() (models.Workspace, error) {
+	path, err := runtime.OpenDirectoryDialog(a.ctx, runtime.OpenDialogOptions{})
+	if err != nil {
+		return models.Workspace{}, err
+	}
+
 	protoFiles, err := filesystem.SearchProtoFiles(path)
 	if err != nil {
 		return models.Workspace{}, fmt.Errorf("api: failed to search proto files: %w", err)
@@ -71,6 +86,8 @@ func (a *Api) NewWorkspace(path string) (models.Workspace, error) {
 		return ws, fmt.Errorf("api: failed to save workspace: %w", err)
 	}
 
+	a.protoRegistry.Add(ws.ID, registry)
+
 	return ws, nil
 }
 
@@ -80,6 +97,14 @@ func (s *Api) RenameWorkspace(id string, name string) error {
 
 func (s *Api) DeleteWorkspace(id string) error {
 	return s.workspace.Delete(id)
+}
+
+func (s *Api) FindWorkspaces() ([]models.Workspace, error) {
+	return s.workspace.List(), nil
+}
+
+func (s *Api) GetWorkspace(id string) (models.Workspace, error) {
+	return s.workspace.Find(id)
 }
 
 // ENVIRONMENT API
@@ -100,43 +125,37 @@ func (s *Api) EnvironmentsByWorkspace(id string) models.Envs {
 // GRPC API
 
 func (a *Api) SendGrpc(request models.Request) (models.Response, error) {
-	protoFiles, err := filesystem.SearchProtoFiles(request.ProtoPath)
+	reg, err := a.protoRegistry.Get(request.WorkspaceID)
 	if err != nil {
-		return models.Response{}, fmt.Errorf("api: failed to search proto files: %w", err)
+		return models.Response{}, err
 	}
-
-	registry, err := a.compiler.Compile([]string{protoFiles.AbsoluteDirPath}, protoFiles.RelativeProtoPaths)
+	sd, md, err := reg.FindMethod(models.MethodName(request.Method))
 	if err != nil {
-		return models.Response{}, fmt.Errorf("api: failed to compile proto files: %w", err)
+		return models.Response{}, err
 	}
 
-	service := registry.Descriptors[0].FindService(request.FullServiceName)
-	if service == nil {
-		return models.Response{}, fmt.Errorf("api: failed to find service %s: %w", request.FullServiceName, err)
+	ws, err := a.workspace.Find(request.WorkspaceID)
+	if err != nil {
+		return models.Response{}, err
 	}
 
-	method := service.FindMethodByName(request.MethodName)
-	if method == nil {
-		return models.Response{}, fmt.Errorf("api: failed to find method %s: %w", request.MethodName, err)
-	}
-
-	c, err := a.newClient(context.TODO(), request.Addr)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+	c, err := a.newClient(ctx, request.Addr)
 	if err != nil {
 		return models.Response{}, fmt.Errorf("api: failed to create client: %w", err)
 	}
 	defer func() { _ = c.Close() }()
 
-	req, err := interpretator.CreateMessageFromScript(request.Script, method.GetInputType())
+	req, err := interpreter.CreateMessageFromScript(request.Body, md.GetInputType(), ws.Spec, sd.GetFullyQualifiedName(), md.GetName())
 	if err != nil {
 		return models.Response{}, fmt.Errorf("api: failed to create request: %w", err)
 	}
 
-	ctx, cancel := context.WithTimeout(context.TODO(), time.Second)
-	defer cancel()
+	md.GetService()
+	resp := dynamic.NewMessage(md.GetOutputType())
 
-	resp := dynamic.NewMessage(method.GetOutputType())
-
-	err = c.Invoke(ctx, "/"+service.GetFullyQualifiedName()+"/"+method.GetName(), req, resp)
+	err = c.Invoke(ctx, "/"+sd.GetFullyQualifiedName()+"/"+md.GetName(), req, resp)
 	if err != nil {
 		return models.Response{}, fmt.Errorf("api: failed to invoke method: %w", err)
 	}

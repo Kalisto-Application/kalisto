@@ -26,8 +26,8 @@ message BookHasDeepNested {
 }
 
 message GetBookRequest {
-    // string id = 1;
-    // double double = 2;
+    string id = 1;
+    double double = 2;
     // float float = 3;
     // int32 int32 = 4;
     // int64 int64 = 5;
@@ -48,14 +48,14 @@ message GetBookRequest {
     // }
     // Enum enum = 16;
     // Book Book = 17;
-    RepeatedNestedBook repeatedNestedBook = 18;
+    // RepeatedNestedBook repeatedNestedBook = 18;
     // oneof someBook {
     //     string oneId = 19;
     //     Enum oneEnum = 20;
     //     Book oneBook = 21;
     //     RepeatedNestedBook OneRepeatedNestedBook = 22;
     // }
-    DeepNestedBook deepNestedBook = 23;
+    // DeepNestedBook deepNestedBook = 23;
     // map float string
     // map int object
     // map enum object

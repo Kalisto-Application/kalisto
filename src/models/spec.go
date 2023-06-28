@@ -1,21 +1,38 @@
 package models
 
 import (
+	"fmt"
+	"strings"
 	"time"
 )
 
 type Workspace struct {
 	ID        string    `json:"id"`
-	Name      string    `json:"workspace"`
+	Name      string    `json:"name"`
 	Spec      Spec      `json:"spec"`
 	LastUsage time.Time `json:"lastUsage"`
 	BasePath  string    `json:"basePath"`
 }
 
 type Spec struct {
-	Services []Service           `json:"services"`
-	Links    map[string]*Message `json:"links"`
+	Services []Service          `json:"services"`
+	Links    map[string]Message `json:"links"`
 }
+
+func (s *Spec) FindInputMessage(serviceName, methodName string) (Message, error) {
+	for _, service := range s.Services {
+		if service.FullName == serviceName {
+			for _, method := range service.Methods {
+				if method.FullName == methodName {
+					return method.RequestMessage, nil
+				}
+			}
+		}
+	}
+
+	return Message{}, fmt.Errorf("input message not found, method=%s", methodName)
+}
+
 type Service struct {
 	Name     string   `json:"name"`
 	Package  string   `json:"package"`
@@ -84,5 +101,17 @@ type Field struct {
 	IsCollection  bool     `json:"isCollection"`
 	CollectionKey *Field   `json:"collectionKey"`
 	OneOf         []Field  `json:"oneOf"`
-	Message       *Message `json:"message"`
+	Message       string   `json:"message"`
+}
+
+type MethodName string
+
+func (m MethodName) ServiceAndShort() (string, string) {
+	values := strings.Split(string(m), ".")
+	if len(values) == 0 {
+		return "", ""
+	}
+
+	s := values[0 : len(values)-1]
+	return strings.Join(s, "."), values[len(values)-1]
 }

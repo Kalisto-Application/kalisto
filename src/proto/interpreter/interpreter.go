@@ -1,14 +1,21 @@
-package interpretator
+package interpreter
 
 import (
 	"fmt"
+	"kalisto/src/models"
 
 	"github.com/dop251/goja"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/dynamic"
 )
 
-func CreateMessageFromScript(script string, desc *desc.MessageDescriptor) (*dynamic.Message, error) {
+func CreateMessageFromScript(script string, desc *desc.MessageDescriptor, spec models.Spec, serviceName, methodName string) (*dynamic.Message, error) {
+	script = `{id: "yo", double: 2}`
+
+	script = fmt.Sprintf(`(() => {
+		return %s
+	  })()`, script)
+
 	vm := goja.New()
 	val, err := vm.RunString(script)
 	if err != nil {
@@ -22,8 +29,13 @@ func CreateMessageFromScript(script string, desc *desc.MessageDescriptor) (*dyna
 
 	resultMessage := dynamic.NewMessage(desc)
 	for k, v := range m {
+		// messageSpec, err := spec.FindInputMessage()
 		resultMessage.SetFieldByName(k, v)
 	}
 
 	return resultMessage, nil
+}
+
+func messageFromScript() (*dynamic.Message, error) {
+	return nil, nil
 }
