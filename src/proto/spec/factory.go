@@ -201,7 +201,7 @@ func (f *Factory) makeRequestExample(m models.Message) string {
 			v = `"string"`
 		}
 
-		line := fmt.Sprintf("%s%s: %s,", strings.Repeat(" ", space), field.Name, v)
+		line := fmt.Sprintf("%s%s: %s,\n", strings.Repeat(" ", space), field.Name, v)
 		buf.WriteString(line)
 	}
 

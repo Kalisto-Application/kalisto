@@ -13,6 +13,8 @@ export const MainLayout: React.FC = () => {;
   const [workspaceId, setWorkspaceId] = useState<string>('');
   const [workspaceItems, setWorkspaceItems] = useState<WorkspaceItem[]>([]);
   const [methodItems, setMethodItems] = useState<ServiceItem[]>([]);
+  const [inputText, setInputText] = useState<string>('');
+  const [method, setMethod] = useState<MethodItem>()
 
   useEffect(() => {
     FindWorkspaces()
@@ -32,9 +34,22 @@ export const MainLayout: React.FC = () => {;
         }
       })
 
+      const getFirstMethod = (): MethodItem | undefined => {
+        for (const ws of res) {
+          for (const service of ws.spec.services) {
+            for (const m of service.methods) {
+              return {name: m.name, fullName: m.fullName, requestExample: m.requestExample}
+            }
+          }
+        }
+      }
+      const fristMethod = getFirstMethod()
+
       setWorkspaceId(latest.id)
       setWorkspaceItems(items.map(it => ({id: it.id, name: it.name, active: it.id == latest.id})))
       setMethodItems(res.find(it => it.id == latest.id)!.spec.services.map(s => ({name: s.name, fullName: s.fullName, methods: s.methods.map(met => ({name: met.name, fullName: met.fullName, requestExample: met.requestExample}))})));
+      setMethod(fristMethod);
+      setInputText(fristMethod?.requestExample || '')
     })
     .catch(err => console.log('error on find workspaces: ', err))
   }, [])
@@ -69,7 +84,7 @@ export const MainLayout: React.FC = () => {;
       <Sidebar>
       </Sidebar>
       <main className="flex-1">
-        <MainPageContent workspaceId={workspaceId} methodItems={methodItems}/>
+        <MainPageContent workspaceId={workspaceId} methodItems={methodItems} method={method} setActiveMethod={setMethod} inputText={inputText} setInputText={setInputText}/>
       </main>
     </div>
   </div>);

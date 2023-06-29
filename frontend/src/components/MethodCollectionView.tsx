@@ -6,7 +6,7 @@ import "react-complex-tree/lib/style-modern.css";
 interface MethodCollectionProps {
   setActiveMethod: (fullName: MethodItem) => void;
   services: ServiceItem[];
-  defaultFocused: string;
+  selectedItem?: string;
 };
 
 export type ServiceItem = {
@@ -36,10 +36,9 @@ type Data = {
   isMethod: boolean;
 }
 
-export const MethodCollection: React.FC<MethodCollectionProps> = ({ setActiveMethod, services, defaultFocused }) => {
+export const MethodCollection: React.FC<MethodCollectionProps> = ({ setActiveMethod, services, selectedItem }) => {
   const serviceNames = services.map(it => it.fullName)
   const [expandedItems, setExpandedItems] = useState<TreeItemIndex[]>(serviceNames);
-  const [selectedItem, setSelectedItem] = useState<TreeItemIndex | undefined>(defaultFocused);
 
   useEffect(() => {
     setExpandedItems(serviceNames)
@@ -92,7 +91,6 @@ export const MethodCollection: React.FC<MethodCollectionProps> = ({ setActiveMet
           const method = findMethod(services, item.index as string)
           setActiveMethod(method!);
         }
-        setSelectedItem(item.index)
       }}
     >
         <Tree treeId="1" rootItem="root" treeLabel="methods collection" />

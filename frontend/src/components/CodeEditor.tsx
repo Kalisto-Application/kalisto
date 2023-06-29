@@ -1,4 +1,4 @@
-import React, {ChangeEvent} from "react";
+import React, {ChangeEvent, useEffect} from "react";
 
 interface CodeEditorProps {
     text: string;
@@ -9,6 +9,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({text, setText}) => {
     const onChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
         setText(e.target.value)
     }
+    console.log('text: ', text)
 
     return (
         <div>
