@@ -166,6 +166,7 @@ export namespace models {
 	    fullName: string;
 	    requestMessage: Message;
 	    kind: string;
+	    requestExample: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new Method(source);
@@ -177,6 +178,7 @@ export namespace models {
 	        this.fullName = source["fullName"];
 	        this.requestMessage = this.convertValues(source["requestMessage"], Message);
 	        this.kind = source["kind"];
+	        this.requestExample = source["requestExample"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"kalisto/src/models"
 	"kalisto/src/proto/compiler"
+	"strings"
 	"sync"
 
 	"github.com/jhump/protoreflect/desc"
@@ -41,12 +42,14 @@ func (f *Factory) FromRegistry(reg *compiler.Registry) (spec models.Spec, err er
 				if !ok {
 					return spec, fmt.Errorf("type %s not found: %w", input.GetFullyQualifiedName(), err)
 				}
+				requestExample := f.makeRequestExample(msg)
 
 				specMethods[j] = models.Method{
 					Name:           method.GetName(),
 					FullName:       method.GetFullyQualifiedName(),
 					RequestMessage: msg,
 					Kind:           models.NewCommunicationKind(method.IsClientStreaming(), method.IsServerStreaming()),
+					RequestExample: requestExample,
 				}
 			}
 
@@ -184,4 +187,24 @@ func (f *Factory) linkMessageFields(mt *desc.MessageDescriptor, key string) erro
 	}
 
 	return nil
+}
+
+func (f *Factory) makeRequestExample(m models.Message) string {
+	var buf strings.Builder
+	buf.WriteString("{\n")
+
+	space := 2
+	for _, field := range m.Fields {
+		var v string
+		switch field.Type {
+		case models.DataTypeString:
+			v = `"string"`
+		}
+
+		line := fmt.Sprintf("%s%s: %s,", strings.Repeat(" ", space), field.Name, v)
+		buf.WriteString(line)
+	}
+
+	buf.WriteString("}")
+	return buf.String()
 }

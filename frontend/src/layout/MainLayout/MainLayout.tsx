@@ -6,13 +6,13 @@ import Sidebar from "../Sidebar";
 import { WorkspaceList, WorkspaceItem } from "../../components/Workspaces";
 import { FindWorkspaces, GetWorkspace, NewWorkspace } from "../../../wailsjs/go/api/Api";
 
-import { MethodItem } from "../../components/MethodCollectionView";
+import { MethodItem, ServiceItem } from "../../components/MethodCollectionView";
 import { MainPageContent } from "../../pages/MainPageContent";
 
 export const MainLayout: React.FC = () => {;
   const [workspaceId, setWorkspaceId] = useState<string>('');
   const [workspaceItems, setWorkspaceItems] = useState<WorkspaceItem[]>([]);
-  const [methodItems, setMethodItems] = useState<MethodItem[]>([]);
+  const [methodItems, setMethodItems] = useState<ServiceItem[]>([]);
 
   useEffect(() => {
     FindWorkspaces()
@@ -34,7 +34,7 @@ export const MainLayout: React.FC = () => {;
 
       setWorkspaceId(latest.id)
       setWorkspaceItems(items.map(it => ({id: it.id, name: it.name, active: it.id == latest.id})))
-      setMethodItems(res.find(it => it.id == latest.id)!.spec.services.map(s => ({name: s.name, fullName: s.fullName, methods: s.methods.map(met => ({name: met.name, fullName: met.fullName}))})));
+      setMethodItems(res.find(it => it.id == latest.id)!.spec.services.map(s => ({name: s.name, fullName: s.fullName, methods: s.methods.map(met => ({name: met.name, fullName: met.fullName, requestExample: met.requestExample}))})));
     })
     .catch(err => console.log('error on find workspaces: ', err))
   }, [])
@@ -43,7 +43,7 @@ export const MainLayout: React.FC = () => {;
     setWorkspaceId(id);
     setWorkspaceItems(items => items.map(it => ({id: it.id, name: it.name, active: it.id == id})))
     GetWorkspace(id).then(res => {
-      setMethodItems(res.spec.services.map(s => ({name: s.name, fullName: s.fullName, methods: s.methods.map(met => ({name: met.name, fullName: met.fullName}))})));
+      setMethodItems(res.spec.services.map(s => ({name: s.name, fullName: s.fullName, methods: s.methods.map(met => ({name: met.name, fullName: met.fullName, requestExample: met.requestExample}))})));
     }).catch(err => console.log(`error on get workspace by id==${id}: `, err))
   }
 
@@ -56,7 +56,7 @@ export const MainLayout: React.FC = () => {;
         items.push({id: res.id, name: res.name, active: true})
         return items;
       });
-      setMethodItems(res.spec.services.map(s => ({name: s.name, fullName: s.fullName, methods: s.methods.map(met => ({name: met.name, fullName: met.fullName}))})));
+      setMethodItems(res.spec.services.map(s => ({name: s.name, fullName: s.fullName, methods: s.methods.map(met => ({name: met.name, fullName: met.fullName, requestExample: met.requestExample}))})));
     })
     .catch(err => console.log('error on new workspace: ', err))
   }

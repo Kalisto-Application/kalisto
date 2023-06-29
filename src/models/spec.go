@@ -67,6 +67,7 @@ type Method struct {
 	FullName       string            `json:"fullName"`
 	RequestMessage Message           `json:"requestMessage"`
 	Kind           CommunicationKind `json:"kind"`
+	RequestExample string            `json:"requestExample"`
 }
 
 type Message struct {
