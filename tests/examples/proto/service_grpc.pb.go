@@ -23,6 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type BookStoreClient interface {
 	GetBook(ctx context.Context, in *GetBookRequest, opts ...grpc.CallOption) (*GetBookResponse, error)
+	Yo(ctx context.Context, in *GetBookRequest, opts ...grpc.CallOption) (*GetBookResponse, error)
 }
 
 type bookStoreClient struct {
@@ -42,11 +43,21 @@ func (c *bookStoreClient) GetBook(ctx context.Context, in *GetBookRequest, opts 
 	return out, nil
 }
 
+func (c *bookStoreClient) Yo(ctx context.Context, in *GetBookRequest, opts ...grpc.CallOption) (*GetBookResponse, error) {
+	out := new(GetBookResponse)
+	err := c.cc.Invoke(ctx, "/kalisto.tests.examples.service.BookStore/Yo", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // BookStoreServer is the server API for BookStore service.
 // All implementations must embed UnimplementedBookStoreServer
 // for forward compatibility
 type BookStoreServer interface {
 	GetBook(context.Context, *GetBookRequest) (*GetBookResponse, error)
+	Yo(context.Context, *GetBookRequest) (*GetBookResponse, error)
 	mustEmbedUnimplementedBookStoreServer()
 }
 
@@ -56,6 +67,9 @@ type UnimplementedBookStoreServer struct {
 
 func (UnimplementedBookStoreServer) GetBook(context.Context, *GetBookRequest) (*GetBookResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetBook not implemented")
+}
+func (UnimplementedBookStoreServer) Yo(context.Context, *GetBookRequest) (*GetBookResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Yo not implemented")
 }
 func (UnimplementedBookStoreServer) mustEmbedUnimplementedBookStoreServer() {}
 
@@ -88,6 +102,24 @@ func _BookStore_GetBook_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
+func _BookStore_Yo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetBookRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BookStoreServer).Yo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/kalisto.tests.examples.service.BookStore/Yo",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BookStoreServer).Yo(ctx, req.(*GetBookRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // BookStore_ServiceDesc is the grpc.ServiceDesc for BookStore service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -98,6 +130,10 @@ var BookStore_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetBook",
 			Handler:    _BookStore_GetBook_Handler,
+		},
+		{
+			MethodName: "Yo",
+			Handler:    _BookStore_Yo_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

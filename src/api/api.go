@@ -10,6 +10,7 @@ import (
 	"kalisto/src/proto/interpreter"
 	"kalisto/src/proto/spec"
 	"kalisto/src/workspace"
+	"reflect"
 	"time"
 
 	"github.com/jhump/protoreflect/dynamic"
@@ -96,13 +97,27 @@ func (s *Api) DeleteWorkspace(id string) error {
 
 func (s *Api) FindWorkspaces() ([]models.Workspace, error) {
 	list := s.workspace.List()
-	for _, w := range list {
+	for i, w := range list {
 		registry, err := s.protoRegistryFromPath(w.BasePath)
 		if err != nil {
 			// TODO: MARK AS INVALID
 			continue
 		}
 		s.protoRegistry.Add(w.ID, registry)
+
+		spec, err := s.specFactory.FromRegistry(registry)
+		if err != nil {
+			// TODO: log
+			continue
+		}
+		if !reflect.DeepEqual(spec, w.Spec) {
+			w.Spec = spec
+			if err := s.workspace.Update(w); err != nil {
+				// TODO: log
+				continue
+			}
+			list[i] = w
+		}
 	}
 	return list, nil
 }

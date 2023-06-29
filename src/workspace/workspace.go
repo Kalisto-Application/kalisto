@@ -35,6 +35,17 @@ func (w *Workspace) Save(workspace models.Workspace) (models.Workspace, error) {
 	return workspace, w.s.SaveWorkspaces(w.cache)
 }
 
+func (w *Workspace) Update(workspace models.Workspace) error {
+	for i := range w.cache {
+		if w.cache[i].ID == workspace.ID {
+			w.cache[i] = workspace
+			return w.s.SaveWorkspaces(w.cache)
+		}
+	}
+
+	return fmt.Errorf("workspace id==%s not found", workspace.ID)
+}
+
 func (w *Workspace) Rename(id string, name string) (err error) {
 	for i, workspace := range w.cache {
 		if workspace.ID == id {

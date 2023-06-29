@@ -63,11 +63,10 @@ export const WorkspaceList: React.FC<WorkspaceListProps> = ({items, setActive, n
               <li key={index} className="px-4 py-2 text-sm text-gray-800 hover:bg-gray-100 cursor-pointer" onClick={() => selectWorkspace(item.id)}>{item.name}</li>
             ))}
           </ul>
+
+          <button onClick={onNewWorkspace}>Add new workspace</button>
         </div>
       )}
-      <div>
-        <button onClick={onNewWorkspace}>Add new workspace</button>
-      </div>
     </div>
   );
 };

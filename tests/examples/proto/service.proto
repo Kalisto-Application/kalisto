@@ -6,6 +6,7 @@ package kalisto.tests.examples.service;
 
 service BookStore {
     rpc GetBook(GetBookRequest) returns (GetBookResponse) {}
+    rpc Yo(GetBookRequest) returns (GetBookResponse) {}
 }
 
 message Book {

@@ -4,8 +4,9 @@ import { EventEmitter } from "react-complex-tree/src/EventEmitter";
 import "react-complex-tree/lib/style-modern.css";
 
 interface MethodCollectionProps {
-  onClick: (e: SyntheticEvent, data: string) => void;
+  setActiveMethod: (fullName: string) => void;
   items: MethodItem[];
+  defaultFocused: string;
 };
 
 export type MethodItem = {
@@ -17,46 +18,69 @@ export type MethodItem = {
   }[];
 }
 
-export const MethodCollection: React.FC<MethodCollectionProps> = ({ onClick, items }) => {
-  const itemsData: Record<TreeItemIndex, TreeItem<string>> = {root: {
+type Data = {
+  display: string;
+  isMethod: boolean;
+}
+
+export const MethodCollection: React.FC<MethodCollectionProps> = ({ setActiveMethod, items, defaultFocused }) => {
+  const serviceNames = items.map(it => it.fullName)
+  const [expandedItems, setExpandedItems] = useState<TreeItemIndex[]>(serviceNames);
+  const [selectedItem, setSelectedItem] = useState<TreeItemIndex | undefined>(defaultFocused);
+
+  useEffect(() => {
+    setExpandedItems(serviceNames)
+  }, [items])
+
+  const itemsData: Record<TreeItemIndex, TreeItem<Data>> = {root: {
     index: 'root',
     isFolder: true,
-    data: 'Root item',
-    children: items.map(it => it.fullName),
+    data: {display: 'Root item', isMethod: false},
+    children: serviceNames,
   }}
   items.forEach(it => {
     itemsData[it.fullName] = {
       index: it.fullName,
-      data: it.name,
+      data: {display: it.name, isMethod: false},
       isFolder: true,
       children: it.methods.map(met => met.fullName),
     }
     it.methods.forEach(met => {
       itemsData[met.fullName] = {
         index: met.fullName,
-        data: met.name,
+        data: {display: met.name, isMethod: true},
       }
     })
   })
-
-  let defaultFocusedItem: TreeItemIndex | undefined;
-  if (items.length > 0 && items[0].methods.length > 0) {
-    defaultFocusedItem = items[0].methods[0].fullName
-  }
 
   return(
     <div>
     <ControlledTreeEnvironment 
       items={itemsData}
-      getItemTitle={item => item.data}
+      getItemTitle={item => item.data.display}
       viewState={{
-        "tree1": {
-          expandedItems: items.map(it => it.fullName),
-          focusedItem: defaultFocusedItem,
+        "1": {
+          expandedItems: expandedItems,
+          focusedItem: selectedItem,
         }
       }}
+      onExpandItem={item => {
+        if (item.data.isMethod) {
+          setActiveMethod(item.index as string);
+        }
+        setExpandedItems([...expandedItems, item.index])}
+      }
+      onCollapseItem={item => {
+        setExpandedItems(expandedItems.filter(expandedItemIndex => expandedItemIndex !== item.index))
+      }}
+      onFocusItem={item => {
+        if (item.data.isMethod) {
+          setActiveMethod(item.index as string);
+        }
+        setSelectedItem(item.index)
+      }}
     >
-        <Tree treeId="tree1" rootItem="root" treeLabel="methods collection" />
+        <Tree treeId="1" rootItem="root" treeLabel="methods collection" />
     </ControlledTreeEnvironment>
     </div>
     );
