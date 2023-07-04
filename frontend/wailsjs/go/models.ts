@@ -87,8 +87,9 @@ export namespace models {
 	    type: string;
 	    defaultValue: string;
 	    enum: number[];
-	    isCollection: boolean;
-	    collectionKey?: Field;
+	    repeated: boolean;
+	    mapKey?: Field;
+	    mapValue?: Field;
 	    oneOf: Field[];
 	    message: string;
 	
@@ -103,8 +104,9 @@ export namespace models {
 	        this.type = source["type"];
 	        this.defaultValue = source["defaultValue"];
 	        this.enum = source["enum"];
-	        this.isCollection = source["isCollection"];
-	        this.collectionKey = this.convertValues(source["collectionKey"], Field);
+	        this.repeated = source["repeated"];
+	        this.mapKey = this.convertValues(source["mapKey"], Field);
+	        this.mapValue = this.convertValues(source["mapValue"], Field);
 	        this.oneOf = this.convertValues(source["oneOf"], Field);
 	        this.message = source["message"];
 	    }

@@ -100,8 +100,7 @@ func (s *Api) FindWorkspaces() ([]models.Workspace, error) {
 	for i, w := range list {
 		registry, err := s.protoRegistryFromPath(w.BasePath)
 		if err != nil {
-			// TODO: MARK AS INVALID
-			continue
+			return nil, fmt.Errorf("failed to create proto registry")
 		}
 		s.protoRegistry.Add(w.ID, registry)
 

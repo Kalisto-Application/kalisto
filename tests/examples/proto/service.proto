@@ -13,18 +13,18 @@ message Book {
     string id = 1;
 }
 
-message RepeatedNestedBook {
-    repeated RepeatedNestedBook books = 1;
-    repeated Book simpleBooks = 2;
-}
+// message RepeatedNestedBook {
+//     repeated RepeatedNestedBook books = 1;
+//     repeated Book simpleBooks = 2;
+// }
 
-message DeepNestedBook {
-    BookHasDeepNested hasNested = 1; 
-}
+// message DeepNestedBook {
+//     BookHasDeepNested hasNested = 1; 
+// }
 
-message BookHasDeepNested {
-    DeepNestedBook deepNested = 1;
-}
+// message BookHasDeepNested {
+//     DeepNestedBook deepNested = 1;
+// }
 
 message GetBookRequest {
     // string id = 1;
@@ -48,22 +48,23 @@ message GetBookRequest {
     //     VALUE_3 = 4;
     // }
     // Enum enum = 16;
-    Book Book = 17;
-    // oneof someBook {
+    // Book Book = 17;
+    // map<string, string> floatToString = 23;
+    map<int32, Book> intToBooks = 24;
+    // map enum enum 25
+    // repeated string 26
+    // repeated enum 27
+    // repeated int 28
+    // repeated object 29
+    // repeated map enum object
+    // DeepNestedBook deepNestedBook = 23;
+    // RepeatedNestedBook repeatedNestedBook = 18;
+        // oneof someBook {
     //     string oneId = 19;
     //     Enum oneEnum = 20;
     //     Book oneBook = 21;
     //     RepeatedNestedBook OneRepeatedNestedBook = 22;
     // }
-    // map float string
-    // map int object
-    // map enum object
-    // repeated string
-    // repeated enum
-    // repeated int
-    // repeated object
-    // DeepNestedBook deepNestedBook = 23;
-    // RepeatedNestedBook repeatedNestedBook = 18;
 }
 
 message GetBookResponse {

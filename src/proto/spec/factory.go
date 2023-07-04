@@ -71,8 +71,9 @@ func (f *Factory) FromRegistry(reg *compiler.Registry) (spec models.Spec, err er
 func (f *Factory) newField(fd *desc.FieldDescriptor) (_ models.Field, err error) {
 	var dataType models.DataType
 	var enum []int32
-	var isCollection bool
-	var collectionKey *models.Field
+	var repeated bool
+	var mapKey *models.Field
+	var mapValue *models.Field
 	var oneOf []models.Field
 	var defaultValue string
 	var link string
@@ -114,6 +115,21 @@ func (f *Factory) newField(fd *desc.FieldDescriptor) (_ models.Field, err error)
 		}
 		defaultValue = `0`
 	case descriptorpb.FieldDescriptorProto_TYPE_MESSAGE:
+		if fd.IsMap() {
+			defaultValue = "{}"
+			key, err := f.newField(fd.GetMapKeyType())
+			if err != nil {
+				return models.Field{}, err
+			}
+			mapKey = &key
+
+			valueField, err := f.newField(fd.GetMapValueType())
+			if err != nil {
+				return models.Field{}, err
+			}
+			mapValue = &valueField
+		}
+
 		dataType = models.DataTypeStruct
 		defaultValue = "{}"
 		message := fd.GetMessageType()
@@ -131,18 +147,8 @@ func (f *Factory) newField(fd *desc.FieldDescriptor) (_ models.Field, err error)
 	}
 
 	if fd.IsRepeated() {
-		isCollection = true
+		repeated = true
 		defaultValue = "[]"
-	}
-
-	if fd.IsMap() {
-		isCollection = true
-		defaultValue = "{}"
-		key, err := f.newField(fd.GetMapKeyType())
-		if err != nil {
-			return models.Field{}, err
-		}
-		collectionKey = &key
 	}
 
 	if oneOf := fd.GetOneOf(); oneOf != nil {
@@ -150,15 +156,16 @@ func (f *Factory) newField(fd *desc.FieldDescriptor) (_ models.Field, err error)
 	}
 
 	specField := models.Field{
-		Name:          fd.GetName(),
-		FullName:      fd.GetFullyQualifiedName(),
-		Type:          dataType,
-		DefaultValue:  defaultValue,
-		Enum:          enum,
-		IsCollection:  isCollection,
-		CollectionKey: collectionKey,
-		OneOf:         oneOf,
-		Message:       link,
+		Name:         fd.GetName(),
+		FullName:     fd.GetFullyQualifiedName(),
+		Type:         dataType,
+		DefaultValue: defaultValue,
+		Enum:         enum,
+		Repeated:     repeated,
+		MapKey:       mapKey,
+		MapValue:     mapValue,
+		OneOf:        oneOf,
+		Message:      link,
 	}
 	return specField, nil
 }
@@ -205,29 +212,9 @@ func (f *Factory) makeRequestExample(m models.Message, space int) string {
 	buf.WriteString("{\n")
 
 	for _, field := range m.Fields {
-		var v string
-		switch field.Type {
-		case models.DataTypeString:
-			v = `"string"`
-		case models.DataTypeBool:
-			v = `true`
-		case models.DataTypeInt32, models.DataTypeInt64, models.DataTypeUint32, models.DataTypeUint64:
-			v = `1`
-		case models.DataTypeFloat32, models.DataTypeFloat64:
-			v = `3.14`
-		case models.DataTypeBytes:
-			v = `"{json: true}"`
-		case models.DataTypeEnum:
-			if len(field.Enum) == 0 {
-				continue
-			}
-			v = fmt.Sprintf(`%d`, field.Enum[0])
-		case models.DataTypeStruct:
-			link, ok := f.links[field.Message]
-			if !ok {
-				return ""
-			}
-			v = f.makeRequestExample(link, 4)
+		v := f.makeExampleValue(field)
+		if v == "" {
+			continue
 		}
 
 		line := fmt.Sprintf("%s%s: %s,\n", strings.Repeat(" ", space), field.Name, v)
@@ -237,4 +224,39 @@ func (f *Factory) makeRequestExample(m models.Message, space int) string {
 	closeBracket := fmt.Sprintf("%s}", strings.Repeat(" ", space-2))
 	buf.WriteString(closeBracket)
 	return buf.String()
+}
+
+func (f *Factory) makeExampleValue(field models.Field) string {
+	var v string
+	switch field.Type {
+	case models.DataTypeString:
+		v = `"string"`
+	case models.DataTypeBool:
+		v = `true`
+	case models.DataTypeInt32, models.DataTypeInt64, models.DataTypeUint32, models.DataTypeUint64:
+		v = `1`
+	case models.DataTypeFloat32, models.DataTypeFloat64:
+		v = `3.14`
+	case models.DataTypeBytes:
+		v = `"{json: true}"`
+	case models.DataTypeEnum:
+		if len(field.Enum) == 0 {
+			return ""
+		}
+		v = fmt.Sprintf(`%d`, field.Enum[0])
+	case models.DataTypeStruct:
+		if field.MapKey != nil && field.MapValue != nil {
+			key := f.makeExampleValue(*field.MapKey)
+			value := f.makeExampleValue(*field.MapValue)
+			v = fmt.Sprintf(`{%s: %s}`, key, value)
+		} else {
+			link, ok := f.links[field.Message]
+			if !ok {
+				return ""
+			}
+			v = f.makeRequestExample(link, 4)
+		}
+	}
+
+	return v
 }

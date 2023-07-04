@@ -44,6 +44,7 @@ func CreateMessageFromScript(script string, desc *desc.MessageDescriptor, spec m
 
 func newMessage(desc *desc.MessageDescriptor, spec models.Spec, m map[string]interface{}, message models.Message) (*dynamic.Message, error) {
 	resultMessage := dynamic.NewMessage(desc)
+
 	for k, v := range m {
 		field, err := message.FindField(k)
 		if err != nil {
@@ -65,6 +66,37 @@ func newMessage(desc *desc.MessageDescriptor, spec models.Spec, m map[string]int
 func castValue(desc *desc.MessageDescriptor, spec models.Spec, f models.Field, v interface{}) (interface{}, error) {
 	if v == nil {
 		return v, nil
+	}
+
+	if f.MapKey != nil {
+		val, ok := v.(map[string]interface{})
+		if !ok {
+			return nil, fmt.Errorf("failed to cast map value, expected object")
+		}
+		mDesc := desc.FindFieldByName(f.Name).GetMessageType()
+		ret := make([]*dynamic.Message, 0, len(val))
+		for k, v := range val {
+			msg := dynamic.NewMessage(mDesc)
+			key, err := castValue(mDesc, spec, *f.MapKey, k)
+			if err != nil {
+				return nil, err
+			}
+
+			value, err := castValue(mDesc, spec, *f.MapValue, v)
+			if err != nil {
+				return nil, err
+			}
+
+			if err := msg.TrySetFieldByName("key", key); err != nil {
+				return nil, err
+			}
+			if err := msg.TrySetFieldByName("value", value); err != nil {
+				return nil, err
+			}
+			ret = append(ret, msg)
+		}
+
+		return ret, nil
 	}
 
 	switch f.Type {
@@ -170,10 +202,17 @@ func castValue(desc *desc.MessageDescriptor, spec models.Spec, f models.Field, v
 			return nil, fmt.Errorf("failed to find message link=%s", f.Message)
 		}
 		return newMessage(fieldDesc.GetMessageType(), spec, val, link)
-	case models.DataTypeMap:
-		return v, nil
-	case models.DataTypeArray:
-		return v, nil
+	// case models.DataTypeMap:
+	// 	if f.MapKey == nil {
+	// 		return nil, fmt.Errorf("map must have collection key, found nil")
+	// 	}
+
+	// 	// keyMessage := newField(f.CollectionKey)
+	// 	// valueMessage := newField(f.)
+
+	// return v, nil
+	// case models.DataTypeArray:
+	// return v, nil
 	case models.DataTypeDate:
 		return v, nil
 	default:

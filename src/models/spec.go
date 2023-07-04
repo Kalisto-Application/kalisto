@@ -102,50 +102,9 @@ const (
 	DataTypeEnum DataType = "DataTypeEnum"
 
 	DataTypeStruct DataType = "DataTypeStruct"
-	DataTypeMap    DataType = "DataTypeMap"
-	DataTypeArray  DataType = "DataTypeArray"
 
 	DataTypeDate DataType = "DataTypeDate"
 )
-
-type CastType string
-
-const (
-	CastTypeBool    CastType = "CastTypeBool"
-	CastTypeInt32   CastType = "CastTypeInt32"
-	CastTypeInt64   CastType = "CastTypeInt64"
-	CastTypeUint32  CastType = "CastTypeUint32"
-	CastTypeUint64  CastType = "CastTypeUint64"
-	CastTypeFloat32 CastType = "CastTypeFloat32"
-	CastTypeFloat64 CastType = "CastTypeFloat64"
-	CastTypeString  CastType = "CastTypeString"
-	CastTypeBytes   CastType = "CastTypeBytes"
-
-	CastTypeEnum CastType = "CastTypeEnum"
-
-	CastTypeStruct CastType = "CastTypeStruct"
-	CastTypeMap    CastType = "CastTypeMap"
-	CastTypeArray  CastType = "CastTypeArray"
-
-	CastTypeDate CastType = "CastTypeDate"
-)
-
-var DataToCast = map[DataType]CastType{
-	DataTypeBool:    CastTypeBool,
-	DataTypeInt32:   CastTypeInt32,
-	DataTypeInt64:   CastTypeInt64,
-	DataTypeUint32:  CastTypeUint32,
-	DataTypeUint64:  CastTypeUint64,
-	DataTypeFloat32: CastTypeFloat32,
-	DataTypeFloat64: CastTypeFloat64,
-	DataTypeString:  CastTypeString,
-	DataTypeBytes:   CastTypeBytes,
-	DataTypeEnum:    CastTypeEnum,
-	DataTypeStruct:  CastTypeStruct,
-	DataTypeMap:     CastTypeMap,
-	DataTypeArray:   CastTypeArray,
-	DataTypeDate:    CastTypeDate,
-}
 
 type Field struct {
 	Name         string   `json:"name"`
@@ -153,11 +112,12 @@ type Field struct {
 	Type         DataType `json:"type"`
 	DefaultValue string   `json:"defaultValue"`
 
-	Enum          []int32 `json:"enum"`
-	IsCollection  bool    `json:"isCollection"`
-	CollectionKey *Field  `json:"collectionKey"`
-	OneOf         []Field `json:"oneOf"`
-	Message       string  `json:"message"`
+	Enum     []int32 `json:"enum"`
+	Repeated bool    `json:"repeated"`
+	MapKey   *Field  `json:"mapKey"`
+	MapValue *Field  `json:"mapValue"`
+	OneOf    []Field `json:"oneOf"`
+	Message  string  `json:"message"`
 }
 
 type MethodName string
