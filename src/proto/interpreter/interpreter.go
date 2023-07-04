@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"kalisto/src/models"
 	"math"
+	"strconv"
 
 	"github.com/dop251/goja"
 	"github.com/jhump/protoreflect/desc"
@@ -101,6 +102,13 @@ func castValue(desc *desc.MessageDescriptor, spec models.Spec, f models.Field, v
 
 	switch f.Type {
 	case models.DataTypeBool:
+		if strV, ok := v.(string); ok {
+			boolV, err := strconv.ParseBool(strV)
+			if err != nil {
+				return nil, fmt.Errorf("expected bool: %w", err)
+			}
+			return boolV, nil
+		}
 		return v, nil
 	case models.DataTypeInt32:
 		var val int32
@@ -109,6 +117,13 @@ func castValue(desc *desc.MessageDescriptor, spec models.Spec, f models.Field, v
 		}
 		if floatV, ok := v.(float64); ok {
 			val = int32(floatV)
+		}
+		if strV, ok := v.(string); ok {
+			intV, err := strconv.ParseInt(strV, 10, 32)
+			if err != nil {
+				return nil, fmt.Errorf("expected int32: %w", err)
+			}
+			val = int32(intV)
 		}
 		if val < math.MinInt32 || val > math.MaxInt32 {
 			return nil, fmt.Errorf("value is out of range")
@@ -125,6 +140,13 @@ func castValue(desc *desc.MessageDescriptor, spec models.Spec, f models.Field, v
 		if val < math.MinInt64 || val > math.MaxInt64 {
 			return nil, fmt.Errorf("value is out of range")
 		}
+		if strV, ok := v.(string); ok {
+			intV, err := strconv.ParseInt(strV, 10, 64)
+			if err != nil {
+				return nil, fmt.Errorf("expected int64: %w", err)
+			}
+			val = intV
+		}
 		return val, nil
 	case models.DataTypeUint32:
 		var val uint32
@@ -140,6 +162,13 @@ func castValue(desc *desc.MessageDescriptor, spec models.Spec, f models.Field, v
 			}
 			val = uint32(floatV)
 		}
+		if strV, ok := v.(string); ok {
+			intV, err := strconv.ParseUint(strV, 10, 32)
+			if err != nil {
+				return nil, fmt.Errorf("expected int64: %w", err)
+			}
+			val = uint32(intV)
+		}
 		return val, nil
 	case models.DataTypeUint64:
 		var val uint64
@@ -154,6 +183,13 @@ func castValue(desc *desc.MessageDescriptor, spec models.Spec, f models.Field, v
 				return nil, fmt.Errorf("value is out of range")
 			}
 			val = uint64(floatV)
+		}
+		if strV, ok := v.(string); ok {
+			intV, err := strconv.ParseUint(strV, 10, 64)
+			if err != nil {
+				return nil, fmt.Errorf("expected int64: %w", err)
+			}
+			val = intV
 		}
 		return val, nil
 	case models.DataTypeFloat32:
