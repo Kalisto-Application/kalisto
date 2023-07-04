@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 
 import Header from "../Header";
 import Sidebar from "../Sidebar";
@@ -8,13 +8,14 @@ import { FindWorkspaces, GetWorkspace, NewWorkspace } from "../../../wailsjs/go/
 
 import { MethodItem, ServiceItem } from "../../components/MethodCollectionView";
 import { MainPageContent } from "../../pages/MainPageContent";
+import { Context } from "../../state";
 
 export const MainLayout: React.FC = () => {;
   const [workspaceId, setWorkspaceId] = useState<string>('');
   const [workspaceItems, setWorkspaceItems] = useState<WorkspaceItem[]>([]);
   const [methodItems, setMethodItems] = useState<ServiceItem[]>([]);
-  const [inputText, setInputText] = useState<string>('');
   const [method, setMethod] = useState<MethodItem>()
+  const ctx = useContext(Context);
 
   useEffect(() => {
     FindWorkspaces()
@@ -49,7 +50,7 @@ export const MainLayout: React.FC = () => {;
       setWorkspaceItems(items.map(it => ({id: it.id, name: it.name, active: it.id == latest.id})))
       setMethodItems(res.find(it => it.id == latest.id)!.spec.services.map(s => ({name: s.name, fullName: s.fullName, methods: s.methods.map(met => ({name: met.name, fullName: met.fullName, requestExample: met.requestExample}))})));
       setMethod(fristMethod);
-      setInputText(fristMethod?.requestExample || '')
+      ctx.dispatch({type: 'changeRequestText', text: fristMethod?.requestExample || ''})
     })
     .catch(err => console.log('error on find workspaces: ', err))
   }, [])
@@ -84,7 +85,7 @@ export const MainLayout: React.FC = () => {;
       <Sidebar>
       </Sidebar>
       <main className="flex-1">
-        <MainPageContent workspaceId={workspaceId} methodItems={methodItems} method={method} setActiveMethod={setMethod} inputText={inputText} setInputText={setInputText}/>
+        <MainPageContent workspaceId={workspaceId} methodItems={methodItems} method={method} setActiveMethod={setMethod} inputText={ctx.state.requestText}/>
       </main>
     </div>
   </div>);

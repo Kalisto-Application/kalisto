@@ -1,15 +1,17 @@
-import React, {ChangeEvent, useEffect} from "react";
+import React, {ChangeEvent, useContext, useEffect} from "react";
+import { Context } from "../state";
 
 interface CodeEditorProps {
     text: string;
-    setText: (t :string) => void;
+    type: 'changeRequestText' | 'changeMetaText';
 }
 
-export const CodeEditor: React.FC<CodeEditorProps> = ({text, setText}) => {
+export const CodeEditor: React.FC<CodeEditorProps> = ({ text, type }) => {
+    const ctx = useContext(Context);
+
     const onChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-        setText(e.target.value)
+        ctx.dispatch({type: type, text: e.target.value});
     }
-    console.log('text: ', text)
 
     return (
         <div>

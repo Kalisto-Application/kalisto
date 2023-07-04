@@ -182,6 +182,9 @@ func (a *Api) SendGrpc(request models.Request) (models.Response, error) {
 	if err != nil {
 		return models.Response{}, fmt.Errorf("api: failed to create request: %w", err)
 	}
+	if req == nil {
+		return models.Response{}, nil
+	}
 
 	md.GetService()
 	resp := dynamic.NewMessage(md.GetOutputType())

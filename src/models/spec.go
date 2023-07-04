@@ -23,7 +23,7 @@ func (s *Spec) FindInputMessage(serviceName, methodName string) (Message, error)
 	for _, service := range s.Services {
 		if service.FullName == serviceName {
 			for _, method := range service.Methods {
-				if method.FullName == methodName {
+				if method.Name == methodName {
 					return method.RequestMessage, nil
 				}
 			}
@@ -76,14 +76,30 @@ type Message struct {
 	Fields   []Field `json:"fields"`
 }
 
+func (m Message) FindField(name string) (Field, error) {
+	for _, f := range m.Fields {
+		if f.Name == name {
+			return f, nil
+		}
+	}
+
+	return Field{}, fmt.Errorf("field=%s not found", name)
+}
+
 type DataType string
 
 const (
-	DataTypeBool   DataType = "DataTypeBool"
-	DataTypeInt    DataType = "DataTypeInt"
-	DataTypeFloat  DataType = "DataTypeFloat"
-	DataTypeString DataType = "DataTypeString"
-	DataTypeEnum   DataType = "DataTypeEnum"
+	DataTypeBool    DataType = "DataTypeBool"
+	DataTypeInt32   DataType = "DataTypeInt32"
+	DataTypeInt64   DataType = "DataTypeInt64"
+	DataTypeUint32  DataType = "DataTypeUint32"
+	DataTypeUint64  DataType = "DataTypeUint64"
+	DataTypeFloat32 DataType = "DataTypeFloat32"
+	DataTypeFloat64 DataType = "DataTypeFloat64"
+	DataTypeString  DataType = "DataTypeString"
+	DataTypeBytes   DataType = "DataTypeBytes"
+
+	DataTypeEnum DataType = "DataTypeEnum"
 
 	DataTypeStruct DataType = "DataTypeStruct"
 	DataTypeMap    DataType = "DataTypeMap"
@@ -92,17 +108,56 @@ const (
 	DataTypeDate DataType = "DataTypeDate"
 )
 
+type CastType string
+
+const (
+	CastTypeBool    CastType = "CastTypeBool"
+	CastTypeInt32   CastType = "CastTypeInt32"
+	CastTypeInt64   CastType = "CastTypeInt64"
+	CastTypeUint32  CastType = "CastTypeUint32"
+	CastTypeUint64  CastType = "CastTypeUint64"
+	CastTypeFloat32 CastType = "CastTypeFloat32"
+	CastTypeFloat64 CastType = "CastTypeFloat64"
+	CastTypeString  CastType = "CastTypeString"
+	CastTypeBytes   CastType = "CastTypeBytes"
+
+	CastTypeEnum CastType = "CastTypeEnum"
+
+	CastTypeStruct CastType = "CastTypeStruct"
+	CastTypeMap    CastType = "CastTypeMap"
+	CastTypeArray  CastType = "CastTypeArray"
+
+	CastTypeDate CastType = "CastTypeDate"
+)
+
+var DataToCast = map[DataType]CastType{
+	DataTypeBool:    CastTypeBool,
+	DataTypeInt32:   CastTypeInt32,
+	DataTypeInt64:   CastTypeInt64,
+	DataTypeUint32:  CastTypeUint32,
+	DataTypeUint64:  CastTypeUint64,
+	DataTypeFloat32: CastTypeFloat32,
+	DataTypeFloat64: CastTypeFloat64,
+	DataTypeString:  CastTypeString,
+	DataTypeBytes:   CastTypeBytes,
+	DataTypeEnum:    CastTypeEnum,
+	DataTypeStruct:  CastTypeStruct,
+	DataTypeMap:     CastTypeMap,
+	DataTypeArray:   CastTypeArray,
+	DataTypeDate:    CastTypeDate,
+}
+
 type Field struct {
 	Name         string   `json:"name"`
 	FullName     string   `json:"fullName"`
 	Type         DataType `json:"type"`
 	DefaultValue string   `json:"defaultValue"`
 
-	Enum          []string `json:"enum"`
-	IsCollection  bool     `json:"isCollection"`
-	CollectionKey *Field   `json:"collectionKey"`
-	OneOf         []Field  `json:"oneOf"`
-	Message       string   `json:"message"`
+	Enum          []int32 `json:"enum"`
+	IsCollection  bool    `json:"isCollection"`
+	CollectionKey *Field  `json:"collectionKey"`
+	OneOf         []Field `json:"oneOf"`
+	Message       string  `json:"message"`
 }
 
 type MethodName string

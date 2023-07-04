@@ -1,6 +1,5 @@
-import React, {SyntheticEvent, useState, useEffect} from "react";
-import { ControlledTreeEnvironment, UncontrolledTreeEnvironment, Tree, StaticTreeDataProvider, TreeDataProvider, TreeItemIndex, TreeItem, Disposable, ExplicitDataSource } from 'react-complex-tree';
-import { EventEmitter } from "react-complex-tree/src/EventEmitter";
+import React, { useState, useEffect } from "react";
+import { ControlledTreeEnvironment, Tree, TreeItemIndex, TreeItem } from 'react-complex-tree';
 import "react-complex-tree/lib/style-modern.css";
 
 interface MethodCollectionProps {
@@ -67,7 +66,7 @@ export const MethodCollection: React.FC<MethodCollectionProps> = ({ setActiveMet
 
   return(
     <div>
-    <ControlledTreeEnvironment 
+    <ControlledTreeEnvironment
       items={itemsData}
       getItemTitle={item => item.data.display}
       viewState={{

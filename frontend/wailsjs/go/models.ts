@@ -86,7 +86,7 @@ export namespace models {
 	    fullName: string;
 	    type: string;
 	    defaultValue: string;
-	    enum: string[];
+	    enum: number[];
 	    isCollection: boolean;
 	    collectionKey?: Field;
 	    oneOf: Field[];

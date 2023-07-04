@@ -42,7 +42,7 @@ func (f *Factory) FromRegistry(reg *compiler.Registry) (spec models.Spec, err er
 				if !ok {
 					return spec, fmt.Errorf("type %s not found: %w", input.GetFullyQualifiedName(), err)
 				}
-				requestExample := f.makeRequestExample(msg)
+				requestExample := f.makeRequestExample(msg, 2)
 
 				specMethods[j] = models.Method{
 					Name:           method.GetName(),
@@ -70,7 +70,7 @@ func (f *Factory) FromRegistry(reg *compiler.Registry) (spec models.Spec, err er
 
 func (f *Factory) newField(fd *desc.FieldDescriptor) (_ models.Field, err error) {
 	var dataType models.DataType
-	var enum []string
+	var enum []int32
 	var isCollection bool
 	var collectionKey *models.Field
 	var oneOf []models.Field
@@ -81,28 +81,40 @@ func (f *Factory) newField(fd *desc.FieldDescriptor) (_ models.Field, err error)
 	case descriptorpb.FieldDescriptorProto_TYPE_BOOL:
 		dataType = models.DataTypeBool
 		defaultValue = "false"
-	case descriptorpb.FieldDescriptorProto_TYPE_INT32, descriptorpb.FieldDescriptorProto_TYPE_SINT32,
-		descriptorpb.FieldDescriptorProto_TYPE_UINT32, descriptorpb.FieldDescriptorProto_TYPE_INT64,
-		descriptorpb.FieldDescriptorProto_TYPE_SINT64, descriptorpb.FieldDescriptorProto_TYPE_UINT64,
-		descriptorpb.FieldDescriptorProto_TYPE_SFIXED32, descriptorpb.FieldDescriptorProto_TYPE_FIXED32,
-		descriptorpb.FieldDescriptorProto_TYPE_FIXED64, descriptorpb.FieldDescriptorProto_TYPE_SFIXED64:
-		dataType = models.DataTypeInt
+	case descriptorpb.FieldDescriptorProto_TYPE_INT32, descriptorpb.FieldDescriptorProto_TYPE_SINT32, descriptorpb.FieldDescriptorProto_TYPE_SFIXED32:
+		dataType = models.DataTypeInt32
 		defaultValue = "0"
-	case descriptorpb.FieldDescriptorProto_TYPE_FLOAT, descriptorpb.FieldDescriptorProto_TYPE_DOUBLE:
-		dataType = models.DataTypeFloat
+	case descriptorpb.FieldDescriptorProto_TYPE_INT64, descriptorpb.FieldDescriptorProto_TYPE_SINT64, descriptorpb.FieldDescriptorProto_TYPE_SFIXED64:
+		dataType = models.DataTypeInt64
+		defaultValue = "0"
+	case descriptorpb.FieldDescriptorProto_TYPE_UINT32, descriptorpb.FieldDescriptorProto_TYPE_FIXED32:
+		dataType = models.DataTypeUint32
+		defaultValue = "0"
+	case descriptorpb.FieldDescriptorProto_TYPE_UINT64, descriptorpb.FieldDescriptorProto_TYPE_FIXED64:
+		dataType = models.DataTypeUint64
+		defaultValue = "0"
+	case descriptorpb.FieldDescriptorProto_TYPE_FLOAT:
+		dataType = models.DataTypeFloat32
 		defaultValue = "0.0"
-	case descriptorpb.FieldDescriptorProto_TYPE_STRING, descriptorpb.FieldDescriptorProto_TYPE_BYTES:
+	case descriptorpb.FieldDescriptorProto_TYPE_DOUBLE:
+		dataType = models.DataTypeFloat64
+		defaultValue = "0.0"
+	case descriptorpb.FieldDescriptorProto_TYPE_STRING:
 		dataType = models.DataTypeString
 		defaultValue = `""`
+	case descriptorpb.FieldDescriptorProto_TYPE_BYTES:
+		dataType = models.DataTypeBytes
+		defaultValue = `"{json: true}"`
 	case descriptorpb.FieldDescriptorProto_TYPE_ENUM:
 		dataType = models.DataTypeEnum
 		v := fd.GetEnumType().GetValues()
-		enum = make([]string, len(v))
+		enum = make([]int32, len(v))
 		for i := range v {
-			enum[i] = v[i].GetName()
+			enum[i] = v[i].GetNumber()
 		}
-		defaultValue = v[0].GetName()
+		defaultValue = `0`
 	case descriptorpb.FieldDescriptorProto_TYPE_MESSAGE:
+		dataType = models.DataTypeStruct
 		defaultValue = "{}"
 		message := fd.GetMessageType()
 		linkKey := message.GetFullyQualifiedName()
@@ -135,7 +147,6 @@ func (f *Factory) newField(fd *desc.FieldDescriptor) (_ models.Field, err error)
 
 	if oneOf := fd.GetOneOf(); oneOf != nil {
 		return models.Field{}, nil
-		panic("not implemented")
 	}
 
 	specField := models.Field{
@@ -189,22 +200,41 @@ func (f *Factory) linkMessageFields(mt *desc.MessageDescriptor, key string) erro
 	return nil
 }
 
-func (f *Factory) makeRequestExample(m models.Message) string {
+func (f *Factory) makeRequestExample(m models.Message, space int) string {
 	var buf strings.Builder
 	buf.WriteString("{\n")
 
-	space := 2
 	for _, field := range m.Fields {
 		var v string
 		switch field.Type {
 		case models.DataTypeString:
 			v = `"string"`
+		case models.DataTypeBool:
+			v = `true`
+		case models.DataTypeInt32, models.DataTypeInt64, models.DataTypeUint32, models.DataTypeUint64:
+			v = `1`
+		case models.DataTypeFloat32, models.DataTypeFloat64:
+			v = `3.14`
+		case models.DataTypeBytes:
+			v = `"{json: true}"`
+		case models.DataTypeEnum:
+			if len(field.Enum) == 0 {
+				continue
+			}
+			v = fmt.Sprintf(`%d`, field.Enum[0])
+		case models.DataTypeStruct:
+			link, ok := f.links[field.Message]
+			if !ok {
+				return ""
+			}
+			v = f.makeRequestExample(link, 4)
 		}
 
 		line := fmt.Sprintf("%s%s: %s,\n", strings.Repeat(" ", space), field.Name, v)
 		buf.WriteString(line)
 	}
 
-	buf.WriteString("}")
+	closeBracket := fmt.Sprintf("%s}", strings.Repeat(" ", space-2))
+	buf.WriteString(closeBracket)
 	return buf.String()
 }

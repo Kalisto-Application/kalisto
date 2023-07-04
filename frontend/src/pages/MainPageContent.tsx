@@ -1,8 +1,8 @@
 import React, {useEffect, useState} from "react";
 import { UrlInput } from "../components/UrlInput";
-import { CodeEditor } from "../components/CodeEditor";
 import { MethodCollection, ServiceItem, MethodItem } from "../components/MethodCollectionView";
 import {SendGrpc} from "../../wailsjs/go/api/Api"
+import { RequestEditor } from "../components/RequestEditor";
 
 type ContentProps = {
     workspaceId: string;
@@ -10,10 +10,9 @@ type ContentProps = {
     method?: MethodItem;
     setActiveMethod: (it: MethodItem) => void;
     inputText: string;
-    setInputText: (t: string) => void;
   }
 
-export const MainPageContent: React.FC<ContentProps> = ({workspaceId, methodItems, method, setActiveMethod, inputText, setInputText}) => {
+export const MainPageContent: React.FC<ContentProps> = ({workspaceId, methodItems, method, setActiveMethod, inputText }) => {
     var firstMethod: MethodItem = {name: "", fullName: "", requestExample: ""};
     if (methodItems.length > 0 && methodItems[0].methods.length > 0) {
       firstMethod = methodItems[0].methods[0]
@@ -23,7 +22,7 @@ export const MainPageContent: React.FC<ContentProps> = ({workspaceId, methodItem
     const [outText, setOutText] = useState<string>('');
   
     const sendRequest = (event: React.SyntheticEvent) => {
-      if (method && method.fullName == '') {
+      if (method?.fullName == '') {
         //TODO: disable Send button
         return
       }
@@ -40,7 +39,7 @@ export const MainPageContent: React.FC<ContentProps> = ({workspaceId, methodItem
         <UrlInput onClick={sendRequest} value={url} setValue={setUrl} />
         <div className="flex flex-1">
         <MethodCollection setActiveMethod={setActiveMethod} services={methodItems} selectedItem={method?.fullName} />
-        <CodeEditor text={inputText} setText={setInputText}/>
+        <RequestEditor />
         <span>{outText}</span>
         </div>
       </div>
