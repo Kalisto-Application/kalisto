@@ -104,6 +104,8 @@ const (
 	DataTypeStruct DataType = "DataTypeStruct"
 
 	DataTypeDate DataType = "DataTypeDate"
+
+	DataTypeOneOf DataType = "DataTypeOneOf"
 )
 
 type Field struct {

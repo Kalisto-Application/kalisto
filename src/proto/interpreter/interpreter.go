@@ -69,6 +69,24 @@ func castValue(desc *desc.MessageDescriptor, spec models.Spec, f models.Field, v
 		return v, nil
 	}
 
+	if f.Repeated {
+		val, ok := v.([]interface{})
+		if !ok {
+			return nil, fmt.Errorf("failed to cast repeated value, expected array")
+		}
+		fCopy := f
+		fCopy.Repeated = false
+		ret := make([]interface{}, 0, len(val))
+		for _, it := range val {
+			casted, err := castValue(desc, spec, fCopy, it)
+			if err != nil {
+				return nil, err
+			}
+			ret = append(ret, casted)
+		}
+		return ret, nil
+	}
+
 	if f.MapKey != nil {
 		val, ok := v.(map[string]interface{})
 		if !ok {

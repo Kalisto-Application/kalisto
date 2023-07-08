@@ -1,6 +1,7 @@
 package spec
 
 import (
+	"errors"
 	"fmt"
 	"kalisto/src/models"
 	"kalisto/src/proto/compiler"
@@ -19,6 +20,8 @@ type Factory struct {
 func NewFactory() *Factory {
 	return &Factory{links: make(map[string]models.Message)}
 }
+
+var ErrFieldIsOneOf = errors.New("field is one of")
 
 func (f *Factory) FromRegistry(reg *compiler.Registry) (spec models.Spec, err error) {
 	f.mx.Lock()
@@ -42,7 +45,7 @@ func (f *Factory) FromRegistry(reg *compiler.Registry) (spec models.Spec, err er
 				if !ok {
 					return spec, fmt.Errorf("type %s not found: %w", input.GetFullyQualifiedName(), err)
 				}
-				requestExample := f.makeRequestExample(msg, 2)
+				requestExample := f.makeRequestExample(make(map[string]bool), msg, 2)
 
 				specMethods[j] = models.Method{
 					Name:           method.GetName(),
@@ -68,15 +71,17 @@ func (f *Factory) FromRegistry(reg *compiler.Registry) (spec models.Spec, err er
 	return spec, err
 }
 
-func (f *Factory) newField(fd *desc.FieldDescriptor) (_ models.Field, err error) {
+func (f *Factory) newField(fd *desc.FieldDescriptor, nameOneOf string) (_ models.Field, err error) {
 	var dataType models.DataType
 	var enum []int32
-	var repeated bool
 	var mapKey *models.Field
 	var mapValue *models.Field
-	var oneOf []models.Field
+	var oneOfs []models.Field
 	var defaultValue string
 	var link string
+	repeated := fd.IsRepeated()
+	name := fd.GetName()
+	fullName := fd.GetFullyQualifiedName()
 
 	switch fd.GetType() {
 	case descriptorpb.FieldDescriptorProto_TYPE_BOOL:
@@ -117,13 +122,13 @@ func (f *Factory) newField(fd *desc.FieldDescriptor) (_ models.Field, err error)
 	case descriptorpb.FieldDescriptorProto_TYPE_MESSAGE:
 		if fd.IsMap() {
 			defaultValue = "{}"
-			key, err := f.newField(fd.GetMapKeyType())
+			key, err := f.newField(fd.GetMapKeyType(), "")
 			if err != nil {
 				return models.Field{}, err
 			}
 			mapKey = &key
 
-			valueField, err := f.newField(fd.GetMapValueType())
+			valueField, err := f.newField(fd.GetMapValueType(), "")
 			if err != nil {
 				return models.Field{}, err
 			}
@@ -151,20 +156,33 @@ func (f *Factory) newField(fd *desc.FieldDescriptor) (_ models.Field, err error)
 		defaultValue = "[]"
 	}
 
-	if oneOf := fd.GetOneOf(); oneOf != nil {
-		return models.Field{}, nil
+	if oneOf := fd.GetOneOf(); nameOneOf == "" && oneOf != nil {
+		dataType = models.DataTypeOneOf
+		oneOfs = make([]models.Field, len(oneOf.GetChoices()))
+
+		name = oneOf.GetName()
+		fullName = oneOf.GetFullyQualifiedName()
+
+		for i, choice := range oneOf.GetChoices() {
+			oneOfField, err := f.newField(choice, nameOneOf)
+			if err != nil {
+				return models.Field{}, err
+			}
+
+			oneOfs[i] = oneOfField
+		}
 	}
 
 	specField := models.Field{
-		Name:         fd.GetName(),
-		FullName:     fd.GetFullyQualifiedName(),
+		Name:         name,
+		FullName:     fullName,
 		Type:         dataType,
 		DefaultValue: defaultValue,
 		Enum:         enum,
 		Repeated:     repeated,
 		MapKey:       mapKey,
 		MapValue:     mapValue,
-		OneOf:        oneOf,
+		OneOf:        oneOfs,
 		Message:      link,
 	}
 	return specField, nil
@@ -196,8 +214,9 @@ func (f *Factory) linkMessageFields(mt *desc.MessageDescriptor, key string) erro
 		Fields:   make([]models.Field, len(mFields)),
 	}
 
+	set := make(map[string]bool)
 	for i, mf := range mFields {
-		mField, err := f.newField(mf)
+		mField, err := f.newField(mf, false, set)
 		if err != nil {
 			return err
 		}
@@ -207,12 +226,16 @@ func (f *Factory) linkMessageFields(mt *desc.MessageDescriptor, key string) erro
 	return nil
 }
 
-func (f *Factory) makeRequestExample(m models.Message, space int) string {
+func (f *Factory) makeRequestExample(set map[string]bool, m models.Message, space int) string {
 	var buf strings.Builder
 	buf.WriteString("{\n")
 
 	for _, field := range m.Fields {
-		v := f.makeExampleValue(field)
+		if field.Message != "" && set[field.Message] {
+			continue
+		}
+		set[field.Message] = true
+		v := f.makeExampleValue(set, field)
 		if v == "" {
 			continue
 		}
@@ -226,7 +249,15 @@ func (f *Factory) makeRequestExample(m models.Message, space int) string {
 	return buf.String()
 }
 
-func (f *Factory) makeExampleValue(field models.Field) string {
+func (f *Factory) makeExampleValue(set map[string]bool, field models.Field) string {
+
+	if field.Repeated {
+		fieldCp := field
+		fieldCp.Repeated = false
+		v := f.makeExampleValue(set, fieldCp)
+		return fmt.Sprintf("[%s]", v)
+	}
+
 	var v string
 	switch field.Type {
 	case models.DataTypeString:
@@ -246,15 +277,15 @@ func (f *Factory) makeExampleValue(field models.Field) string {
 		v = fmt.Sprintf(`%d`, field.Enum[0])
 	case models.DataTypeStruct:
 		if field.MapKey != nil && field.MapValue != nil {
-			key := f.makeExampleValue(*field.MapKey)
-			value := f.makeExampleValue(*field.MapValue)
+			key := f.makeExampleValue(set, *field.MapKey)
+			value := f.makeExampleValue(set, *field.MapValue)
 			v = fmt.Sprintf(`{%s: %s}`, key, value)
 		} else {
 			link, ok := f.links[field.Message]
 			if !ok {
 				return ""
 			}
-			v = f.makeRequestExample(link, 4)
+			v = f.makeRequestExample(set, link, 4)
 		}
 	}
 
