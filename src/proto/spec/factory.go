@@ -71,7 +71,7 @@ func (f *Factory) FromRegistry(reg *compiler.Registry) (spec models.Spec, err er
 	return spec, err
 }
 
-func (f *Factory) newField(fd *desc.FieldDescriptor, nameOneOf string) (_ models.Field, err error) {
+func (f *Factory) newField(fd *desc.FieldDescriptor, oneOfName string, set map[string]bool) (_ models.Field, err error) {
 	var dataType models.DataType
 	var enum []int32
 	var mapKey *models.Field
@@ -122,13 +122,13 @@ func (f *Factory) newField(fd *desc.FieldDescriptor, nameOneOf string) (_ models
 	case descriptorpb.FieldDescriptorProto_TYPE_MESSAGE:
 		if fd.IsMap() {
 			defaultValue = "{}"
-			key, err := f.newField(fd.GetMapKeyType(), "")
+			key, err := f.newField(fd.GetMapKeyType(), "", set)
 			if err != nil {
 				return models.Field{}, err
 			}
 			mapKey = &key
 
-			valueField, err := f.newField(fd.GetMapValueType(), "")
+			valueField, err := f.newField(fd.GetMapValueType(), "", set)
 			if err != nil {
 				return models.Field{}, err
 			}
@@ -156,15 +156,19 @@ func (f *Factory) newField(fd *desc.FieldDescriptor, nameOneOf string) (_ models
 		defaultValue = "[]"
 	}
 
-	if oneOf := fd.GetOneOf(); nameOneOf == "" && oneOf != nil {
+	if oneOf := fd.GetOneOf(); oneOf != nil && oneOfName == "" {
+		if set[oneOf.GetName()] {
+			return models.Field{}, ErrFieldIsOneOf
+		}
 		dataType = models.DataTypeOneOf
+		set[oneOf.GetName()] = true
 		oneOfs = make([]models.Field, len(oneOf.GetChoices()))
 
 		name = oneOf.GetName()
 		fullName = oneOf.GetFullyQualifiedName()
 
 		for i, choice := range oneOf.GetChoices() {
-			oneOfField, err := f.newField(choice, nameOneOf)
+			oneOfField, err := f.newField(choice, oneOf.GetName(), set)
 			if err != nil {
 				return models.Field{}, err
 			}
@@ -208,19 +212,27 @@ func (f *Factory) linkMessages(reg *compiler.Registry) (err error) {
 
 func (f *Factory) linkMessageFields(mt *desc.MessageDescriptor, key string) error {
 	mFields := mt.GetFields()
+	fields := make([]models.Field, 0, len(mFields))
 	f.links[key] = models.Message{
 		Name:     mt.GetName(),
 		FullName: mt.GetFullyQualifiedName(),
-		Fields:   make([]models.Field, len(mFields)),
 	}
 
 	set := make(map[string]bool)
-	for i, mf := range mFields {
-		mField, err := f.newField(mf, false, set)
+	for _, mf := range mFields {
+		mField, err := f.newField(mf, "", set)
 		if err != nil {
+			if errors.Is(err, ErrFieldIsOneOf) {
+				continue
+			}
 			return err
 		}
-		f.links[key].Fields[i] = mField
+		fields = append(fields, mField)
+	}
+	f.links[key] = models.Message{
+		Name:     mt.GetName(),
+		FullName: mt.GetFullyQualifiedName(),
+		Fields:   fields,
 	}
 
 	return nil
@@ -287,6 +299,17 @@ func (f *Factory) makeExampleValue(set map[string]bool, field models.Field) stri
 			}
 			v = f.makeRequestExample(set, link, 4)
 		}
+	case models.DataTypeOneOf:
+		var oneOfBuf strings.Builder
+		for i, one := range field.OneOf {
+			oneV := f.makeExampleValue(set, one)
+			oneV = fmt.Sprintf(`{"%s": %s}\n`, one.Name, oneV)
+			if i != 0 {
+				oneV = "// " + oneV
+			}
+			oneOfBuf.WriteString(oneV)
+		}
+		v = oneOfBuf.String()
 	}
 
 	return v
