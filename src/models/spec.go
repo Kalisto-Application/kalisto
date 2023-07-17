@@ -122,6 +122,16 @@ type Field struct {
 	Message  string  `json:"message"`
 }
 
+func (f Field) FindOneofByName(name string) (Field, error) {
+	for i := range f.OneOf {
+		if f.OneOf[i].Name == name {
+			return f.OneOf[i], nil
+		}
+	}
+
+	return Field{}, fmt.Errorf("can't find a field<%s>", name)
+}
+
 type MethodName string
 
 func (m MethodName) ServiceAndShort() (string, string) {

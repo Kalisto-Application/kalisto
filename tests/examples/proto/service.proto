@@ -49,24 +49,24 @@ message GetBookRequest {
     }
     // Enum enum = 16;
     // Book Book = 17;
-    // map<string, string> floatToString = 23;
+    // map<string, string> strToStr = 23;
     // map<int32, Book> intToBooks = 24;
     // map<bool, Enum> etoe = 25;
     // repeated string strings = 26;
     // repeated Enum enums = 27;
     // repeated uint32 uints = 28;
     // repeated Book books = 29;
-    // DeepNestedBook deepNestedBook = 23;
+    // DeepNestedBook deepNestedBook = 30;
     // repeated DeepNestedBook repeatedNestedBook = 18;
     oneof someBook {
         string oneId = 19;
         Enum oneEnum = 20;
     }
 
-    oneof anotherBook {
-        Book anotherBookObject = 32;
-        DeepNestedBook anotherNestedBook = 33;
-    }
+    // oneof anotherBook {
+    //     Book anotherBookObject = 32;
+    //     DeepNestedBook anotherNestedBook = 33;
+    // }
 }
 
 message GetBookResponse {

@@ -10,11 +10,11 @@ import (
 	"kalisto/src/proto/interpreter"
 	"kalisto/src/proto/spec"
 	"kalisto/src/workspace"
-	"os"
 	"reflect"
 	"time"
 
 	"github.com/jhump/protoreflect/dynamic"
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 type Client interface {
@@ -58,13 +58,10 @@ func SetContext(a *Api, ctx context.Context) {
 // WORKSPACE API
 
 func (a *Api) NewWorkspace() (models.Workspace, error) {
-	// path, err := runtime.OpenDirectoryDialog(a.ctx, runtime.OpenDialogOptions{})
-	// if err != nil {
-	// 	return models.Workspace{}, err
-	// }
-	wd, _ := os.Getwd()
-	println(wd)
-	path := wd + "/examples/proto"
+	path, err := runtime.OpenDirectoryDialog(a.ctx, runtime.OpenDialogOptions{})
+	if err != nil {
+		return models.Workspace{}, err
+	}
 
 	registry, err := a.protoRegistryFromPath(path)
 	if err != nil {

@@ -122,6 +122,7 @@ func (f *Factory) newField(fd *desc.FieldDescriptor, oneOfName string, set map[s
 	case descriptorpb.FieldDescriptorProto_TYPE_MESSAGE:
 		if fd.IsMap() {
 			defaultValue = "{}"
+			repeated = false
 			key, err := f.newField(fd.GetMapKeyType(), "", set)
 			if err != nil {
 				return models.Field{}, err
@@ -149,11 +150,6 @@ func (f *Factory) newField(fd *desc.FieldDescriptor, oneOfName string, set map[s
 
 	case descriptorpb.FieldDescriptorProto_TYPE_GROUP:
 		return models.Field{}, models.ErrProto2NotSupported
-	}
-
-	if fd.IsRepeated() {
-		repeated = true
-		defaultValue = "[]"
 	}
 
 	if oneOf := fd.GetOneOf(); oneOf != nil && oneOfName == "" {
@@ -247,12 +243,16 @@ func (f *Factory) makeRequestExample(set map[string]bool, m models.Message, spac
 			continue
 		}
 		set[field.Message] = true
-		v := f.makeExampleValue(set, field)
+		v := f.makeExampleValue(set, field, space)
 		if v == "" {
 			continue
 		}
 
-		line := fmt.Sprintf("%s%s: %s,\n", strings.Repeat(" ", space), field.Name, v)
+		tpl := "%s%s: %s,\n"
+		if field.Type == models.DataTypeOneOf {
+			tpl = "%s%s: %s"
+		}
+		line := fmt.Sprintf(tpl, strings.Repeat(" ", space), field.Name, v)
 		buf.WriteString(line)
 	}
 
@@ -261,12 +261,12 @@ func (f *Factory) makeRequestExample(set map[string]bool, m models.Message, spac
 	return buf.String()
 }
 
-func (f *Factory) makeExampleValue(set map[string]bool, field models.Field) string {
+func (f *Factory) makeExampleValue(set map[string]bool, field models.Field, space int) string {
 
 	if field.Repeated {
 		fieldCp := field
 		fieldCp.Repeated = false
-		v := f.makeExampleValue(set, fieldCp)
+		v := f.makeExampleValue(set, fieldCp, space)
 		return fmt.Sprintf("[%s]", v)
 	}
 
@@ -289,23 +289,23 @@ func (f *Factory) makeExampleValue(set map[string]bool, field models.Field) stri
 		v = fmt.Sprintf(`%d`, field.Enum[0])
 	case models.DataTypeStruct:
 		if field.MapKey != nil && field.MapValue != nil {
-			key := f.makeExampleValue(set, *field.MapKey)
-			value := f.makeExampleValue(set, *field.MapValue)
+			key := f.makeExampleValue(set, *field.MapKey, space)
+			value := f.makeExampleValue(set, *field.MapValue, space)
 			v = fmt.Sprintf(`{%s: %s}`, key, value)
 		} else {
 			link, ok := f.links[field.Message]
 			if !ok {
 				return ""
 			}
-			v = f.makeRequestExample(set, link, 4)
+			v = f.makeRequestExample(set, link, space+2)
 		}
 	case models.DataTypeOneOf:
 		var oneOfBuf strings.Builder
 		for i, one := range field.OneOf {
-			oneV := f.makeExampleValue(set, one)
-			oneV = fmt.Sprintf(`{"%s": %s}\n`, one.Name, oneV)
+			oneV := f.makeExampleValue(set, one, space)
+			oneV = fmt.Sprintf("{\"%s\": %s},\n", one.Name, oneV)
 			if i != 0 {
-				oneV = "// " + oneV
+				oneV = strings.Repeat(" ", space) + "// " + field.Name + ": " + oneV
 			}
 			oneOfBuf.WriteString(oneV)
 		}

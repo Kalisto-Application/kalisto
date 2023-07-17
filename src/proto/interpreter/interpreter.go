@@ -12,11 +12,6 @@ import (
 )
 
 func CreateMessageFromScript(script string, desc *desc.MessageDescriptor, spec models.Spec, serviceName, methodName string) (*dynamic.Message, error) {
-	defer func() {
-		x := recover()
-		fmt.Println(x)
-	}()
-
 	message, err := spec.FindInputMessage(serviceName, methodName)
 	if err != nil {
 		return nil, err
@@ -52,11 +47,17 @@ func newMessage(desc *desc.MessageDescriptor, spec models.Spec, m map[string]int
 			return nil, err
 		}
 
-		v, err = castValue(desc, spec, field, v)
+		value, err := castValue(desc, spec, field, v)
 		if err != nil {
 			return nil, err
 		}
-		if err := resultMessage.TrySetFieldByName(k, v); err != nil {
+		if field.Type == models.DataTypeOneOf {
+			for key := range v.(map[string]interface{}) {
+				k = key
+			}
+		}
+
+		if err := resultMessage.TrySetFieldByName(k, value); err != nil {
 			return nil, err
 		}
 	}
@@ -256,17 +257,22 @@ func castValue(desc *desc.MessageDescriptor, spec models.Spec, f models.Field, v
 			return nil, fmt.Errorf("failed to find message link=%s", f.Message)
 		}
 		return newMessage(fieldDesc.GetMessageType(), spec, val, link)
-	// case models.DataTypeMap:
-	// 	if f.MapKey == nil {
-	// 		return nil, fmt.Errorf("map must have collection key, found nil")
-	// 	}
+	case models.DataTypeOneOf:
+		val, ok := v.(map[string]interface{})
+		if !ok {
+			return nil, fmt.Errorf("can not cast message type, given %T", v)
+		}
+		if len(val) > 1 {
+			return nil, fmt.Errorf("oneof must contain only one field")
+		}
+		for key, value := range val {
+			oneOf, err := f.FindOneofByName(key)
+			if err != nil {
+				return nil, err
+			}
+			return castValue(desc, spec, oneOf, value)
+		}
 
-	// 	// keyMessage := newField(f.CollectionKey)
-	// 	// valueMessage := newField(f.)
-
-	// return v, nil
-	// case models.DataTypeArray:
-	// return v, nil
 	case models.DataTypeDate:
 		return v, nil
 	default:
