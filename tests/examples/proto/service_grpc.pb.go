@@ -11,6 +11,8 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	anypb "google.golang.org/protobuf/types/known/anypb"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -23,7 +25,8 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type BookStoreClient interface {
 	GetBook(ctx context.Context, in *GetBookRequest, opts ...grpc.CallOption) (*GetBookResponse, error)
-	Yo(ctx context.Context, in *GetBookRequest, opts ...grpc.CallOption) (*GetBookResponse, error)
+	Empty(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	Any(ctx context.Context, in *anypb.Any, opts ...grpc.CallOption) (*anypb.Any, error)
 }
 
 type bookStoreClient struct {
@@ -43,9 +46,18 @@ func (c *bookStoreClient) GetBook(ctx context.Context, in *GetBookRequest, opts 
 	return out, nil
 }
 
-func (c *bookStoreClient) Yo(ctx context.Context, in *GetBookRequest, opts ...grpc.CallOption) (*GetBookResponse, error) {
-	out := new(GetBookResponse)
-	err := c.cc.Invoke(ctx, "/kalisto.tests.examples.service.BookStore/Yo", in, out, opts...)
+func (c *bookStoreClient) Empty(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/kalisto.tests.examples.service.BookStore/Empty", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bookStoreClient) Any(ctx context.Context, in *anypb.Any, opts ...grpc.CallOption) (*anypb.Any, error) {
+	out := new(anypb.Any)
+	err := c.cc.Invoke(ctx, "/kalisto.tests.examples.service.BookStore/Any", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +69,8 @@ func (c *bookStoreClient) Yo(ctx context.Context, in *GetBookRequest, opts ...gr
 // for forward compatibility
 type BookStoreServer interface {
 	GetBook(context.Context, *GetBookRequest) (*GetBookResponse, error)
-	Yo(context.Context, *GetBookRequest) (*GetBookResponse, error)
+	Empty(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
+	Any(context.Context, *anypb.Any) (*anypb.Any, error)
 	mustEmbedUnimplementedBookStoreServer()
 }
 
@@ -68,8 +81,11 @@ type UnimplementedBookStoreServer struct {
 func (UnimplementedBookStoreServer) GetBook(context.Context, *GetBookRequest) (*GetBookResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetBook not implemented")
 }
-func (UnimplementedBookStoreServer) Yo(context.Context, *GetBookRequest) (*GetBookResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Yo not implemented")
+func (UnimplementedBookStoreServer) Empty(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Empty not implemented")
+}
+func (UnimplementedBookStoreServer) Any(context.Context, *anypb.Any) (*anypb.Any, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Any not implemented")
 }
 func (UnimplementedBookStoreServer) mustEmbedUnimplementedBookStoreServer() {}
 
@@ -102,20 +118,38 @@ func _BookStore_GetBook_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BookStore_Yo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetBookRequest)
+func _BookStore_Empty_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(BookStoreServer).Yo(ctx, in)
+		return srv.(BookStoreServer).Empty(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/kalisto.tests.examples.service.BookStore/Yo",
+		FullMethod: "/kalisto.tests.examples.service.BookStore/Empty",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BookStoreServer).Yo(ctx, req.(*GetBookRequest))
+		return srv.(BookStoreServer).Empty(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BookStore_Any_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(anypb.Any)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BookStoreServer).Any(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/kalisto.tests.examples.service.BookStore/Any",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BookStoreServer).Any(ctx, req.(*anypb.Any))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -132,8 +166,12 @@ var BookStore_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _BookStore_GetBook_Handler,
 		},
 		{
-			MethodName: "Yo",
-			Handler:    _BookStore_Yo_Handler,
+			MethodName: "Empty",
+			Handler:    _BookStore_Empty_Handler,
+		},
+		{
+			MethodName: "Any",
+			Handler:    _BookStore_Any_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

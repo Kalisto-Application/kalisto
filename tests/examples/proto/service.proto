@@ -4,9 +4,15 @@ option go_package = "kalisto/tests/service";
 
 package kalisto.tests.examples.service;
 
+import "google/protobuf/empty.proto";
+import "google/protobuf/any.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+
 service BookStore {
     rpc GetBook(GetBookRequest) returns (GetBookResponse) {}
-    rpc Yo(GetBookRequest) returns (GetBookResponse) {}
+    rpc Empty(google.protobuf.Empty) returns (google.protobuf.Empty) {}
+    rpc Any(google.protobuf.Any) returns (google.protobuf.Any) {}
 }
 
 message Book {
@@ -42,11 +48,11 @@ message GetBookRequest {
     // sfixed64 sfixed64 = 13;
     // bool bool = 14;
     // bytes bytes = 15;
-    enum Enum {
-        VALUE_1 = 0;
-        VALUE_2 = 3;
-        VALUE_3 = 4;
-    }
+    // enum Enum {
+    //     VALUE_1 = 0;
+    //     VALUE_2 = 3;
+    //     VALUE_3 = 4;
+    // }
     // Enum enum = 16;
     // Book Book = 17;
     // map<string, string> strToStr = 23;
@@ -58,15 +64,18 @@ message GetBookRequest {
     // repeated Book books = 29;
     // DeepNestedBook deepNestedBook = 30;
     // repeated DeepNestedBook repeatedNestedBook = 18;
-    oneof someBook {
-        string oneId = 19;
-        Enum oneEnum = 20;
-    }
+    // oneof someBook {
+    //     string oneId = 19;
+    //     Enum oneEnum = 20;
+    // }
 
     // oneof anotherBook {
     //     Book anotherBookObject = 32;
     //     DeepNestedBook anotherNestedBook = 33;
     // }
+
+    google.protobuf.Duration dur = 34;
+    google.protobuf.Timestamp time = 35;
 }
 
 message GetBookResponse {

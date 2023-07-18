@@ -8,6 +8,8 @@ import (
 	"net"
 
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/anypb"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type server struct {
@@ -22,6 +24,26 @@ func (s *server) GetBook(ctx context.Context, in *pb.GetBookRequest) (*pb.GetBoo
 
 	log.Printf("Received: %s\n", string(data))
 	return &pb.GetBookResponse{Name: "Chuk und Gek"}, nil
+}
+
+func (s *server) Empty(ctx context.Context, in *emptypb.Empty) (*emptypb.Empty, error) {
+	data, err := json.Marshal(in)
+	if err != nil {
+		return nil, err
+	}
+
+	log.Printf("Received: %s\n", string(data))
+	return &emptypb.Empty{}, nil
+}
+
+func (s *server) Any(ctx context.Context, in *anypb.Any) (*anypb.Any, error) {
+	data, err := json.Marshal(in)
+	if err != nil {
+		return nil, err
+	}
+
+	log.Printf("Received: %s\n", string(data))
+	return &anypb.Any{TypeUrl: "google.protobuf.Empty", Value: nil}, nil
 }
 
 func main() {

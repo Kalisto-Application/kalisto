@@ -274,7 +274,19 @@ func castValue(desc *desc.MessageDescriptor, spec models.Spec, f models.Field, v
 		}
 
 	case models.DataTypeDate:
-		return v, nil
+		panic("not implemented")
+		switch v.(type) {
+		case int64:
+			// as nanoseconds
+		case string:
+			// as timestamp rfc3336
+		case interface{}:
+			// map from date
+		default:
+			return nil, fmt.Errorf("date must be nanoseconds (number), timestamp (string) or Date instance")
+		}
+	case models.DataTypeDuration:
+		panic("not implemented")
 	default:
 		return nil, fmt.Errorf("undefined type=%s", f.Type)
 	}

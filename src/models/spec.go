@@ -103,16 +103,16 @@ const (
 
 	DataTypeStruct DataType = "DataTypeStruct"
 
-	DataTypeDate DataType = "DataTypeDate"
+	DataTypeDate     DataType = "DataTypeDate"
+	DataTypeDuration DataType = "DataTypeDuration"
 
 	DataTypeOneOf DataType = "DataTypeOneOf"
 )
 
 type Field struct {
-	Name         string   `json:"name"`
-	FullName     string   `json:"fullName"`
-	Type         DataType `json:"type"`
-	DefaultValue string   `json:"defaultValue"`
+	Name     string   `json:"name"`
+	FullName string   `json:"fullName"`
+	Type     DataType `json:"type"`
 
 	Enum     []int32 `json:"enum"`
 	Repeated bool    `json:"repeated"`

@@ -9,6 +9,8 @@ import (
 	"sync"
 
 	"github.com/jhump/protoreflect/desc"
+	"google.golang.org/protobuf/reflect/protoreflect"
+	"google.golang.org/protobuf/reflect/protoregistry"
 	"google.golang.org/protobuf/types/descriptorpb"
 )
 
@@ -77,7 +79,6 @@ func (f *Factory) newField(fd *desc.FieldDescriptor, oneOfName string, set map[s
 	var mapKey *models.Field
 	var mapValue *models.Field
 	var oneOfs []models.Field
-	var defaultValue string
 	var link string
 	repeated := fd.IsRepeated()
 	name := fd.GetName()
@@ -86,31 +87,22 @@ func (f *Factory) newField(fd *desc.FieldDescriptor, oneOfName string, set map[s
 	switch fd.GetType() {
 	case descriptorpb.FieldDescriptorProto_TYPE_BOOL:
 		dataType = models.DataTypeBool
-		defaultValue = "false"
 	case descriptorpb.FieldDescriptorProto_TYPE_INT32, descriptorpb.FieldDescriptorProto_TYPE_SINT32, descriptorpb.FieldDescriptorProto_TYPE_SFIXED32:
 		dataType = models.DataTypeInt32
-		defaultValue = "0"
 	case descriptorpb.FieldDescriptorProto_TYPE_INT64, descriptorpb.FieldDescriptorProto_TYPE_SINT64, descriptorpb.FieldDescriptorProto_TYPE_SFIXED64:
 		dataType = models.DataTypeInt64
-		defaultValue = "0"
 	case descriptorpb.FieldDescriptorProto_TYPE_UINT32, descriptorpb.FieldDescriptorProto_TYPE_FIXED32:
 		dataType = models.DataTypeUint32
-		defaultValue = "0"
 	case descriptorpb.FieldDescriptorProto_TYPE_UINT64, descriptorpb.FieldDescriptorProto_TYPE_FIXED64:
 		dataType = models.DataTypeUint64
-		defaultValue = "0"
 	case descriptorpb.FieldDescriptorProto_TYPE_FLOAT:
 		dataType = models.DataTypeFloat32
-		defaultValue = "0.0"
 	case descriptorpb.FieldDescriptorProto_TYPE_DOUBLE:
 		dataType = models.DataTypeFloat64
-		defaultValue = "0.0"
 	case descriptorpb.FieldDescriptorProto_TYPE_STRING:
 		dataType = models.DataTypeString
-		defaultValue = `""`
 	case descriptorpb.FieldDescriptorProto_TYPE_BYTES:
 		dataType = models.DataTypeBytes
-		defaultValue = `"{json: true}"`
 	case descriptorpb.FieldDescriptorProto_TYPE_ENUM:
 		dataType = models.DataTypeEnum
 		v := fd.GetEnumType().GetValues()
@@ -118,35 +110,39 @@ func (f *Factory) newField(fd *desc.FieldDescriptor, oneOfName string, set map[s
 		for i := range v {
 			enum[i] = v[i].GetNumber()
 		}
-		defaultValue = `0`
 	case descriptorpb.FieldDescriptorProto_TYPE_MESSAGE:
-		if fd.IsMap() {
-			defaultValue = "{}"
-			repeated = false
-			key, err := f.newField(fd.GetMapKeyType(), "", set)
-			if err != nil {
-				return models.Field{}, err
-			}
-			mapKey = &key
+		switch fd.GetMessageType().GetFullyQualifiedName() {
+		case "google.protobuf.Timestamp":
+			dataType = models.DataTypeDate
+		case "google.protobuf.Duration":
+			dataType = models.DataTypeDuration
+		default:
+			if fd.IsMap() {
+				repeated = false
+				key, err := f.newField(fd.GetMapKeyType(), "", set)
+				if err != nil {
+					return models.Field{}, err
+				}
+				mapKey = &key
 
-			valueField, err := f.newField(fd.GetMapValueType(), "", set)
-			if err != nil {
-				return models.Field{}, err
+				valueField, err := f.newField(fd.GetMapValueType(), "", set)
+				if err != nil {
+					return models.Field{}, err
+				}
+				mapValue = &valueField
 			}
-			mapValue = &valueField
+
+			dataType = models.DataTypeStruct
+			message := fd.GetMessageType()
+			linkKey := message.GetFullyQualifiedName()
+			if _, ok := f.links[linkKey]; !ok {
+				if err := f.linkMessageFields(message, linkKey); err != nil {
+					return models.Field{}, err
+				}
+			}
+
+			link = linkKey
 		}
-
-		dataType = models.DataTypeStruct
-		defaultValue = "{}"
-		message := fd.GetMessageType()
-		linkKey := message.GetFullyQualifiedName()
-		if _, ok := f.links[linkKey]; !ok {
-			if err := f.linkMessageFields(message, linkKey); err != nil {
-				return models.Field{}, err
-			}
-		}
-
-		link = linkKey
 
 	case descriptorpb.FieldDescriptorProto_TYPE_GROUP:
 		return models.Field{}, models.ErrProto2NotSupported
@@ -174,21 +170,39 @@ func (f *Factory) newField(fd *desc.FieldDescriptor, oneOfName string, set map[s
 	}
 
 	specField := models.Field{
-		Name:         name,
-		FullName:     fullName,
-		Type:         dataType,
-		DefaultValue: defaultValue,
-		Enum:         enum,
-		Repeated:     repeated,
-		MapKey:       mapKey,
-		MapValue:     mapValue,
-		OneOf:        oneOfs,
-		Message:      link,
+		Name:     name,
+		FullName: fullName,
+		Type:     dataType,
+		Enum:     enum,
+		Repeated: repeated,
+		MapKey:   mapKey,
+		MapValue: mapValue,
+		OneOf:    oneOfs,
+		Message:  link,
 	}
 	return specField, nil
 }
 
 func (f *Factory) linkMessages(reg *compiler.Registry) (err error) {
+	protoregistry.GlobalTypes.RangeMessages(func(t protoreflect.MessageType) bool {
+		mt, err := desc.WrapMessage(t.Descriptor())
+		if err != nil {
+			fmt.Println("failed to wrap message descriptor: ", string(t.Descriptor().FullName()), err.Error())
+		}
+
+		fullName := mt.GetFullyQualifiedName()
+		if _, ok := f.links[fullName]; ok {
+			return true
+		}
+
+		if err := f.linkMessageFields(mt, fullName); err != nil {
+			fmt.Println("failed to link default msg: ", fullName, err.Error())
+			return false
+		}
+
+		return true
+	})
+
 	for _, fd := range reg.Descriptors {
 		mTypes := fd.GetMessageTypes()
 		for _, mt := range mTypes {
@@ -287,6 +301,10 @@ func (f *Factory) makeExampleValue(set map[string]bool, field models.Field, spac
 			return ""
 		}
 		v = fmt.Sprintf(`%d`, field.Enum[0])
+	case models.DataTypeDuration:
+		v = "1576800000000000"
+	case models.DataTypeDate:
+		v = "Date.now()"
 	case models.DataTypeStruct:
 		if field.MapKey != nil && field.MapValue != nil {
 			key := f.makeExampleValue(set, *field.MapKey, space)

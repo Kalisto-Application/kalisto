@@ -55,10 +55,9 @@ func (s *FactorySuite) TestSingleFileWithNoDeps() {
 							FullName: "kalisto.tests.examples.service.GetBookRequest",
 							Fields: []models.Field{
 								{
-									Name:         "id",
-									FullName:     "kalisto.tests.examples.service.GetBookRequest.id",
-									Type:         models.DataTypeString,
-									DefaultValue: `""`,
+									Name:     "id",
+									FullName: "kalisto.tests.examples.service.GetBookRequest.id",
+									Type:     models.DataTypeString,
 								},
 							},
 						},
