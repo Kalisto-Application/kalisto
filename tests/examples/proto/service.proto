@@ -74,8 +74,26 @@ message GetBookRequest {
     //     DeepNestedBook anotherNestedBook = 33;
     // }
 
-    google.protobuf.Duration dur = 34;
-    google.protobuf.Timestamp time = 35;
+    // google.protobuf.Duration dur = 34;
+    // google.protobuf.Timestamp time = 35;
+    // google.protobuf.Timestamp time2 = 36;
+    Leveled l1 = 37;
+    Leveled l2 = 38;
+}
+
+message Leveled {
+    L2 f1 = 1;
+    L2 f2 = 2;
+}
+
+message L2 {
+    L3 f1 = 1;
+    L3 f2 = 2;
+}
+
+message L3 {
+    string f1 = 1;
+    string f2 = 2;
 }
 
 message GetBookResponse {

@@ -5,10 +5,13 @@ import (
 	"kalisto/src/models"
 	"math"
 	"strconv"
+	"time"
 
 	"github.com/dop251/goja"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/dynamic"
+	"google.golang.org/protobuf/reflect/protoreflect"
+	"google.golang.org/protobuf/reflect/protoregistry"
 )
 
 func CreateMessageFromScript(script string, desc *desc.MessageDescriptor, spec models.Spec, serviceName, methodName string) (*dynamic.Message, error) {
@@ -237,11 +240,14 @@ func castValue(desc *desc.MessageDescriptor, spec models.Spec, f models.Field, v
 		}
 		return []byte(strV), nil
 	case models.DataTypeEnum:
-		intV, ok := v.(int64)
-		if !ok {
-			return nil, fmt.Errorf("enum value is out of range")
+		switch v := v.(type) {
+		case int64:
+			return int32(v), nil
+		case string:
+			panic("not implemented")
+		default:
+			return nil, fmt.Errorf("enum value must be integer or string")
 		}
-		return int32(intV), nil
 	case models.DataTypeStruct:
 		val, ok := v.(map[string]interface{})
 		if !ok {
@@ -274,25 +280,105 @@ func castValue(desc *desc.MessageDescriptor, spec models.Spec, f models.Field, v
 		}
 
 	case models.DataTypeDate:
-		panic("not implemented")
-		switch v.(type) {
+		m, err := makeKnownMessage("google.protobuf.Timestamp")
+		if err != nil {
+			return nil, err
+		}
+		switch v := v.(type) {
 		case int64:
-			// as nanoseconds
+			t := time.UnixMilli(v).UTC()
+			if err := timestampMessageFromTime(t, m); err != nil {
+				return nil, err
+			}
+			return m, nil
 		case string:
-			// as timestamp rfc3336
-		case interface{}:
-			// map from date
+			t, err := time.Parse(time.RFC3339, v)
+			if err != nil {
+				return nil, err
+			}
+			if err := timestampMessageFromTime(t, m); err != nil {
+				return nil, err
+			}
+			return m, nil
+		case time.Time:
+			if err := timestampMessageFromTime(v, m); err != nil {
+				return nil, err
+			}
+			return m, nil
 		default:
 			return nil, fmt.Errorf("date must be nanoseconds (number), timestamp (string) or Date instance")
 		}
 	case models.DataTypeDuration:
-		panic("not implemented")
+		m, err := makeKnownMessage("google.protobuf.Duration")
+		if err != nil {
+			return nil, err
+		}
+		switch v := v.(type) {
+		case float64:
+			if v > math.MaxInt64 {
+				return nil, fmt.Errorf("max value of duration is int64: %d", math.MaxInt64)
+			}
+			if err := durationMessageFromInt64(int64(v), m); err != nil {
+				return nil, err
+			}
+			return m, nil
+		case int64:
+			if err := durationMessageFromInt64(v, m); err != nil {
+				return nil, err
+			}
+			return m, nil
+		case string:
+			d, err := ParseDuration(v)
+			if err != nil {
+				return nil, err
+			}
+			if err := durationMessageFromInt64(int64(d), m); err != nil {
+				return nil, err
+			}
+			return m, nil
+		default:
+			return nil, fmt.Errorf("duration must be integer or string")
+		}
 	default:
 		return nil, fmt.Errorf("undefined type=%s", f.Type)
 	}
 	return v, nil
 }
 
-func messageFromScript() (*dynamic.Message, error) {
-	return nil, nil
+func makeKnownMessage(name string) (*dynamic.Message, error) {
+	mt, err := protoregistry.GlobalTypes.FindMessageByName(protoreflect.FullName(name))
+	if err != nil {
+		return nil, fmt.Errorf("failed to get descriptor: %w", err)
+	}
+	d, err := desc.WrapMessage(mt.Descriptor())
+	if err != nil {
+		return nil, fmt.Errorf("failed to wrap descriptor")
+	}
+	return dynamic.NewMessage(d), nil
+}
+
+func durationMessageFromInt64(v int64, m *dynamic.Message) error {
+	nanos := v
+	secs := nanos / 1e9
+	nanos -= nanos * 1e9
+	if err := m.TrySetFieldByName("seconds", secs); err != nil {
+		return err
+	}
+	if err := m.TrySetFieldByName("nanos", int32(nanos)); err != nil {
+		return err
+	}
+	return nil
+}
+
+func timestampMessageFromTime(t time.Time, m *dynamic.Message) error {
+	nanos := t.UnixNano()
+	secs := nanos / 1e9
+	nanos -= nanos * 1e9
+	if err := m.TrySetFieldByName("seconds", secs); err != nil {
+		return err
+	}
+	if err := m.TrySetFieldByName("nanos", int32(nanos)); err != nil {
+		return err
+	}
+	return nil
 }
