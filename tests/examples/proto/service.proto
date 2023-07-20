@@ -48,12 +48,12 @@ message GetBookRequest {
     // sfixed64 sfixed64 = 13;
     // bool bool = 14;
     // bytes bytes = 15;
-    // enum Enum {
-    //     VALUE_1 = 0;
-    //     VALUE_2 = 3;
-    //     VALUE_3 = 4;
-    // }
-    // Enum enum = 16;
+    enum Enum {
+        VALUE_1 = 0;
+        VALUE_2 = 3;
+        VALUE_3 = 4;
+    }
+    Enum enum = 16;
     // Book Book = 17;
     // map<string, string> strToStr = 23;
     // map<int32, Book> intToBooks = 24;
@@ -77,8 +77,8 @@ message GetBookRequest {
     // google.protobuf.Duration dur = 34;
     // google.protobuf.Timestamp time = 35;
     // google.protobuf.Timestamp time2 = 36;
-    Leveled l1 = 37;
-    Leveled l2 = 38;
+    // Leveled l1 = 37;
+    // Leveled l2 = 38;
 }
 
 message Leveled {

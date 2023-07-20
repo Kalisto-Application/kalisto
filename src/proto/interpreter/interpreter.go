@@ -244,7 +244,15 @@ func castValue(desc *desc.MessageDescriptor, spec models.Spec, f models.Field, v
 		case int64:
 			return int32(v), nil
 		case string:
-			panic("not implemented")
+			fieldDesc := desc.FindFieldByName(f.Name)
+			if fieldDesc == nil {
+				return nil, fmt.Errorf("descriptor field=%s not found", f.Name)
+			}
+			enumValue := fieldDesc.GetEnumType().FindValueByName(v)
+			if enumValue == nil {
+				return nil, fmt.Errorf("failed to find enum value")
+			}
+			return enumValue.GetNumber(), nil
 		default:
 			return nil, fmt.Errorf("enum value must be integer or string")
 		}

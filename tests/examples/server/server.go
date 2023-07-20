@@ -6,7 +6,6 @@ import (
 	pb "kalisto/tests/examples/proto"
 	"log"
 	"net"
-	"time"
 
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/anypb"
@@ -18,12 +17,12 @@ type server struct {
 }
 
 func (s *server) GetBook(ctx context.Context, in *pb.GetBookRequest) (*pb.GetBookResponse, error) {
-	dur := in.Dur.AsDuration().String()
-	t := in.Time.AsTime().String()
-	tt := time.UnixMilli(in.Dur.AsDuration().Milliseconds()).String()
-	log.Println("dur: ", dur)
-	log.Println("time: ", t)
-	log.Println("since: ", tt)
+	// dur := in.Dur.AsDuration().String()
+	// t := in.Time.AsTime().String()
+	// tt := time.UnixMilli(in.Dur.AsDuration().Milliseconds()).String()
+	// log.Println("dur: ", dur)
+	// log.Println("time: ", t)
+	// log.Println("since: ", tt)
 	data, err := json.Marshal(in)
 	if err != nil {
 		return nil, err
