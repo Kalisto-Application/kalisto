@@ -23,5 +23,7 @@
         <string>true</string>
         <key>NSHumanReadableCopyright</key>
         <string>{{.Info.Copyright}}</string>
+        <key>com.apple.security.files.user-selected.read-write</key>
+        <true/>
     </dict>
 </plist>

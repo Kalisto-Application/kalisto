@@ -24,7 +24,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type BookStoreClient interface {
-	GetBook(ctx context.Context, in *GetBookRequest, opts ...grpc.CallOption) (*GetBookResponse, error)
+	GetBook(ctx context.Context, in *GetBookRequest, opts ...grpc.CallOption) (*GetBookRequest, error)
 	Empty(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	Any(ctx context.Context, in *anypb.Any, opts ...grpc.CallOption) (*anypb.Any, error)
 }
@@ -37,8 +37,8 @@ func NewBookStoreClient(cc grpc.ClientConnInterface) BookStoreClient {
 	return &bookStoreClient{cc}
 }
 
-func (c *bookStoreClient) GetBook(ctx context.Context, in *GetBookRequest, opts ...grpc.CallOption) (*GetBookResponse, error) {
-	out := new(GetBookResponse)
+func (c *bookStoreClient) GetBook(ctx context.Context, in *GetBookRequest, opts ...grpc.CallOption) (*GetBookRequest, error) {
+	out := new(GetBookRequest)
 	err := c.cc.Invoke(ctx, "/kalisto.tests.examples.service.BookStore/GetBook", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -68,7 +68,7 @@ func (c *bookStoreClient) Any(ctx context.Context, in *anypb.Any, opts ...grpc.C
 // All implementations must embed UnimplementedBookStoreServer
 // for forward compatibility
 type BookStoreServer interface {
-	GetBook(context.Context, *GetBookRequest) (*GetBookResponse, error)
+	GetBook(context.Context, *GetBookRequest) (*GetBookRequest, error)
 	Empty(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
 	Any(context.Context, *anypb.Any) (*anypb.Any, error)
 	mustEmbedUnimplementedBookStoreServer()
@@ -78,7 +78,7 @@ type BookStoreServer interface {
 type UnimplementedBookStoreServer struct {
 }
 
-func (UnimplementedBookStoreServer) GetBook(context.Context, *GetBookRequest) (*GetBookResponse, error) {
+func (UnimplementedBookStoreServer) GetBook(context.Context, *GetBookRequest) (*GetBookRequest, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetBook not implemented")
 }
 func (UnimplementedBookStoreServer) Empty(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {

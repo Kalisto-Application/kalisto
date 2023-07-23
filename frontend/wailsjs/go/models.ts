@@ -85,7 +85,6 @@ export namespace models {
 	    name: string;
 	    fullName: string;
 	    type: string;
-	    defaultValue: string;
 	    enum: number[];
 	    repeated: boolean;
 	    mapKey?: Field;
@@ -102,7 +101,6 @@ export namespace models {
 	        this.name = source["name"];
 	        this.fullName = source["fullName"];
 	        this.type = source["type"];
-	        this.defaultValue = source["defaultValue"];
 	        this.enum = source["enum"];
 	        this.repeated = source["repeated"];
 	        this.mapKey = this.convertValues(source["mapKey"], Field);

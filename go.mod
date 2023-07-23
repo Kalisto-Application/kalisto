@@ -3,6 +3,7 @@ module kalisto
 go 1.18
 
 require (
+	github.com/adrg/xdg v0.4.0
 	github.com/bobg/go-generics/v2 v2.1.2
 	github.com/dop251/goja v0.0.0-20230605162241-28ee0ee714f3
 	github.com/google/uuid v1.3.0
@@ -48,7 +49,7 @@ require (
 	golang.org/x/net v0.10.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
 	golang.org/x/sys v0.8.0 // indirect
-	golang.org/x/text v0.9.0 // indirect
+	golang.org/x/text v0.11.0 // indirect
 	google.golang.org/genproto v0.0.0-20230306155012-7f2fa6fef1f4 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

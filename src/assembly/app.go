@@ -10,7 +10,8 @@ import (
 	"kalisto/src/proto/spec"
 	"kalisto/src/workspace"
 	"log"
-	"os"
+
+	"github.com/adrg/xdg"
 )
 
 // App struct
@@ -22,8 +23,7 @@ type App struct {
 
 // NewApp creates a new App application struct
 func NewApp() *App {
-	wd, _ := os.Getwd()
-	store, err := db.New(wd)
+	store, err := db.New(xdg.DataHome)
 	if err != nil {
 		log.Fatal("failed to init db: ", err)
 	}

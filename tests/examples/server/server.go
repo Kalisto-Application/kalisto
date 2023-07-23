@@ -16,20 +16,19 @@ type server struct {
 	pb.UnimplementedBookStoreServer
 }
 
-func (s *server) GetBook(ctx context.Context, in *pb.GetBookRequest) (*pb.GetBookResponse, error) {
-	// dur := in.Dur.AsDuration().String()
-	// t := in.Time.AsTime().String()
-	// tt := time.UnixMilli(in.Dur.AsDuration().Milliseconds()).String()
-	// log.Println("dur: ", dur)
-	// log.Println("time: ", t)
-	// log.Println("since: ", tt)
-	data, err := json.Marshal(in)
-	if err != nil {
-		return nil, err
-	}
+func (s *server) GetBook(ctx context.Context, in *pb.GetBookRequest) (*pb.GetBookRequest, error) {
+	// data, err := json.Marshal(in)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// log.Printf("Received: %s\n", string(data))
 
-	log.Printf("Received: %s\n", string(data))
-	return &pb.GetBookResponse{Name: "Chuk und Gek"}, nil
+	res := pb.GetBookRequest{
+		Etoe: map[bool]pb.GetBookRequest_Enum{
+			true: 3,
+		},
+	}
+	return &res, nil
 }
 
 func (s *server) Empty(ctx context.Context, in *emptypb.Empty) (*emptypb.Empty, error) {

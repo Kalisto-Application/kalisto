@@ -20,9 +20,9 @@ func CreateMessageFromScript(script string, desc *desc.MessageDescriptor, spec m
 		return nil, err
 	}
 
-	script = fmt.Sprintf(`(() => {
-		return %s
-	  })()`, script)
+	script = fmt.Sprintf(`(()=> {
+		return %s;
+	})()`, script)
 
 	vm := goja.New()
 	val, err := vm.RunString(script)
