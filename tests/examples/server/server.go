@@ -24,9 +24,9 @@ func (s *server) GetBook(ctx context.Context, in *pb.GetBookRequest) (*pb.GetBoo
 	// log.Printf("Received: %s\n", string(data))
 
 	res := pb.GetBookRequest{
-		Etoe: map[bool]pb.GetBookRequest_Enum{
-			true: 3,
-		},
+		// Etoe: map[bool]pb.GetBookRequest_Enum{
+		// 	true: 3,
+		// },
 	}
 	return &res, nil
 }

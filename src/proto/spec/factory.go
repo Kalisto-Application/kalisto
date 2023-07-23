@@ -327,7 +327,15 @@ func (f *Factory) makeExampleValue(set map[string]bool, field models.Field, spac
 			oneV := f.makeExampleValue(set, one, space, field.FullName)
 			oneV = fmt.Sprintf("{\"%s\": %s},\n", one.Name, oneV)
 			if i != 0 {
-				oneV = strings.Repeat(" ", space) + "// " + field.Name + ": " + oneV
+				oneV = field.Name + ": " + oneV
+				lines := strings.Split(oneV, "\n")
+				for i, line := range lines {
+					if line == "" {
+						continue
+					}
+					lines[i] = strings.Repeat(" ", space) + "// " + line
+				}
+				oneV = strings.Join(lines, "\n")
 			}
 			oneOfBuf.WriteString(oneV)
 		}
