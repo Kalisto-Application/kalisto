@@ -1,34 +1,37 @@
-import React, {useState} from "react";
+import React, {useContext, useState} from "react";
 import { UrlInput } from "../components/UrlInput";
 import { MethodCollection } from "../components/MethodCollectionView";
 import {SendGrpc} from "../../wailsjs/go/api/Api"
 import {models} from "../../wailsjs/go/models"
 import { RequestEditor } from "../components/RequestEditor";
+import { Context } from "../state";
 
 type ApiPageProps = {
-    workspace: models.Workspace;
-    method?: models.Method;
-    inputText: string;
+    // workspace: models.Workspace;
+    // method?: models.Method;
+    // inputText: string;
 }
 
-export const ApiPage: React.FC<ApiPageProps> = ({workspace, method, inputText }) => {
+export const ApiPage: React.FC<ApiPageProps> = () => {
+    const ctx = useContext(Context);
+
     const [url, setUrl] = useState<string>('localhost:9000');
     const [outText, setOutText] = useState<string>('');
   
     const sendRequest = (event: React.SyntheticEvent) => {
-      if (method?.fullName == '') {
+      if (ctx.state.activeMethod?.fullName == '') {
         //TODO: disable Send button
         return
       }
 
-      SendGrpc({addr: url, workspaceId: workspace.id, method: method!.fullName, body: inputText, meta: ""}).then(res => {
+      SendGrpc({addr: url, workspaceId: ctx.state.activeWorkspace.id, method: ctx.state.activeMethod!.fullName, body: ctx.state.requestText, meta: ""}).then(res => {
         setOutText(res.body)
       }).catch(err => {
         setOutText(err)
       })
     };
 
-    if (!workspace) {
+    if (!ctx.state.activeWorkspace) {
       return (<div></div>)
     }
 
@@ -36,7 +39,7 @@ export const ApiPage: React.FC<ApiPageProps> = ({workspace, method, inputText })
       <div className="p-4">
         <UrlInput onClick={sendRequest} value={url} setValue={setUrl} />
         <div className="flex flex-1">
-        <MethodCollection services={workspace.spec.services} selectedItem={method?.fullName} />
+        <MethodCollection services={ctx.state.activeWorkspace.spec.services} selectedItem={ctx.state.activeMethod?.fullName} />
         <RequestEditor />
         <span>{outText}</span>
         </div>

@@ -1,0 +1,52 @@
+import { ReactNode, useEffect, useReducer } from "react";
+
+import {reducer, State, Context} from './state';
+
+import { models } from "../../wailsjs/go/models";
+import { FindWorkspaces } from "../../wailsjs/go/api/Api";
+
+type ContextProps = {
+  children?: ReactNode,
+}
+
+export const ContextProvider: React.FC<ContextProps> = ({ children }) => {
+  const [state, dispatch] = useReducer(reducer, {} as State);
+  useEffect(() => {
+    // load the app
+    FindWorkspaces()
+    .then(res => {
+      if (res == null) {
+        return
+      }
+
+      let latest = res[0]
+      res.forEach(it => {
+        if (it.lastUsage > latest.lastUsage) {
+          latest = it.lastUsage
+        }
+      })
+
+      const getFirstMethod = (): models.Method | undefined => {
+        for (const ws of res) {
+          for (const service of ws.spec.services) {
+            for (const m of service.methods) {
+              return m
+            }
+          }
+        }
+      }
+      const fristMethod = getFirstMethod()
+      if (fristMethod) {
+        dispatch({type: 'activeMethod', activeMethod: fristMethod});
+      }
+      dispatch({type: 'workspaceList', workspaceList: res});
+    })
+    .catch(err => console.log('error on find workspaces: ', err))
+  }, [])
+
+  return (
+    <Context.Provider value={{ state, dispatch }}>
+      {children}
+    </Context.Provider>
+  );
+};

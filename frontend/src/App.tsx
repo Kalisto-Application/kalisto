@@ -1,16 +1,22 @@
-import { useReducer, useContext, useEffect } from "react";
-import { FindWorkspaces } from "../wailsjs/go/api/Api";
-import { models } from "../wailsjs/go/models";
-import MainLayout from "./layout/MainLayout";
-import {reducer, State, Context} from './state';
+import MainLayout from "./layout";
+import { Route, Routes, MemoryRouter } from "react-router-dom";
+import { ApiPage } from "./pages/ApiPage";
+import { VariablesPage } from "./pages/VariablesPage";
+import {ContextProvider} from './state/ContextProvider';
+
 
 function App() {
-  const [state, dispatch] = useReducer(reducer, {} as State);
-
   return (
-    <Context.Provider value={{state: state, dispatch: dispatch}}>
-      <MainLayout />
-    </Context.Provider>
+    <MemoryRouter initialEntries={['/api']} initialIndex={0}>
+      <ContextProvider>
+        <Routes>
+          <Route path="/" element={<MainLayout />}>
+            <Route path='/api' element={<ApiPage />} />
+            <Route path='/variables' element={<VariablesPage />} />
+          </Route>
+        </Routes>
+      </ContextProvider>
+    </MemoryRouter>
   );
 }
 

@@ -1,16 +1,37 @@
-import React, {ChangeEvent, useContext, useEffect} from "react";
+import React, {ChangeEvent, useContext, useMemo } from "react";
 import { Context } from "../state";
 
 interface CodeEditorProps {
     text: string;
-    type: 'changeRequestText' | 'changeMetaText';
+    type: 'changeRequestText' | 'changeMetaText' | 'changeVariables';
+    action?: Action;
+};
+
+const debounce = (f: Action, delay: number): Action => {
+    let timer: number;
+    return (text: string) => {
+      clearTimeout(timer);
+      timer = setTimeout(() => { f(text); }, delay);
+    };
 }
 
-export const CodeEditor: React.FC<CodeEditorProps> = ({ text, type }) => {
+type Action = (data: string) => void
+
+export const CodeEditor: React.FC<CodeEditorProps> = ({ text, type, action }) => {
     const ctx = useContext(Context);
 
-    const onChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    let debouncedAction: Action | undefined;
+    if (action) {
+      debouncedAction = useMemo<Action>(()=> {
+        return debounce(action, 400);
+      }, [])
+    }
+
+    let onChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
         ctx.dispatch({type: type, text: e.target.value});
+        if (debouncedAction) {
+          debouncedAction(e.target.value)
+        }
     }
 
     return (

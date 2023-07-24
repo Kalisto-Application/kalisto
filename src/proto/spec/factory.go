@@ -330,7 +330,7 @@ func (f *Factory) makeExampleValue(set map[string]bool, field models.Field, spac
 				oneV = field.Name + ": " + oneV
 				lines := strings.Split(oneV, "\n")
 				for i, line := range lines {
-					if line == "" {
+					if strings.TrimSpace(line) == "" {
 						continue
 					}
 					lines[i] = strings.Repeat(" ", space) + "// " + line

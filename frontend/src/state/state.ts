@@ -9,6 +9,7 @@ type Action =
     | {type: 'activeWorkspace', workspace: models.Workspace}
     | {type: 'workspaceList', workspaceList: models.Workspace[]}
     | {type: 'activeMethod', activeMethod: models.Method}
+    | {type: 'changeVariables', text: string}
 
 export type State = {
     activeEditor: number;
@@ -17,6 +18,7 @@ export type State = {
     workspaceList: models.Workspace[];
     activeWorkspace: models.Workspace;
     activeMethod: models.Method;
+    variables: string;
 }
 
 export const reducer = (state: State, action: Action): State => {
@@ -59,6 +61,11 @@ export const reducer = (state: State, action: Action): State => {
                 activeMethod: action.activeMethod,
                 requestText: action.activeMethod.requestExample,
                 activeEditor: 0,
+            }
+        case 'changeVariables':
+            return {
+                ... state,
+                variables: action.text,
             }
         default:
             return state
