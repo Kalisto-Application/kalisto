@@ -1,11 +1,16 @@
 import React from "react";
 
 type SidebarProps = {
-  children?: React.ReactNode;
+
 };
 
-export const Sidebar: React.FC<SidebarProps> = ({ children }) => (
+export const Sidebar: React.FC<SidebarProps> = ({}) => (
   <aside className="w-[80px] select-none border-r border-solid border-layoutBorder">
-    {children}
+    <button>
+      APIs
+    </button>
+    <button>
+      Variables
+    </button>
   </aside>
 );

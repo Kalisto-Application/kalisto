@@ -1,14 +1,22 @@
 import { Dispatch, createContext, useReducer } from "react";
+import {models} from '../../wailsjs/go/models';
 
 type Action = 
     | {type: 'switchEditor', i: number}
     | {type: 'changeRequestText', text: string}
     | {type: 'changeMetaText', text: string}
+    | {type: 'newWorkspace', workspace: models.Workspace}
+    | {type: 'activeWorkspace', workspace: models.Workspace}
+    | {type: 'workspaceList', workspaceList: models.Workspace[]}
+    | {type: 'activeMethod', activeMethod: models.Method}
 
 export type State = {
     activeEditor: number;
     requestText: string;
     requestMetaText: string;
+    workspaceList: models.Workspace[];
+    activeWorkspace: models.Workspace;
+    activeMethod: models.Method;
 }
 
 export const reducer = (state: State, action: Action): State => {
@@ -27,6 +35,30 @@ export const reducer = (state: State, action: Action): State => {
             return {
                 ... state,
                 requestMetaText: action.text,
+            }
+        case 'newWorkspace':
+            return {
+                ... state,
+                workspaceList: state.workspaceList.concat([action.workspace]),
+                activeWorkspace: action.workspace,
+            } 
+        case 'activeWorkspace':
+            return {
+                ... state,
+                activeWorkspace: action.workspace,
+            }
+        case 'workspaceList':
+            return {
+                ... state,
+                workspaceList: action.workspaceList,
+                activeWorkspace: action.workspaceList.length > 0 ? action.workspaceList[0]: new models.Workspace()
+            }
+        case 'activeMethod':
+            return {
+                ... state,
+                activeMethod: action.activeMethod,
+                requestText: action.activeMethod.requestExample,
+                activeEditor: 0,
             }
         default:
             return state

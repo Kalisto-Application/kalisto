@@ -1,20 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { ControlledTreeEnvironment, Tree, TreeItemIndex, TreeItem } from 'react-complex-tree';
+import { models } from "../../wailsjs/go/models";
 import "react-complex-tree/lib/style-modern.css";
+import { Context } from "../state";
 
 interface MethodCollectionProps {
-  setActiveMethod: (fullName: MethodItem) => void;
-  services: ServiceItem[];
+  services: models.Service[];
   selectedItem?: string;
 };
 
-export type ServiceItem = {
-  name: string;
-  fullName: string;
-  methods: MethodItem[];
-}
-
-const findMethod = (s: ServiceItem[], name: string): MethodItem | undefined => {
+const findMethod = (s: models.Service[], name: string): models.Method | undefined => {
   for (const service of s) {
     for (const method of service.methods) {
       if (method.fullName == name) {
@@ -24,18 +19,14 @@ const findMethod = (s: ServiceItem[], name: string): MethodItem | undefined => {
   }
 }
 
-export type MethodItem = {
-  name: string;
-  fullName: string;
-  requestExample: string
-} 
-
 type Data = {
   display: string;
   isMethod: boolean;
 }
 
-export const MethodCollection: React.FC<MethodCollectionProps> = ({ setActiveMethod, services, selectedItem }) => {
+export const MethodCollection: React.FC<MethodCollectionProps> = ({ services, selectedItem }) => {
+  const ctx = useContext(Context);
+  
   const serviceNames = services.map(it => it.fullName)
   const [expandedItems, setExpandedItems] = useState<TreeItemIndex[]>(serviceNames);
 
@@ -78,7 +69,8 @@ export const MethodCollection: React.FC<MethodCollectionProps> = ({ setActiveMet
       onExpandItem={item => {
         if (item.data.isMethod) {
           const method = findMethod(services, item.index as string)
-          setActiveMethod(method!);
+
+          ctx.dispatch({type: 'activeMethod', activeMethod: method!})
         }
         setExpandedItems([...expandedItems, item.index])}
       }
@@ -88,7 +80,7 @@ export const MethodCollection: React.FC<MethodCollectionProps> = ({ setActiveMet
       onFocusItem={item => {
         if (item.data.isMethod) {
           const method = findMethod(services, item.index as string)
-          setActiveMethod(method!);
+          ctx.dispatch({type: 'activeMethod', activeMethod: method!})
         }
       }}
     >

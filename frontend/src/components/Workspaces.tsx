@@ -1,18 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
+import { Context } from "../state";
+
+import { NewWorkspace, GetWorkspace } from "../../wailsjs/go/api/Api";
+import { models } from "../../wailsjs/go/models";
 
 interface WorkspaceListProps {
-    items: WorkspaceItem[];
-    setActive: (id: string) => void;
-    newWorkspace: () => void;
+    items: models.Workspace[];
+    activeWorkspace: models.Workspace;
 }
 
-export type WorkspaceItem = {
-    id: string;
-    name: string;
-    active: boolean;
-}
+export const WorkspaceList: React.FC<WorkspaceListProps> = ({items, activeWorkspace}) => {
+  const ctx = useContext(Context);
 
-export const WorkspaceList: React.FC<WorkspaceListProps> = ({items, setActive, newWorkspace}) => {
+  const newWorkspace = () => {
+    NewWorkspace()
+    .then(res => {
+      ctx.dispatch({type: 'activeWorkspace', workspace: res});
+    })
+    .catch(err => console.log('error on new workspace: ', err))
+  }
+  
+  const setActiveWorkspace = (id: string) => {
+    GetWorkspace(id).then(res => {
+      ctx.dispatch({type: 'activeWorkspace', workspace: res});
+    }).catch(err => console.log(`error on get workspace by id==${id}: `, err))
+  }
+
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
 
   const toggleDropdown = () => {
@@ -26,10 +39,8 @@ export const WorkspaceList: React.FC<WorkspaceListProps> = ({items, setActive, n
     newWorkspace();
   }
 
-  const selectedWorkspace = items.find(it => it.active)
-
   const selectWorkspace = (id: string) => {
-    setActive(id);
+    setActiveWorkspace(id);
     setIsDropdownOpen(false);
   };
 
@@ -40,7 +51,7 @@ export const WorkspaceList: React.FC<WorkspaceListProps> = ({items, setActive, n
         className="flex items-center px-4 py-2 text-sm font-medium text-gray-800 bg-gray-200 border border-gray-300 rounded-md hover:bg-gray-300 focus:outline-none focus:ring focus:ring-gray-400"
         onClick={toggleDropdown}
       >
-        {selectedWorkspace && (<span className="mr-1">{selectedWorkspace.name}</span>)}
+        {activeWorkspace && (<span className="mr-1">{activeWorkspace.name}</span>)}
         <svg
           className={`w-4 h-4 transition-transform duration-300 ${
             isDropdownOpen ? 'transform rotate-180' : ''
