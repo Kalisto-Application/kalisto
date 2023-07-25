@@ -8,6 +8,7 @@ import (
 	"net"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/types/known/anypb"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
@@ -17,17 +18,15 @@ type server struct {
 }
 
 func (s *server) GetBook(ctx context.Context, in *pb.GetBookRequest) (*pb.GetBookRequest, error) {
-	// data, err := json.Marshal(in)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// log.Printf("Received: %s\n", string(data))
-
-	res := pb.GetBookRequest{
-		// Etoe: map[bool]pb.GetBookRequest_Enum{
-		// 	true: 3,
-		// },
+	data, err := json.Marshal(in)
+	if err != nil {
+		return nil, err
 	}
+	log.Printf("Received: %s\n", string(data))
+	md, _ := metadata.FromIncomingContext(ctx)
+	log.Printf("meta: %s", md.Get("k"))
+
+	res := pb.GetBookRequest{}
 	return &res, nil
 }
 

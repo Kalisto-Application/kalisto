@@ -1,86 +1,5 @@
 export namespace models {
 	
-	export class Var {
-	    name: string;
-	    type: string;
-	    value: any;
-	
-	    static createFrom(source: any = {}) {
-	        return new Var(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.name = source["name"];
-	        this.type = source["type"];
-	        this.value = source["value"];
-	    }
-	}
-	export class Env {
-	    id: string;
-	    kind: string;
-	    name: string;
-	    active: boolean;
-	    vars: Var[];
-	    workspaceID: string;
-	    // Go type: time
-	    createdAt: any;
-	
-	    static createFrom(source: any = {}) {
-	        return new Env(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.id = source["id"];
-	        this.kind = source["kind"];
-	        this.name = source["name"];
-	        this.active = source["active"];
-	        this.vars = this.convertValues(source["vars"], Var);
-	        this.workspaceID = source["workspaceID"];
-	        this.createdAt = this.convertValues(source["createdAt"], null);
-	    }
-	
-		convertValues(a: any, classs: any, asMap: boolean = false): any {
-		    if (!a) {
-		        return a;
-		    }
-		    if (a.slice) {
-		        return (a as any[]).map(elem => this.convertValues(elem, classs));
-		    } else if ("object" === typeof a) {
-		        if (asMap) {
-		            for (const key of Object.keys(a)) {
-		                a[key] = new classs(a[key]);
-		            }
-		            return a;
-		        }
-		        return new classs(a);
-		    }
-		    return a;
-		}
-	}
-	export class EnvRaw {
-	    id: string;
-	    kind: string;
-	    name: string;
-	    active: boolean;
-	    vars: string;
-	    workspaceID: string;
-	
-	    static createFrom(source: any = {}) {
-	        return new EnvRaw(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.id = source["id"];
-	        this.kind = source["kind"];
-	        this.name = source["name"];
-	        this.active = source["active"];
-	        this.vars = source["vars"];
-	        this.workspaceID = source["workspaceID"];
-	    }
-	}
 	export class Field {
 	    name: string;
 	    fullName: string;
@@ -303,7 +222,6 @@ export namespace models {
 		    return a;
 		}
 	}
-	
 	export class Workspace {
 	    id: string;
 	    name: string;

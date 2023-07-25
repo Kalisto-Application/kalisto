@@ -18,13 +18,14 @@ export const ApiPage: React.FC<ApiPageProps> = () => {
     const [url, setUrl] = useState<string>('localhost:9000');
     const [outText, setOutText] = useState<string>('');
   
-    const sendRequest = (event: React.SyntheticEvent) => {
+    const sendRequest = (_: React.SyntheticEvent) => {
+      debugger;
       if (ctx.state.activeMethod?.fullName == '') {
         //TODO: disable Send button
         return
       }
 
-      SendGrpc({addr: url, workspaceId: ctx.state.activeWorkspace.id, method: ctx.state.activeMethod!.fullName, body: ctx.state.requestText, meta: ""}).then(res => {
+      SendGrpc({addr: url, workspaceId: ctx.state.activeWorkspace.id, method: ctx.state.activeMethod.fullName, body: ctx.state.requestText, meta: ctx.state.requestMetaText}).then(res => {
         setOutText(res.body)
       }).catch(err => {
         setOutText(err)

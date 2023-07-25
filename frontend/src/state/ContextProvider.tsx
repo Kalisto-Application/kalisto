@@ -3,7 +3,7 @@ import { ReactNode, useEffect, useReducer } from "react";
 import {reducer, State, Context} from './state';
 
 import { models } from "../../wailsjs/go/models";
-import { FindWorkspaces } from "../../wailsjs/go/api/Api";
+import { FindWorkspaces, GetGlobalVars } from "../../wailsjs/go/api/Api";
 
 type ContextProps = {
   children?: ReactNode,
@@ -42,6 +42,10 @@ export const ContextProvider: React.FC<ContextProps> = ({ children }) => {
       dispatch({type: 'workspaceList', workspaceList: res});
     })
     .catch(err => console.log('error on find workspaces: ', err))
+
+    GetGlobalVars().then(vars => {
+      dispatch({type: 'changeVariables', text: vars})
+    }).catch(err => console.log('error on get global variables: ', err))
   }, [])
 
   return (

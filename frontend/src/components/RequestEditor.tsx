@@ -10,8 +10,6 @@ interface RequestEditorProps {
 export const RequestEditor: React.FC<RequestEditorProps> = () => {
     const ctx = useContext(Context)
 
-    console.log('state: ', ctx.state)
-    console.log(ctx.state.requestMetaText)
     const editors = [<CodeEditor key={0} text={ctx.state.requestText} type="changeRequestText"/>, <CodeEditor key={1} text={ctx.state.requestMetaText} type="changeMetaText"/>]
 
     return (

@@ -18,7 +18,7 @@ export type State = {
     workspaceList: models.Workspace[];
     activeWorkspace: models.Workspace;
     activeMethod: models.Method;
-    variables: string;
+    vars: string;
 }
 
 export const reducer = (state: State, action: Action): State => {
@@ -65,7 +65,7 @@ export const reducer = (state: State, action: Action): State => {
         case 'changeVariables':
             return {
                 ... state,
-                variables: action.text,
+                vars: action.text,
             }
         default:
             return state

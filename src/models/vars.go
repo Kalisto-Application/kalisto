@@ -22,34 +22,13 @@ var AllEnvKinds = []EnvKind{
 	EnvKindProfile,
 }
 
-type EnvRaw struct {
-	ID          string  `json:"id"`
-	Kind        EnvKind `json:"kind"`
-	Name        string  `json:"name"`
-	Active      bool    `json:"active"`
-	Vars        string  `json:"vars"`
-	WorkspaceID string  `json:"workspaceID"`
-}
-
 type Env struct {
 	ID          string    `json:"id"`
 	Kind        EnvKind   `json:"kind"`
 	Name        string    `json:"name"`
-	Active      bool      `json:"active"`
-	Vars        []Var     `json:"vars"`
+	Vars        string    `json:"vars"`
 	WorkspaceID string    `json:"workspaceID"`
 	CreatedAt   time.Time `json:"createdAt"`
-}
-
-func EnvFromRaw(e EnvRaw, vars []Var) Env {
-	return Env{
-		ID:          e.ID,
-		Kind:        e.Kind,
-		Name:        e.Name,
-		Active:      e.Active,
-		Vars:        vars,
-		WorkspaceID: e.WorkspaceID,
-	}
 }
 
 type Envs []Env

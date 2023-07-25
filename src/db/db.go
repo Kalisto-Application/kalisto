@@ -18,22 +18,15 @@ type DB struct {
 func New(wd string) (*DB, error) {
 	os.MkdirAll(path.Join(wd, "db"), os.ModePerm)
 
-	workspaceFile := path.Join(wd, "db", "workspaces")
-	if _, err := os.Stat(workspaceFile); errors.Is(err, os.ErrNotExist) {
-		f, err := os.Create(workspaceFile)
-		if err != nil {
-			return nil, fmt.Errorf("failed to create worksapce db: %w", err)
+	for _, name := range []string{"workspaces", "envs", "globalVars"} {
+		fileName := path.Join(wd, "db", name)
+		if _, err := os.Stat(fileName); errors.Is(err, os.ErrNotExist) {
+			f, err := os.Create(fileName)
+			if err != nil {
+				return nil, fmt.Errorf("failed to create %s db: %w", name, err)
+			}
+			f.Close()
 		}
-		f.Close()
-	}
-
-	envsFile := path.Join(wd, "db", "envs")
-	if _, err := os.Stat(envsFile); errors.Is(err, os.ErrNotExist) {
-		f, err := os.Create(envsFile)
-		if err != nil {
-			return nil, fmt.Errorf("failed to create envs db: %w", err)
-		}
-		f.Close()
 	}
 
 	d := diskv.New(diskv.Options{
@@ -51,6 +44,14 @@ func (db *DB) SaveEnvs(d map[string]models.Envs) error {
 
 func (db *DB) Envs() (map[string]models.Envs, error) {
 	return read[map[string]models.Envs](db.d, "envs")
+}
+
+func (db *DB) SaveGlobalVars(vars string) error {
+	return write[string](db.d, "globalVars", vars)
+}
+
+func (db *DB) GlobalVars() (string, error) {
+	return read[string](db.d, "globalVars")
 }
 
 func (db *DB) SaveWorkspaces(w []models.Workspace) error {

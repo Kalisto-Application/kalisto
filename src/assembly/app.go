@@ -33,20 +33,20 @@ func NewApp() *App {
 	if err != nil {
 		log.Fatal("failed to init workspace: ", err)
 	}
-	env, err := environment.NewEnvironment(store)
+	glovalVars, err := environment.NewGlovalVars(store)
 	if err != nil {
 		log.Fatal("failed to init environments: ", err)
 	}
 	protoCompiler := compiler.NewFileCompiler()
 	specFactory := spec.NewFactory()
 
-	newClient := func(ctx context.Context, addr string) (api.Client, error) {
+	newClient := func(ctx context.Context, addr string) (*client.Client, error) {
 		return client.NewClient(ctx, client.Config{
 			Addr: addr,
 		})
 	}
 
-	a := api.New(protoCompiler, specFactory, ws, env, newClient, protoRegistry)
+	a := api.New(protoCompiler, specFactory, ws, glovalVars, newClient, protoRegistry)
 
 	return &App{Api: a}
 }

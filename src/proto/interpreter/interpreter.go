@@ -10,35 +10,65 @@ import (
 	"github.com/dop251/goja"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/dynamic"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/reflect/protoregistry"
 )
 
-func CreateMessageFromScript(script string, desc *desc.MessageDescriptor, spec models.Spec, serviceName, methodName string) (*dynamic.Message, error) {
+type Interpreter struct {
+	vars string
+}
+
+func NewInterpreter(vars string) *Interpreter {
+	return &Interpreter{vars: vars}
+}
+
+func (ip *Interpreter) CreateMessageFromScript(script string, desc *desc.MessageDescriptor, spec models.Spec, serviceName, methodName string) (*dynamic.Message, error) {
+	m, err := ip.exportValue(script)
+	if err != nil {
+		return nil, err
+	}
+
 	message, err := spec.FindInputMessage(serviceName, methodName)
 	if err != nil {
 		return nil, err
 	}
 
+	return newMessage(desc, spec, m, message)
+}
+
+func (ip *Interpreter) CreateMetadata(script string) (metadata.MD, error) {
+	m, err := ip.exportValue(script)
+	if err != nil {
+		return nil, err
+	}
+
+	return newMeta(m)
+}
+
+func (ip *Interpreter) exportValue(script string) (map[string]interface{}, error) {
 	script = fmt.Sprintf(`(()=> {
 		return %s;
 	})()`, script)
 
 	vm := goja.New()
+	globalScript := fmt.Sprintf("g = %s;", ip.vars)
+	if _, err := vm.RunScript("global.js", globalScript); err != nil {
+		return nil, err
+	}
 	val, err := vm.RunString(script)
 	if err != nil {
 		return nil, fmt.Errorf("interpretator: failed to run script: %w", err)
 	}
-	if val == nil {
+	if val == nil || val.ExportType() == nil {
 		return nil, nil
 	}
-
 	m, ok := val.Export().(map[string]interface{})
 	if !ok {
 		return nil, fmt.Errorf("interpretator: failed to convert script to map: %w", err)
 	}
 
-	return newMessage(desc, spec, m, message)
+	return m, nil
 }
 
 func newMessage(desc *desc.MessageDescriptor, spec models.Spec, m map[string]interface{}, message models.Message) (*dynamic.Message, error) {
@@ -66,6 +96,19 @@ func newMessage(desc *desc.MessageDescriptor, spec models.Spec, m map[string]int
 	}
 
 	return resultMessage, nil
+}
+
+func newMeta(vals map[string]interface{}) (metadata.MD, error) {
+	metaMap := make(map[string]string, len(vals))
+	for k, v := range vals {
+		value, ok := v.(string)
+		if !ok {
+			return nil, fmt.Errorf("only string values allowed in meta data")
+		}
+		metaMap[k] = value
+	}
+
+	return metadata.New(metaMap), nil
 }
 
 func castValue(desc *desc.MessageDescriptor, spec models.Spec, f models.Field, v interface{}) (interface{}, error) {

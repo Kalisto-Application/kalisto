@@ -6,21 +6,19 @@ import (
 	"kalisto/src/environment"
 	"kalisto/src/filesystem"
 	"kalisto/src/models"
+	"kalisto/src/proto/client"
 	"kalisto/src/proto/compiler"
 	"kalisto/src/proto/interpreter"
 	"kalisto/src/proto/spec"
 	"kalisto/src/workspace"
 	"reflect"
+	"strings"
 	"time"
 
 	"github.com/jhump/protoreflect/dynamic"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
+	"google.golang.org/grpc/metadata"
 )
-
-type Client interface {
-	Invoke(ctx context.Context, method string, req, resp interface{}) error
-	Close() error
-}
 
 type Api struct {
 	ctx context.Context
@@ -28,8 +26,8 @@ type Api struct {
 	compiler      *compiler.FileCompiler
 	specFactory   *spec.Factory
 	workspace     *workspace.Workspace
-	env           *environment.Environment
-	newClient     func(ctx context.Context, addr string) (Client, error)
+	globalVars    *environment.GlovalVars
+	newClient     func(ctx context.Context, addr string) (*client.Client, error)
 	protoRegistry *compiler.Descritors
 }
 
@@ -37,15 +35,15 @@ func New(
 	compiler *compiler.FileCompiler,
 	specFactory *spec.Factory,
 	workspace *workspace.Workspace,
-	env *environment.Environment,
-	newClient func(ctx context.Context, addr string) (Client, error),
+	globalVars *environment.GlovalVars,
+	newClient func(ctx context.Context, addr string) (*client.Client, error),
 	protoRegistry *compiler.Descritors,
 ) *Api {
 	return &Api{
 		compiler:      compiler,
 		specFactory:   specFactory,
 		workspace:     workspace,
-		env:           env,
+		globalVars:    globalVars,
 		newClient:     newClient,
 		protoRegistry: protoRegistry,
 	}
@@ -139,22 +137,21 @@ func (s *Api) GetWorkspace(id string) (models.Workspace, error) {
 
 // ENVIRONMENT API
 
-func (s *Api) SaveEnvironment(env models.EnvRaw) (models.Env, error) {
-	vars := []models.Var{}
-	return s.env.Save(models.EnvFromRaw(env, vars))
+func (s *Api) GetGlobalVars() string {
+	return s.globalVars.Get()
 }
 
-func (s *Api) DeleteEnvivonment(id string, workspaceID string) error {
-	return s.env.Delete(id, workspaceID)
-}
-
-func (s *Api) EnvironmentsByWorkspace(id string) models.Envs {
-	return s.env.GetByWorkspace(id)
+func (s *Api) SaveGlovalVars(vars string) error {
+	return s.globalVars.Save(vars)
 }
 
 // GRPC API
 
 func (a *Api) SendGrpc(request models.Request) (models.Response, error) {
+	if strings.TrimSpace(request.Body) == "" {
+		return models.Response{}, nil
+	}
+
 	reg, err := a.protoRegistry.Get(request.WorkspaceID)
 	if err != nil {
 		return models.Response{}, err
@@ -177,18 +174,24 @@ func (a *Api) SendGrpc(request models.Request) (models.Response, error) {
 	}
 	defer func() { _ = c.Close() }()
 
-	req, err := interpreter.CreateMessageFromScript(request.Body, md.GetInputType(), ws.Spec, sd.GetFullyQualifiedName(), md.GetName())
+	vars := a.GetGlobalVars()
+	ip := interpreter.NewInterpreter(vars)
+
+	req, err := ip.CreateMessageFromScript(request.Body, md.GetInputType(), ws.Spec, sd.GetFullyQualifiedName(), md.GetName())
 	if err != nil {
 		return models.Response{}, fmt.Errorf("api: failed to create request: %w", err)
 	}
-	if req == nil {
-		return models.Response{}, nil
+
+	meta, err := ip.CreateMetadata(request.Meta)
+	if err != nil {
+		return models.Response{}, fmt.Errorf("api: failed to create metadata: %w", err)
 	}
 
-	md.GetService()
 	resp := dynamic.NewMessage(md.GetOutputType())
 
-	err = c.Invoke(ctx, "/"+sd.GetFullyQualifiedName()+"/"+md.GetName(), req, resp)
+	ctx = metadata.NewOutgoingContext(ctx, meta)
+	responseMeta := metadata.MD{}
+	err = c.Invoke(ctx, "/"+sd.GetFullyQualifiedName()+"/"+md.GetName(), req, resp, responseMeta)
 	if err != nil {
 		return models.Response{}, fmt.Errorf("api: failed to invoke method: %w", err)
 	}
@@ -197,6 +200,7 @@ func (a *Api) SendGrpc(request models.Request) (models.Response, error) {
 	if err != nil {
 		return models.Response{}, fmt.Errorf("api: failed to marshal response: %w", err)
 	}
+	_ = responseMeta
 
 	return models.Response{
 		Body: string(b),
