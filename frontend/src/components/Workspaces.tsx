@@ -69,11 +69,12 @@ export const WorkspaceList: React.FC<WorkspaceListProps> = ({items, activeWorksp
 
       {isDropdownOpen && (
         <div className="absolute top-full z-10 w-40 mt-2 bg-white border border-gray-300 rounded-md shadow-lg">
-          <ul className="py-1">
+
+          { items && (<ul className="py-1">
             {items.map((item, index) => (
               <li key={index} className="px-4 py-2 text-sm text-gray-800 hover:bg-gray-100 cursor-pointer" onClick={() => selectWorkspace(item.id)}>{item.name}</li>
             ))}
-          </ul>
+          </ul>)}
 
           <button onClick={onNewWorkspace}>Add new workspace</button>
         </div>

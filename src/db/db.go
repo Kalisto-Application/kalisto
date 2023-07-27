@@ -15,11 +15,13 @@ type DB struct {
 	d *diskv.Diskv
 }
 
+const dbFolderName = "kalisto.db"
+
 func New(wd string) (*DB, error) {
-	os.MkdirAll(path.Join(wd, "db"), os.ModePerm)
+	os.MkdirAll(path.Join(wd, dbFolderName), os.ModePerm)
 
 	for _, name := range []string{"workspaces", "envs", "globalVars"} {
-		fileName := path.Join(wd, "db", name)
+		fileName := path.Join(wd, dbFolderName, name)
 		if _, err := os.Stat(fileName); errors.Is(err, os.ErrNotExist) {
 			f, err := os.Create(fileName)
 			if err != nil {
@@ -30,7 +32,7 @@ func New(wd string) (*DB, error) {
 	}
 
 	d := diskv.New(diskv.Options{
-		BasePath:  path.Join(wd, "db"),
+		BasePath:  path.Join(wd, dbFolderName),
 		Transform: func(s string) []string { return []string{} },
 		// CacheSizeMax 10MB
 		CacheSizeMax: 10 * 1024 * 1024,

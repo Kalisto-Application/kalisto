@@ -26,7 +26,7 @@ func (s *server) GetBook(ctx context.Context, in *pb.GetBookRequest) (*pb.GetBoo
 	md, _ := metadata.FromIncomingContext(ctx)
 	log.Printf("meta: %s", md.Get("k"))
 
-	res := pb.GetBookRequest{}
+	res := pb.GetBookRequest{Id: in.Id}
 	return &res, nil
 }
 
