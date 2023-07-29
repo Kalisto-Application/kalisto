@@ -2,30 +2,22 @@ import React, {useContext, useState} from "react";
 import { UrlInput } from "../components/UrlInput";
 import { MethodCollection } from "../components/MethodCollectionView";
 import {SendGrpc} from "../../wailsjs/go/api/Api"
-import {models} from "../../wailsjs/go/models"
 import { RequestEditor } from "../components/RequestEditor";
 import { Context } from "../state";
 
-type ApiPageProps = {
-    // workspace: models.Workspace;
-    // method?: models.Method;
-    // inputText: string;
-}
-
-export const ApiPage: React.FC<ApiPageProps> = () => {
+export const ApiPage: React.FC = () => {
     const ctx = useContext(Context);
 
     const [url, setUrl] = useState<string>('localhost:9000');
     const [outText, setOutText] = useState<string>('');
-  
+
     const sendRequest = (_: React.SyntheticEvent) => {
-      debugger;
-      if (ctx.state.activeMethod?.fullName == '') {
+      if (!ctx.state.activeMethod || !ctx.state.activeWorkspace) {
         //TODO: disable Send button
         return
       }
 
-      SendGrpc({addr: url, workspaceId: ctx.state.activeWorkspace.id, method: ctx.state.activeMethod.fullName, body: ctx.state.requestText, meta: ctx.state.requestMetaText}).then(res => {
+      SendGrpc!({addr: url, workspaceId: ctx.state.activeWorkspace.id, method: ctx.state.activeMethod.fullName, body: ctx.state.requestText, meta: ctx.state.requestMetaText}).then(res => {
         setOutText(res.body)
       }).catch(err => {
         setOutText(err)

@@ -1,4 +1,4 @@
-import { Dispatch, createContext, useReducer } from "react";
+import { Dispatch, createContext } from "react";
 import {models} from '../../wailsjs/go/models';
 
 type Action = 
@@ -7,6 +7,7 @@ type Action =
     | {type: 'changeMetaText', text: string}
     | {type: 'newWorkspace', workspace: models.Workspace}
     | {type: 'activeWorkspace', workspace: models.Workspace}
+    | {type: 'removeWorkspace', id: string}
     | {type: 'workspaceList', workspaceList: models.Workspace[]}
     | {type: 'activeMethod', activeMethod: models.Method}
     | {type: 'changeVariables', text: string}
@@ -16,8 +17,8 @@ export type State = {
     requestText: string;
     requestMetaText: string;
     workspaceList: models.Workspace[];
-    activeWorkspace: models.Workspace;
-    activeMethod: models.Method;
+    activeWorkspace?: models.Workspace;
+    activeMethod?: models.Method;
     vars: string;
 }
 
@@ -49,11 +50,17 @@ export const reducer = (state: State, action: Action): State => {
                 ... state,
                 activeWorkspace: action.workspace,
             }
+        case 'removeWorkspace':
+            return {
+                ... state,
+                workspaceList: state.workspaceList.filter(it => it.id != action.id),
+                activeWorkspace: action.id === state.activeWorkspace?.id ? undefined: state.activeWorkspace,
+            }
         case 'workspaceList':
             return {
                 ... state,
                 workspaceList: action.workspaceList,
-                activeWorkspace: action.workspaceList.length > 0 ? action.workspaceList[0]: new models.Workspace()
+                activeWorkspace: action.workspaceList.length > 0 ? action.workspaceList[0]: undefined
             }
         case 'activeMethod':
             return {

@@ -1,12 +1,12 @@
 import React, { useState, useContext } from 'react';
 import { Context } from "../state";
 
-import { NewWorkspace, GetWorkspace } from "../../wailsjs/go/api/Api";
+import { NewWorkspace, GetWorkspace, DeleteWorkspace } from "../../wailsjs/go/api/Api";
 import { models } from "../../wailsjs/go/models";
 
 interface WorkspaceListProps {
     items: models.Workspace[];
-    activeWorkspace: models.Workspace;
+    activeWorkspace?: models.Workspace;
 }
 
 export const WorkspaceList: React.FC<WorkspaceListProps> = ({items, activeWorkspace}) => {
@@ -15,15 +15,9 @@ export const WorkspaceList: React.FC<WorkspaceListProps> = ({items, activeWorksp
   const newWorkspace = () => {
     NewWorkspace()
     .then(res => {
-      ctx.dispatch({type: 'activeWorkspace', workspace: res});
+      ctx.dispatch({type: 'newWorkspace', workspace: res});
     })
     .catch(err => console.log('error on new workspace: ', err))
-  }
-  
-  const setActiveWorkspace = (id: string) => {
-    GetWorkspace(id).then(res => {
-      ctx.dispatch({type: 'activeWorkspace', workspace: res});
-    }).catch(err => console.log(`error on get workspace by id==${id}: `, err))
   }
 
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
@@ -38,11 +32,6 @@ export const WorkspaceList: React.FC<WorkspaceListProps> = ({items, activeWorksp
     }
     newWorkspace();
   }
-
-  const selectWorkspace = (id: string) => {
-    setActiveWorkspace(id);
-    setIsDropdownOpen(false);
-  };
 
   return (
     <div className="relative">
@@ -72,7 +61,7 @@ export const WorkspaceList: React.FC<WorkspaceListProps> = ({items, activeWorksp
 
           { items && (<ul className="py-1">
             {items.map((item, index) => (
-              <li key={index} className="px-4 py-2 text-sm text-gray-800 hover:bg-gray-100 cursor-pointer" onClick={() => selectWorkspace(item.id)}>{item.name}</li>
+              <WorkspaceItem key={index} id={item.id} onClick={()=> {setIsDropdownOpen(false)}} name={item.name} />
             ))}
           </ul>)}
 
@@ -82,3 +71,84 @@ export const WorkspaceList: React.FC<WorkspaceListProps> = ({items, activeWorksp
     </div>
   );
 };
+
+type WorkspaceItemProps = {
+  id: string;
+  onClick: () => void;
+  name: string;
+}
+
+const WorkspaceItem: React.FC<WorkspaceItemProps> = ({ id, onClick, name}) => {
+  const ctx = useContext(Context);
+
+  const [isHovered, setIsHovered] = useState(false);
+
+  const onMouseEnter = () => {
+    setIsHovered(true);
+  }
+
+  const onMouseLeave = () => {
+    setIsHovered(false);
+  }
+
+  const removeWorkspace = (id: string) => {
+    onClick();
+    DeleteWorkspace(id).then(_ => {
+      ctx.dispatch({type: 'removeWorkspace', id: id})
+    }).catch(err => {
+      console.log(`failed to remove workspace id=${id}: ${err}`);
+    })
+  }
+
+  const renameWorkspace = (id: string) => {
+
+  }
+
+  const setActiveWorkspace = (id: string) => {
+    GetWorkspace(id).then(res => {
+      ctx.dispatch({type: 'activeWorkspace', workspace: res});
+    }).catch(err => console.log(`error on get workspace by id==${id}: `, err))
+  }
+
+
+  const selectWorkspace = (id: string) => {
+    setActiveWorkspace(id);
+    onClick();
+  };
+
+  return (
+    <div className="h-auto" onMouseEnter={onMouseEnter} 
+    onMouseLeave={onMouseLeave} >
+      <li className="px-4 py-2 text-sm text-gray-800 hover:bg-gray-100 cursor-pointer"
+             onClick={() => {selectWorkspace(id)}}>{name}</li>
+
+    {isHovered && <WorkspaceMenu 
+      items={[
+        {text: "Remove", onClick: () => {removeWorkspace(id)}},
+        {text: "Rename", onClick: () => {renameWorkspace(id)}},
+        ]} />}
+             </div>);
+}
+
+type WorkspaceMenuProps = {
+    items: WorkspaceMenuItemProps[];
+}
+
+type WorkspaceMenuItemProps = {
+  text: string;
+  onClick: () => void;
+};
+
+const WorkspaceMenu: React.FC<WorkspaceMenuProps> = ({items}) => {
+  return (<div className="top-full z-10 w-40 mt-2 bg-white border border-gray-300 rounded-md shadow-lg">
+    <ul className="py-1">
+      {items.map((it, i) => {
+        return <WorkspaceMenuItem key={i} text={it.text} onClick={it.onClick} />;
+      })}
+    </ul>
+  </div>);
+}
+
+const WorkspaceMenuItem: React.FC<WorkspaceMenuItemProps> = ({text, onClick}) => {
+  return (<li className="px-4 py-2 text-sm text-gray-800 hover:bg-gray-100 cursor-pointer" onClick={onClick}>{text}</li>);
+}

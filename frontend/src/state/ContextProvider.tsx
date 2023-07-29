@@ -1,4 +1,5 @@
 import { ReactNode, useEffect, useReducer } from "react";
+import * as Sentry from "@sentry/react";
 
 import {reducer, State, Context} from './state';
 
@@ -49,8 +50,12 @@ export const ContextProvider: React.FC<ContextProps> = ({ children }) => {
   }, [])
 
   return (
-    <Context.Provider value={{ state, dispatch }}>
-      {children}
-    </Context.Provider>
+    <Sentry.ErrorBoundary beforeCapture={(scope) => {
+      scope.setExtra('state', state);
+    }}>
+      <Context.Provider value={{ state, dispatch }}>
+        {children}
+      </Context.Provider>
+    </Sentry.ErrorBoundary>
   );
 };

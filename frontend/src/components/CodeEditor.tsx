@@ -8,7 +8,7 @@ interface CodeEditorProps {
 };
 
 const debounce = (f: Action, delay: number): Action => {
-    let timer: number;
+    let timer: NodeJS.Timeout;
     return (text: string) => {
       clearTimeout(timer);
       timer = setTimeout(() => { f(text); }, delay);

@@ -2,6 +2,7 @@ package assembly
 
 import (
 	"context"
+	"fmt"
 	"kalisto/src/api"
 	"kalisto/src/db"
 	"kalisto/src/environment"
@@ -9,7 +10,6 @@ import (
 	"kalisto/src/proto/compiler"
 	"kalisto/src/proto/spec"
 	"kalisto/src/workspace"
-	"log"
 
 	"github.com/adrg/xdg"
 )
@@ -22,20 +22,20 @@ type App struct {
 }
 
 // NewApp creates a new App application struct
-func NewApp() *App {
+func NewApp() (*App, error) {
 	store, err := db.New(xdg.DataHome)
 	if err != nil {
-		log.Fatal("failed to init db: ", err)
+		return nil, fmt.Errorf("failed to init db: %w", err)
 	}
 
 	protoRegistry := compiler.NewProtoRegistry()
 	ws, err := workspace.New(store)
 	if err != nil {
-		log.Fatal("failed to init workspace: ", err)
+		return nil, fmt.Errorf("failed to init workspace: %w", err)
 	}
 	glovalVars, err := environment.NewGlovalVars(store)
 	if err != nil {
-		log.Fatal("failed to init environments: ", err)
+		return nil, fmt.Errorf("failed to init environments: %w", err)
 	}
 	protoCompiler := compiler.NewFileCompiler()
 	specFactory := spec.NewFactory()
@@ -48,7 +48,7 @@ func NewApp() *App {
 
 	a := api.New(protoCompiler, specFactory, ws, glovalVars, newClient, protoRegistry)
 
-	return &App{Api: a}
+	return &App{Api: a}, nil
 }
 
 // startup is called when the app starts. The context is saved
