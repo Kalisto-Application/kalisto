@@ -1,5 +1,6 @@
 import { Dispatch, createContext } from "react";
 import {models} from '../../wailsjs/go/models';
+import { LazyResult } from "postcss";
 
 type Action = 
     | {type: 'switchEditor', i: number}
@@ -8,6 +9,7 @@ type Action =
     | {type: 'newWorkspace', workspace: models.Workspace}
     | {type: 'activeWorkspace', workspace: models.Workspace}
     | {type: 'removeWorkspace', id: string}
+    | {type: 'renameWorkspace', id: string, name: string}
     | {type: 'workspaceList', workspaceList: models.Workspace[]}
     | {type: 'activeMethod', activeMethod: models.Method}
     | {type: 'changeVariables', text: string}
@@ -55,6 +57,16 @@ export const reducer = (state: State, action: Action): State => {
                 ... state,
                 workspaceList: state.workspaceList.filter(it => it.id != action.id),
                 activeWorkspace: action.id === state.activeWorkspace?.id ? undefined: state.activeWorkspace,
+            }
+        case 'renameWorkspace':
+            return {
+                ... state,
+                workspaceList: state.workspaceList.map(it => {
+                    if (it.id === action.id) {
+                        it.name = action.name
+                    }
+                    return it;
+                }),
             }
         case 'workspaceList':
             return {
