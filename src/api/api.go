@@ -96,25 +96,11 @@ func (s *Api) DeleteWorkspace(id string) error {
 func (s *Api) FindWorkspaces() ([]models.Workspace, error) {
 	list := s.workspace.List()
 	for i, w := range list {
-		registry, err := s.protoRegistryFromPath(w.BasePath)
+		w, err := s.enrichWorkspace(w, w.LastUsage)
 		if err != nil {
-			return nil, fmt.Errorf("failed to create proto registry: %w", err)
+			return nil, err
 		}
-		s.protoRegistry.Add(w.ID, registry)
-
-		spec, err := s.specFactory.FromRegistry(registry)
-		if err != nil {
-			// TODO: log
-			continue
-		}
-		if !reflect.DeepEqual(spec, w.Spec) {
-			w.Spec = spec
-			if err := s.workspace.Update(w); err != nil {
-				// TODO: log
-				continue
-			}
-			list[i] = w
-		}
+		list[i] = w
 	}
 	return list, nil
 }
@@ -125,12 +111,31 @@ func (s *Api) GetWorkspace(id string) (models.Workspace, error) {
 		return ws, err
 	}
 
+	return s.enrichWorkspace(ws, time.Now())
+}
+
+func (s *Api) enrichWorkspace(ws models.Workspace, lastUsage time.Time) (models.Workspace, error) {
 	registry, err := s.protoRegistryFromPath(ws.BasePath)
 	if err != nil {
 		// TODO: MARK AS INVALID
 		return ws, err
 	}
 	s.protoRegistry.Add(ws.ID, registry)
+
+	spec, err := s.specFactory.FromRegistry(registry)
+	if err != nil {
+		return ws, err
+	}
+
+	newWs := ws
+	newWs.Spec = spec
+	newWs.LastUsage = lastUsage
+
+	if !reflect.DeepEqual(ws, newWs) {
+		if err := s.workspace.Update(newWs); err != nil {
+			return ws, err
+		}
+	}
 
 	return ws, nil
 }
@@ -205,6 +210,10 @@ func (a *Api) SendGrpc(request models.Request) (models.Response, error) {
 	return models.Response{
 		Body: string(b),
 	}, nil
+}
+
+func (s *Api) UpdateWorkspace(ws models.Workspace) error {
+	return s.workspace.Update(ws)
 }
 
 func (s *Api) protoRegistryFromPath(path string) (*compiler.Registry, error) {

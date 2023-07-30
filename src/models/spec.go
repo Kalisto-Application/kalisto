@@ -9,14 +9,15 @@ import (
 type Workspace struct {
 	ID        string    `json:"id"`
 	Name      string    `json:"name"`
+	TargetUrl string    `json:"targetUrl"`
 	Spec      Spec      `json:"spec"`
-	LastUsage time.Time `json:"lastUsage"`
+	LastUsage time.Time `json:"lastUsage" ts_type:"Date" ts_transform:"new Date(__VALUE__)"`
 	BasePath  string    `json:"basePath"`
 }
 
 type Spec struct {
 	Services []Service          `json:"services"`
-	Links    map[string]Message `json:"links"`
+	Links    map[string]Message `json:"-"`
 }
 
 func (s *Spec) FindInputMessage(serviceName, methodName string) (Message, error) {

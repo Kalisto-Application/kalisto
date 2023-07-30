@@ -192,7 +192,6 @@ export namespace models {
 	}
 	export class Spec {
 	    services: Service[];
-	    links: {[key: string]: Message};
 	
 	    static createFrom(source: any = {}) {
 	        return new Spec(source);
@@ -201,7 +200,6 @@ export namespace models {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.services = this.convertValues(source["services"], Service);
-	        this.links = this.convertValues(source["links"], Message, true);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -225,9 +223,9 @@ export namespace models {
 	export class Workspace {
 	    id: string;
 	    name: string;
+	    targetUrl: string;
 	    spec: Spec;
-	    // Go type: time
-	    lastUsage: any;
+	    lastUsage: Date;
 	    basePath: string;
 	
 	    static createFrom(source: any = {}) {
@@ -238,8 +236,9 @@ export namespace models {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.id = source["id"];
 	        this.name = source["name"];
+	        this.targetUrl = source["targetUrl"];
 	        this.spec = this.convertValues(source["spec"], Spec);
-	        this.lastUsage = this.convertValues(source["lastUsage"], null);
+	        this.lastUsage = new Date(source["lastUsage"]);
 	        this.basePath = source["basePath"];
 	    }
 	

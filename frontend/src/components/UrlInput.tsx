@@ -1,4 +1,4 @@
-import React, {SyntheticEvent, useState} from "react";
+import React, {SyntheticEvent} from "react";
 
 interface UrlInputProps {
   value: string;
@@ -18,4 +18,3 @@ export const UrlInput: React.FC<UrlInputProps> = ({ onClick, value, setValue }) 
   </div>
   );
 };
- 

@@ -1,21 +1,12 @@
 import React, {ChangeEvent, useContext, useMemo } from "react";
 import { Context } from "../state";
+import { debounce, Action } from "../pkg";
 
 interface CodeEditorProps {
     text: string;
     type: 'changeRequestText' | 'changeMetaText' | 'changeVariables';
     action?: Action;
 };
-
-const debounce = (f: Action, delay: number): Action => {
-    let timer: NodeJS.Timeout;
-    return (text: string) => {
-      clearTimeout(timer);
-      timer = setTimeout(() => { f(text); }, delay);
-    };
-}
-
-type Action = (data: string) => void
 
 export const CodeEditor: React.FC<CodeEditorProps> = ({ text, type, action }) => {
     const ctx = useContext(Context);

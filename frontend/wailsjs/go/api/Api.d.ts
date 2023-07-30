@@ -17,3 +17,5 @@ export function RenameWorkspace(arg1:string,arg2:string):Promise<void>;
 export function SaveGlovalVars(arg1:string):Promise<void>;
 
 export function SendGrpc(arg1:models.Request):Promise<models.Response>;
+
+export function UpdateWorkspace(arg1:models.Workspace):Promise<void>;

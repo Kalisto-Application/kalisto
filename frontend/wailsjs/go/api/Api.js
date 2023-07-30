@@ -33,3 +33,7 @@ export function SaveGlovalVars(arg1) {
 export function SendGrpc(arg1) {
   return window['go']['api']['Api']['SendGrpc'](arg1);
 }
+
+export function UpdateWorkspace(arg1) {
+  return window['go']['api']['Api']['UpdateWorkspace'](arg1);
+}

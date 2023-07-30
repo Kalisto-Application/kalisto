@@ -20,9 +20,9 @@ export const ContextProvider: React.FC<ContextProps> = ({ children }) => {
         return
       }
 
-      let latest = res[0]
+      let latest = res[0].lastUsage
       res.forEach(it => {
-        if (it.lastUsage > latest.lastUsage) {
+        if (it.lastUsage > latest) {
           latest = it.lastUsage
         }
       })
