@@ -37,8 +37,8 @@ func main() {
 	// Create application with options
 	if err := wails.Run(&options.App{
 		Title:  "kalisto",
-		Width:  1024,
-		Height: 768,
+		Width:  1440,
+		Height: 925,
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},

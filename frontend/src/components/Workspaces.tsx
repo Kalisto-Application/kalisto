@@ -43,31 +43,43 @@ export const WorkspaceList: React.FC<WorkspaceListProps> = ({items, activeWorksp
     })
   }
 
+  let containerClass = "w-[220px] bg-primaryFill relative border-2 border-borderFill"
+  if (isDropdownOpen) {
+    containerClass += " z-10"
+  }
+
   return (
-    <div className="relative">
+    <div className={containerClass}>
       <button
         type="button"
-        className="flex items-center px-4 py-2 text-sm font-medium text-gray-800 bg-gray-200 border border-gray-300 rounded-md hover:bg-gray-300 focus:outline-none focus:ring focus:ring-gray-400"
+        className="flex items-center p-[12px] text-sm"
         onClick={toggleDropdown}
       >
-        {activeWorkspace && (<span className="mr-1">{activeWorkspace.name}</span>)}
-        <svg
-          className={`w-4 h-4 transition-transform duration-300 ${
-            isDropdownOpen ? 'transform rotate-180' : ''
-          }`}
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
-          <path
-            fillRule="evenodd"
-            d="M10.707 14.293a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L10 11.586l3.293-3.293a1 1 0 111.414 1.414l-4 4z"
-            clipRule="evenodd"
-          />
+        <div className='flex flex-1 m-[4px]'>
+          <div className='mt-[4px]'>
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <g clip-path="url(#clip0_400_226)">
+          <path d="M12.2569 4.06432H6.74063L4.94081 2.26449C4.85706 2.18046 4.75752 2.11382 4.64791 2.06843C4.5383 2.02304 4.42079 1.99978 4.30216 2H0.903137C0.66361 2 0.433894 2.09515 0.264523 2.26452C0.0951517 2.4339 0 2.66361 0 2.90314V12.2325C0.00017086 12.4614 0.0911636 12.6809 0.252997 12.8427C0.41483 13.0045 0.634274 13.0955 0.863141 13.0957H12.3143C12.5385 13.0955 12.7535 13.0064 12.9121 12.8478C13.0707 12.6892 13.1598 12.4742 13.16 12.25V4.96745C13.16 4.72793 13.0648 4.49821 12.8955 4.32884C12.7261 4.15947 12.4964 4.06432 12.2569 4.06432ZM0.903137 2.77412H4.30216C4.33632 2.77426 4.36903 2.78795 4.39312 2.81218L5.64525 4.06432H0.774118V2.90314C0.774118 2.86892 0.787711 2.8361 0.811907 2.81191C0.836102 2.78771 0.868919 2.77412 0.903137 2.77412ZM12.3859 12.25C12.3859 12.269 12.3783 12.2872 12.3649 12.3006C12.3515 12.314 12.3333 12.3216 12.3143 12.3216H0.863141C0.839635 12.3212 0.817184 12.3118 0.800561 12.2951C0.783937 12.2785 0.774451 12.2561 0.774118 12.2325V4.83843H12.2569C12.2911 4.83843 12.3239 4.85203 12.3481 4.87622C12.3723 4.90042 12.3859 4.93323 12.3859 4.96745V12.25Z" fill="#BEBEC3" stroke="#BEBEC3" stroke-width="0.5"/>
+          </g>
+          <defs>
+          <clipPath id="clip0_400_226">
+          <rect width="14" height="14" fill="white"/>
+          </clipPath>
+          </defs>
         </svg>
+        </div>
+        {activeWorkspace && (<span className="ml-[12px]">{activeWorkspace.name}</span>)}
+        </div>
+        <div>
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5 9L7 11L9 9" stroke="#BEBEC3" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M9 5L7 3L5 5" stroke="#BEBEC3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
       </button>
 
       {isDropdownOpen && (
-        <div className="absolute top-full z-10 w-40 mt-2 bg-white border border-gray-300 rounded-md shadow-lg">
+        <div className="absolute top-full">
 
           { items && (<ul className="py-1">
             {items.map((item, index) => {

@@ -16,7 +16,7 @@ export const VariablesPage: React.FC<VariablesPageProps> = () => {
     }
 
     return (
-      <div className="p-4">
+      <div className="">
         <CodeEditor text={ctx.state.vars} type='changeVariables' action={saveGlobalVariables} />
       </div>
     );
