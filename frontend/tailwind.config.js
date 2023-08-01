@@ -7,6 +7,7 @@ module.exports = {
       borderFill: '#343434',
       textBlockFill: '#1E1E20',
       primaryGeneral: '#3D3DAB',
+      secondaryText: '#8D8D98',
     },
     extend: {},
   },

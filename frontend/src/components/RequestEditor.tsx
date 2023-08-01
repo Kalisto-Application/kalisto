@@ -14,7 +14,7 @@ export const RequestEditor: React.FC<RequestEditorProps> = () => {
     <CodeEditor key={1} text={ctx.state.requestMetaText} type="changeMetaText"/>]
 
     return (
-        <div>
+        <div className="bg-textBlockFill">
             <EditorSwitcher switches={['Request', 'Metadata']}/>
             {editors[ctx.state.activeEditor] || editors[0]}
         </div>

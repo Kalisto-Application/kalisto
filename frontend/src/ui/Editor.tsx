@@ -44,5 +44,5 @@ export const Editor: React.FC<props> = ({value, onChange}) => {
 		return clean;
 	}, [monacoEl.current]);
 
-	return <div className="w-[450px] h-[600px] bg-codeSectionBg text-inputPrimary" ref={monacoEl}></div>;
+	return <div className="w-[450px] h-[600px]" ref={monacoEl}></div>;
 };
