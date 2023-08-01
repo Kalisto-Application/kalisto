@@ -4,6 +4,7 @@ import { MethodCollection } from "../components/MethodCollectionView";
 import { WorkspaceList } from "../components/Workspaces";
 import {SendGrpc, UpdateWorkspace} from "../../wailsjs/go/api/Api"
 import { RequestEditor } from "../components/RequestEditor";
+import { ResponseText } from "../components/ResponseText";
 import { Context } from "../state";
 import { models } from "../../wailsjs/go/models";
 import { debounce, Action } from "../pkg";
@@ -12,7 +13,7 @@ export const ApiPage: React.FC = () => {
     const ctx = useContext(Context);
 
     const [url, setUrl] = useState(ctx.state.activeWorkspace?.targetUrl || 'localhost:9000');
-    const [outText, setOutText] = useState('');
+    const [resp, setResp] = useState(models.Response.createFrom({}));
     useEffect(() => {
       if (ctx.state.activeWorkspace?.targetUrl) {
         setUrl(ctx.state.activeWorkspace.targetUrl);
@@ -41,9 +42,10 @@ export const ApiPage: React.FC = () => {
       }
 
       SendGrpc!({addr: url, workspaceId: ctx.state.activeWorkspace.id, method: ctx.state.activeMethod.fullName, body: ctx.state.requestText, meta: ctx.state.requestMetaText}).then(res => {
-        setOutText(res.body)
+        setResp(res);
+        ctx.dispatch({type: 'switchResponseEditor', i: 0})
       }).catch(err => {
-        setOutText(err)
+        console.log('failed to get response: ', err)
       })
     };
 
@@ -61,7 +63,7 @@ export const ApiPage: React.FC = () => {
           <UrlInput onClick={sendRequest} value={url} setValue={onSetUrl} />          
           <div className="flex flex-1">
             <RequestEditor />
-            <span>{outText}</span>
+            <ResponseText body={resp.body} meta={resp.metaData} />
           </div>
         </div>
       </div>

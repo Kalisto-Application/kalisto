@@ -3,7 +3,8 @@ import {models} from '../../wailsjs/go/models';
 import { LazyResult } from "postcss";
 
 type Action = 
-    | {type: 'switchEditor', i: number}
+    | {type: 'switchRequestEditor', i: number}
+    | {type: 'switchResponseEditor', i: number}
     | {type: 'changeRequestText', text: string}
     | {type: 'changeMetaText', text: string}
     | {type: 'newWorkspace', workspace: models.Workspace}
@@ -15,7 +16,8 @@ type Action =
     | {type: 'changeVariables', text: string}
 
 export type State = {
-    activeEditor: number;
+    activeRequestEditor: number;
+    activeResponseEditor: number;
     requestText: string;
     requestMetaText: string;
     workspaceList: models.Workspace[];
@@ -26,10 +28,15 @@ export type State = {
 
 export const reducer = (state: State, action: Action): State => {
     switch (action.type) {
-        case 'switchEditor':
+        case 'switchRequestEditor':
             return {
                 ...state,
-                activeEditor: action.i as number,
+                activeRequestEditor: action.i as number,
+            }
+        case 'switchResponseEditor':
+            return {
+                ...state,
+                activeResponseEditor: action.i as number,
             }
         case 'changeRequestText':
             return {
@@ -79,7 +86,7 @@ export const reducer = (state: State, action: Action): State => {
                 ... state,
                 activeMethod: action.activeMethod,
                 requestText: action.activeMethod.requestExample,
-                activeEditor: 0,
+                activeRequestEditor: 0,
             }
         case 'changeVariables':
             return {

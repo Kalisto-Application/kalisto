@@ -3,10 +3,11 @@ import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 
 type props = {
     value: string;
-    onChange: (value: string) => void;
+    onChange?: (value: string) => void;
+	readonly?: boolean;
 }
 
-export const Editor: React.FC<props> = ({value, onChange}) => {
+export const Editor: React.FC<props> = ({value, onChange, readonly}) => {
 	const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor | null>(null);
 	const [sub, setSub] = useState<monaco.IDisposable | undefined>();
 	const monacoEl = useRef(null);
@@ -32,9 +33,10 @@ export const Editor: React.FC<props> = ({value, onChange}) => {
 					language: 'javascript',
 					theme: 'vs-dark',
 					minimap: {enabled: false},
+					readOnly: readonly,
 				});
 				setSub(ed.getModel()?.onDidChangeContent(e => {
-					onChange(ed.getModel()?.getValue() || "") 
+					if (onChange) {onChange(ed.getModel()?.getValue() || "")} 
 				}))
 
                 return ed
@@ -44,5 +46,5 @@ export const Editor: React.FC<props> = ({value, onChange}) => {
 		return clean;
 	}, [monacoEl.current]);
 
-	return <div className="w-[450px] h-[600px]" ref={monacoEl}></div>;
+	return <div className="w-full h-[600px]" ref={monacoEl}></div>;
 };
