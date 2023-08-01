@@ -12,6 +12,7 @@
   "dependencies": {
     "@sentry/react": "^7.60.1",
     "@sentry/vite-plugin": "^2.5.0",
+    "monaco-editor": "^0.40.0",
     "react": "^18.2.0",
     "react-complex-tree": "^2.2.0",
     "react-dom": "^18.2.0",

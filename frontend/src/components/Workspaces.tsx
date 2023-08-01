@@ -21,7 +21,7 @@ export const WorkspaceList: React.FC<WorkspaceListProps> = ({items, activeWorksp
     .catch(err => console.log('error on new workspace: ', err))
   }
 
-  const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const toggleDropdown = () => {
     setIsDropdownOpen((prevIsDropdownOpen) => !prevIsDropdownOpen);

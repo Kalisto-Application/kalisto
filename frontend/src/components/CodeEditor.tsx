@@ -2,6 +2,8 @@ import React, {ChangeEvent, useContext, useMemo } from "react";
 import { Context } from "../state";
 import { debounce, Action } from "../pkg";
 
+import { Editor } from "../ui/Editor";
+
 interface CodeEditorProps {
     text: string;
     type: 'changeRequestText' | 'changeMetaText' | 'changeVariables';
@@ -18,16 +20,16 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({ text, type, action }) =>
       }, [])
     }
 
-    let onChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-        ctx.dispatch({type: type, text: e.target.value});
+    let onChange = (value: string) => {
+        ctx.dispatch({type: type, text: value});
         if (debouncedAction) {
-          debouncedAction(e.target.value)
+          debouncedAction(value)
         }
     }
 
     return (
         <div>
-          <textarea value={text} onChange={onChange} className="w-[480px] h-[600px] bg-codeSectionBg text-inputPrimary"/>
+          <Editor key={ctx.state.activeMethod?.fullName || ""} value={text} onChange={onChange}/>
         </div>
       );
 }
