@@ -5,7 +5,7 @@ import { Link, useMatch } from "react-router-dom";
 import iconUrl from "../../icons/icon.svg";
 
 export const Sidebar: React.FC = ({}) => (
-  <aside className="w-[90px] flex flex-col justify-star border-[1px] border-r-borderFill border-y-0 border-l-0">
+  <aside className="flex flex-[0_0_90px] flex-col justify-star border-[1px] border-r-borderFill border-y-0 border-l-0">
     <SideIcon link="/api" />
     <SideIcon link="/variables" />
   </aside>
@@ -16,7 +16,7 @@ type SideIconProps = {
   link: string;
 }
 const SideIcon: React.FC<SideIconProps> = ({ link }) => {
-  let className = "h-[40px] my-[10px] py-[8px] px-[26px] static"
+  let className = "h-[40px] w-full my-[10px] py-[8px] px-[26px] static"
   const match = useMatch(link);
   if (match?.pathname === link) {
     className += " border-l-primaryGeneral border-l-4"

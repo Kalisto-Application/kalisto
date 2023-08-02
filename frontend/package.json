@@ -10,6 +10,8 @@
     "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,json,css,scss,md}\""
   },
   "dependencies": {
+    "@headlessui/react": "^1.7.16",
+    "@headlessui/tailwindcss": "^0.2.0",
     "@sentry/react": "^7.60.1",
     "@sentry/vite-plugin": "^2.5.0",
     "monaco-editor": "^0.40.0",

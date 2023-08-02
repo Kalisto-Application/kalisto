@@ -8,7 +8,7 @@ import Header from "./Header";
 import Sidebar from "./Sidebar";
 
 export const MainLayout: React.FC = () => {
-  return (<div className="flex h-screen flex-col">
+  return (<div className="flex flex-1 flex-col">
     <Header />
     <div className="flex flex-1">
       <Sidebar />

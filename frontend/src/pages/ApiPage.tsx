@@ -54,12 +54,12 @@ export const ApiPage: React.FC = () => {
     }
 
     return (
-      <div className="flex flex-1">
-        <div className="">
+      <div className="flex flex-1 w-full">
+        <div className="flex flex-[0_0_200px] justify-items-start flex-col">
           <WorkspaceList items={ctx.state.workspaceList} activeWorkspace={ctx.state?.activeWorkspace} />
           <MethodCollection services={ctx.state.activeWorkspace.spec.services} selectedItem={ctx.state.activeMethod?.fullName} />
         </div>
-        <div className="w-full">
+        <div className="flex flex-1 flex-col">
           <UrlInput onClick={sendRequest} value={url} setValue={onSetUrl} />          
           <div className="flex flex-1">
             <RequestEditor />
