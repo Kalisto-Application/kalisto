@@ -30,7 +30,6 @@ func New(s Store) (*Workspace, error) {
 
 func (w *Workspace) Save(workspace models.Workspace) (models.Workspace, error) {
 	workspace.ID = uuid.NewString()
-	workspace.LastUsage = time.Now()
 	w.cache = append(w.cache, workspace)
 	return workspace, w.s.SaveWorkspaces(w.cache)
 }

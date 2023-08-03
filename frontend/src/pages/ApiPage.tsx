@@ -3,7 +3,7 @@ import { UrlInput } from "../components/UrlInput";
 import SearchBox from "../ui/SearchBox";
 import { MethodCollection } from "../components/MethodCollectionView";
 import { WorkspaceList } from "../components/Workspaces";
-import {SendGrpc, UpdateWorkspace} from "../../wailsjs/go/api/Api"
+import {NewWorkspace, SendGrpc, UpdateWorkspace} from "../../wailsjs/go/api/Api"
 import { RequestEditor } from "../components/RequestEditor";
 import { ResponseText } from "../components/ResponseText";
 import { Context } from "../state";
@@ -14,14 +14,14 @@ import TabList from "../ui/TabList";
 export const ApiPage: React.FC = () => {
     const ctx = useContext(Context);
 
-    const [url, setUrl] = useState(ctx.state.activeWorkspace?.targetUrl || 'localhost:9000');
+    const [url, setUrl] = useState(ctx.state.activeWorkspace?.targetUrl || '');
     const [resp, setResp] = useState(models.Response.createFrom({}));
+
     useEffect(() => {
       if (ctx.state.activeWorkspace?.targetUrl) {
         setUrl(ctx.state.activeWorkspace.targetUrl);
       }
     }, [ctx.state.activeWorkspace?.targetUrl])
-
 
     const action: Action = (url: string) => {
       UpdateWorkspace(new models.Workspace({... ctx.state.activeWorkspace, targetUrl: url})).catch(err => {
@@ -51,16 +51,12 @@ export const ApiPage: React.FC = () => {
       })
     };
 
-    if (!ctx.state.activeWorkspace) {
-      return (<div></div>)
-    }
-
     return (
       <div className="flex flex-1 w-full">
         <div className="flex flex-[0_0_220px] justify-items-start flex-col">
-          <WorkspaceList items={ctx.state.workspaceList} activeWorkspace={ctx.state?.activeWorkspace} />
+          <WorkspaceList items={ctx.state.workspaceList||[]} activeWorkspace={ctx.state?.activeWorkspace} />
           <SearchBox />
-          <MethodCollection services={ctx.state.activeWorkspace.spec.services} selectedItem={ctx.state.activeMethod?.fullName} />
+          <MethodCollection services={ctx.state.activeWorkspace?.spec.services} selectedItem={ctx.state.activeMethod?.fullName} />
         </div>
         <div className="flex flex-1 flex-col">
           <TabList />

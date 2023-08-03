@@ -8,6 +8,7 @@ module.exports = {
       textBlockFill: '#1E1E20',
       primaryGeneral: '#3D3DAB',
       secondaryText: '#8D8D98',
+      icon: '#BEBEC3',
     },
     extend: {},
   },

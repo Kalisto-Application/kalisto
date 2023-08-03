@@ -1,15 +1,14 @@
 import React, { useState, useEffect, useContext } from "react";
 import { ControlledTreeEnvironment, Tree, TreeItemIndex, TreeItem } from 'react-complex-tree';
 import { models } from "../../wailsjs/go/models";
-import "react-complex-tree/lib/style-modern.css";
 import { Context } from "../state";
 
 interface MethodCollectionProps {
-  services: models.Service[];
+  services?: models.Service[];
   selectedItem?: string;
 };
 
-const findMethod = (s: models.Service[], name: string): models.Method | undefined => {
+const findMethod = (s: models.Service[] = [], name: string): models.Method | undefined => {
   for (const service of s) {
     for (const method of service.methods) {
       if (method.fullName == name) {
@@ -27,7 +26,7 @@ type Data = {
 export const MethodCollection: React.FC<MethodCollectionProps> = ({ services, selectedItem }) => {
   const ctx = useContext(Context);
   
-  const serviceNames = services.map(it => it.fullName)
+  const serviceNames = services?.map(it => it.fullName) || []
   const [expandedItems, setExpandedItems] = useState<TreeItemIndex[]>(serviceNames);
 
   useEffect(() => {
@@ -40,7 +39,7 @@ export const MethodCollection: React.FC<MethodCollectionProps> = ({ services, se
     data: {display: 'Root item', isMethod: false},
     children: serviceNames,
   }}
-  services.forEach(it => {
+  services?.forEach(it => {
     itemsData[it.fullName] = {
       index: it.fullName,
       data: {display: it.name, isMethod: false},
@@ -63,7 +62,7 @@ export const MethodCollection: React.FC<MethodCollectionProps> = ({ services, se
       viewState={{
         "1": {
           expandedItems: expandedItems,
-          focusedItem: selectedItem,
+          selectedItems: selectedItem? [selectedItem]: undefined,
         }
       }}
       onExpandItem={item => {

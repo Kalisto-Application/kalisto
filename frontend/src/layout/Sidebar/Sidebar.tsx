@@ -2,7 +2,7 @@ import React from "react";
 
 import { Link, useMatch } from "react-router-dom";
 
-import iconUrl from "../../icons/icon.svg";
+import iconUrl from "../../../assets/icons/icon.svg";
 
 export const Sidebar: React.FC = ({}) => (
   <aside className="flex flex-[0_0_90px] flex-col justify-star border-[1px] border-r-borderFill border-y-0 border-l-0">

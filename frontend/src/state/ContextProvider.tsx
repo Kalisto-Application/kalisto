@@ -4,7 +4,7 @@ import * as Sentry from "@sentry/react";
 import {reducer, State, Context} from './state';
 
 import { models } from "../../wailsjs/go/models";
-import { FindWorkspaces, GetGlobalVars } from "../../wailsjs/go/api/Api";
+import { FindWorkspaces, NewWorkspace, GetGlobalVars } from "../../wailsjs/go/api/Api";
 
 type ContextProps = {
   children?: ReactNode,
@@ -16,9 +16,9 @@ export const ContextProvider: React.FC<ContextProps> = ({ children }) => {
     // load the app
     FindWorkspaces()
     .then(res => {
-      if (res == null) {
-        return
-      }
+      if (res.length === 0) {
+        return 
+        }
 
       let latest = res[0].lastUsage
       res.forEach(it => {

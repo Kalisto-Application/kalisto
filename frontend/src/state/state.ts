@@ -20,7 +20,7 @@ export type State = {
     activeResponseEditor: number;
     requestText: string;
     requestMetaText: string;
-    workspaceList: models.Workspace[];
+    workspaceList?: models.Workspace[];
     activeWorkspace?: models.Workspace;
     activeMethod?: models.Method;
     vars: string;
@@ -51,7 +51,7 @@ export const reducer = (state: State, action: Action): State => {
         case 'newWorkspace':
             return {
                 ... state,
-                workspaceList: state.workspaceList.concat([action.workspace]),
+                workspaceList: [action.workspace].concat(state.workspaceList||[]),
                 activeWorkspace: action.workspace,
             } 
         case 'activeWorkspace':
@@ -62,13 +62,13 @@ export const reducer = (state: State, action: Action): State => {
         case 'removeWorkspace':
             return {
                 ... state,
-                workspaceList: state.workspaceList.filter(it => it.id != action.id),
+                workspaceList: state.workspaceList?.filter(it => it.id != action.id),
                 activeWorkspace: action.id === state.activeWorkspace?.id ? undefined: state.activeWorkspace,
             }
         case 'renameWorkspace':
             return {
                 ... state,
-                workspaceList: state.workspaceList.map(it => {
+                workspaceList: state.workspaceList?.map(it => {
                     if (it.id === action.id) {
                         it.name = action.name
                     }

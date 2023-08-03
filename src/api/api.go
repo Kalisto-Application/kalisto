@@ -72,9 +72,11 @@ func (a *Api) NewWorkspace() (models.Workspace, error) {
 	}
 
 	ws, err := a.workspace.Save(models.Workspace{
-		Name:     "New workspace",
-		Spec:     spc,
-		BasePath: path,
+		Name:      "New workspace",
+		Spec:      spc,
+		BasePath:  path,
+		TargetUrl: "localhost:9000",
+		LastUsage: time.Now(),
 	})
 	if err != nil {
 		return ws, fmt.Errorf("api: failed to save workspace: %w", err)

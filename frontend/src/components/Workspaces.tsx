@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { Context } from "../state";
 
 import { NewWorkspace, GetWorkspace, DeleteWorkspace, RenameWorkspace } from "../../wailsjs/go/api/Api";
@@ -6,11 +6,11 @@ import { models } from "../../wailsjs/go/models";
 
 import Dropdown from './../ui/Dropdown';
 
-import folderIcon from '../icons/folder.svg'
-import dropdownIcon from '../icons/dropdown.svg'
-import editIcon from '../icons/edit.svg'
-import deleteIcon from '../icons/delete.svg'
-import plusIcon from '../icons/plus.svg'
+import folderIcon from '../../assets/icons/folder.svg'
+import dropdownIcon from '../../assets/icons/dropdown.svg'
+import editIcon from '../../assets/icons/edit.svg'
+import deleteIcon from '../../assets/icons/delete.svg'
+import plusIcon from '../../assets/icons/plus.svg'
 
 interface WorkspaceListProps {
     items: models.Workspace[];
@@ -59,7 +59,7 @@ export const WorkspaceList: React.FC<WorkspaceListProps> = ({items, activeWorksp
       onClick: () => newWorkspace(),
       divide: true,
     },
-    ... items.map((it, i) => {
+    ... items?.map((it, i) => {
     return {
       text: it.name,
       onClick: () => setActiveWorkspace(it.id),
@@ -69,10 +69,10 @@ export const WorkspaceList: React.FC<WorkspaceListProps> = ({items, activeWorksp
       },
       menu: [
         {icon: editIcon, text: "Edit", onClick: (e: React.MouseEvent) => {e.preventDefault(); setRenameI(i)}},
-        {icon: deleteIcon, text: "Delete", onClick: () => removeWorkspace(it.id)},
+        {icon: deleteIcon, text: "Delete", onClick: (e: React.MouseEvent) => {e.preventDefault(); removeWorkspace(it.id)}},
       ],
     }
-  })];
+  })||[]];
   const main = {
     text: activeWorkspace?.name || "",
     icon: folderIcon,
