@@ -5,7 +5,7 @@ import { NewWorkspace, GetWorkspace, DeleteWorkspace, RenameWorkspace } from "..
 import { models } from "../../wailsjs/go/models";
 
 import Dropdown from './../ui/Dropdown';
-import Menu from '../ui/Menu';
+
 import folderIcon from '../icons/folder.svg'
 import dropdownIcon from '../icons/dropdown.svg'
 import editIcon from '../icons/edit.svg'
@@ -55,8 +55,9 @@ export const WorkspaceList: React.FC<WorkspaceListProps> = ({items, activeWorksp
   const menuItems = [
     {
       text: "Add new workspace",
-      icon: plusIcon,
+      tip: <img src={plusIcon} />,
       onClick: () => newWorkspace(),
+      divide: true,
     },
     ... items.map((it, i) => {
     return {
@@ -66,16 +67,19 @@ export const WorkspaceList: React.FC<WorkspaceListProps> = ({items, activeWorksp
         inEdit: i === renameI,
         onEditDone: (newName: string) => renameWorkspace(it.id, newName),
       },
-      icon: folderIcon,
-      tip: <img src={dropdownIcon} />,
       menu: [
         {icon: editIcon, text: "Edit", onClick: (e: React.MouseEvent) => {e.preventDefault(); setRenameI(i)}},
         {icon: deleteIcon, text: "Delete", onClick: () => removeWorkspace(it.id)},
       ],
     }
   })];
+  const main = {
+    text: activeWorkspace?.name || "",
+    icon: folderIcon,
+    tip: <img src={dropdownIcon} />,
+  }
 
   return (
-    <Dropdown main={{text: activeWorkspace?.name || ""}} items={menuItems} />
+    <Dropdown main={main} items={menuItems} />
   );
 };

@@ -13,8 +13,18 @@ CSS rules to specify families:
 body {
   background-color: theme('colors.primaryFill');
   color: white;
+
+  font-family: Inter;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
 }
 
 input {
   padding-left: 16px;
+}
+
+.divide {
+  border-bottom-width: 1px;
+  border-color: theme('colors.borderFill');
 }

@@ -1,5 +1,6 @@
 import React, {useContext, useEffect, useState, useMemo} from "react";
 import { UrlInput } from "../components/UrlInput";
+import SearchBox from "../ui/SearchBox";
 import { MethodCollection } from "../components/MethodCollectionView";
 import { WorkspaceList } from "../components/Workspaces";
 import {SendGrpc, UpdateWorkspace} from "../../wailsjs/go/api/Api"
@@ -8,6 +9,7 @@ import { ResponseText } from "../components/ResponseText";
 import { Context } from "../state";
 import { models } from "../../wailsjs/go/models";
 import { debounce, Action } from "../pkg";
+import TabList from "../ui/TabList";
 
 export const ApiPage: React.FC = () => {
     const ctx = useContext(Context);
@@ -55,11 +57,13 @@ export const ApiPage: React.FC = () => {
 
     return (
       <div className="flex flex-1 w-full">
-        <div className="flex flex-[0_0_200px] justify-items-start flex-col">
+        <div className="flex flex-[0_0_220px] justify-items-start flex-col">
           <WorkspaceList items={ctx.state.workspaceList} activeWorkspace={ctx.state?.activeWorkspace} />
+          <SearchBox />
           <MethodCollection services={ctx.state.activeWorkspace.spec.services} selectedItem={ctx.state.activeMethod?.fullName} />
         </div>
         <div className="flex flex-1 flex-col">
+          <TabList />
           <UrlInput onClick={sendRequest} value={url} setValue={onSetUrl} />          
           <div className="flex flex-1">
             <RequestEditor />
