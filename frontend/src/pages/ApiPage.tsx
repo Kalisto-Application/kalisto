@@ -17,12 +17,6 @@ export const ApiPage: React.FC = () => {
     const [url, setUrl] = useState(ctx.state.activeWorkspace?.targetUrl || '');
     const [resp, setResp] = useState(models.Response.createFrom({}));
 
-    useEffect(() => {
-      if (ctx.state.activeWorkspace?.targetUrl) {
-        setUrl(ctx.state.activeWorkspace.targetUrl);
-      }
-    }, [ctx.state.activeWorkspace?.targetUrl])
-
     const action: Action = (url: string) => {
       UpdateWorkspace(new models.Workspace({... ctx.state.activeWorkspace, targetUrl: url})).catch(err => {
         console.log('failed to save the workspace url: ', err);
@@ -54,7 +48,7 @@ export const ApiPage: React.FC = () => {
     return (
       <div className="flex flex-1 w-full">
         <div className="flex flex-[0_0_220px] justify-items-start flex-col">
-          <WorkspaceList items={ctx.state.workspaceList||[]} activeWorkspace={ctx.state?.activeWorkspace} />
+          <WorkspaceList items={ctx.state.workspaceList} activeWorkspace={ctx.state?.activeWorkspace} />
           <SearchBox />
           <MethodCollection services={ctx.state.activeWorkspace?.spec.services} selectedItem={ctx.state.activeMethod?.fullName} />
         </div>

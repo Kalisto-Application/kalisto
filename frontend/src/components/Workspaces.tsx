@@ -1,10 +1,10 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useMemo } from 'react';
 import { Context } from "../state";
 
 import { NewWorkspace, GetWorkspace, DeleteWorkspace, RenameWorkspace } from "../../wailsjs/go/api/Api";
 import { models } from "../../wailsjs/go/models";
 
-import Dropdown from './../ui/Dropdown';
+import Dropdown, {DropdownItemProps} from './../ui/Dropdown';
 
 import folderIcon from '../../assets/icons/folder.svg'
 import dropdownIcon from '../../assets/icons/dropdown.svg'
@@ -12,8 +12,10 @@ import editIcon from '../../assets/icons/edit.svg'
 import deleteIcon from '../../assets/icons/delete.svg'
 import plusIcon from '../../assets/icons/plus.svg'
 
+let called = false;
+
 interface WorkspaceListProps {
-    items: models.Workspace[];
+    items?: models.Workspace[];
     activeWorkspace?: models.Workspace;
 }
 
@@ -27,6 +29,12 @@ export const WorkspaceList: React.FC<WorkspaceListProps> = ({items, activeWorksp
       ctx.dispatch({type: 'newWorkspace', workspace: res});
     })
     .catch(err => console.log('error on new workspace: ', err))
+  }
+
+  console.log('items:', items)
+  if (items?.length === 0 && !called) {
+    called = true;
+    newWorkspace();
   }
 
   const renameWorkspace = (id: string, name: string) => {
@@ -52,15 +60,24 @@ export const WorkspaceList: React.FC<WorkspaceListProps> = ({items, activeWorksp
     })
   }
 
-  const menuItems = [
+  let menuItems: DropdownItemProps[] = activeWorkspace? [{
+    text: activeWorkspace?.name || "",
+    icon: folderIcon,
+    tip: <img src={dropdownIcon} />,
+  }] : [{
+    text: "No workspace found",
+    icon: folderIcon,
+    tip: <img src={dropdownIcon} />,
+  }] 
+  menuItems = menuItems.concat([
     {
       text: "Add new workspace",
       tip: <img src={plusIcon} />,
       onClick: () => newWorkspace(),
       divide: true,
     },
-    ... items?.map((it, i) => {
-    return {
+    ...items?.map((it, i) => {
+      return {
       text: it.name,
       onClick: () => setActiveWorkspace(it.id),
       edit: {
@@ -71,15 +88,12 @@ export const WorkspaceList: React.FC<WorkspaceListProps> = ({items, activeWorksp
         {icon: editIcon, text: "Edit", onClick: (e: React.MouseEvent) => {e.preventDefault(); setRenameI(i)}},
         {icon: deleteIcon, text: "Delete", onClick: (e: React.MouseEvent) => {e.preventDefault(); removeWorkspace(it.id)}},
       ],
-    }
-  })||[]];
-  const main = {
-    text: activeWorkspace?.name || "",
-    icon: folderIcon,
-    tip: <img src={dropdownIcon} />,
-  }
+      }
+    }) || []
+  ])
 
+  const main = menuItems.shift();
   return (
-    <Dropdown main={main} items={menuItems} />
+    <Dropdown main={main!} items={menuItems} />
   );
 };

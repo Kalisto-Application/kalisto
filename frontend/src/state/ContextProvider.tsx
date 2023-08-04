@@ -12,13 +12,15 @@ type ContextProps = {
 
 export const ContextProvider: React.FC<ContextProps> = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, {} as State);
+
   useEffect(() => {
     // load the app
     FindWorkspaces()
     .then(res => {
       if (res.length === 0) {
-        return 
-        }
+        dispatch({type: 'workspaceList', workspaceList: []})
+        return
+      }
 
       let latest = res[0].lastUsage
       res.forEach(it => {
@@ -36,6 +38,7 @@ export const ContextProvider: React.FC<ContextProps> = ({ children }) => {
           }
         }
       }
+
       const fristMethod = getFirstMethod()
       if (fristMethod) {
         dispatch({type: 'activeMethod', activeMethod: fristMethod});

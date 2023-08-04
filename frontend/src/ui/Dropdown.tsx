@@ -23,12 +23,12 @@ interface editable {
 }
 
 const shortifyMainText = (value: string): string => {
-  return value.length > 15? value.slice(0, 15) + " ...": value 
+  return value.length > 15? value.slice(0, 12) + " ...": value 
 }
 
 export const Dropdown: React.FC<DropdownProps> = ({ main, items }) => {
-  const mainText = shortifyMainText(main.text)
-
+  const mainText = shortifyMainText(main.text);
+  
   return (
     <Menu>
       <Menu.Button className="flex h-[48px] border-[1px] border-borderFill items-center content-center gap-3 shrink-0 flex-wrap px-4 py-2.5">

@@ -12,7 +12,7 @@ type Action =
     | {type: 'removeWorkspace', id: string}
     | {type: 'renameWorkspace', id: string, name: string}
     | {type: 'workspaceList', workspaceList: models.Workspace[]}
-    | {type: 'activeMethod', activeMethod: models.Method}
+    | {type: 'activeMethod', activeMethod?: models.Method}
     | {type: 'changeVariables', text: string}
 
 export type State = {
