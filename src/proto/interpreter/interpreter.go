@@ -1,6 +1,7 @@
 package interpreter
 
 import (
+	"errors"
 	"fmt"
 	"kalisto/src/models"
 	"math"
@@ -46,19 +47,25 @@ func (ip *Interpreter) CreateMetadata(script string) (metadata.MD, error) {
 	return newMeta(m)
 }
 
+func (ip *Interpreter) Raw(script string) (map[string]interface{}, error) {
+	return ip.exportValue(script)
+}
+
 func (ip *Interpreter) exportValue(script string) (map[string]interface{}, error) {
 	script = fmt.Sprintf(`(()=> {
 		return %s;
 	})()`, script)
 
 	vm := goja.New()
-	globalScript := fmt.Sprintf("g = %s;", ip.vars)
-	if _, err := vm.RunScript("global.js", globalScript); err != nil {
-		return nil, err
+	if ip.vars != "" {
+		globalScript := fmt.Sprintf("g = %s;", ip.vars)
+		if _, err := vm.RunScript("global.js", globalScript); err != nil {
+			return nil, ip.mapErr(err)
+		}
 	}
 	val, err := vm.RunString(script)
 	if err != nil {
-		return nil, fmt.Errorf("interpretator: failed to run script: %w", err)
+		return nil, ip.mapErr(err)
 	}
 	if val == nil || val.ExportType() == nil {
 		return nil, nil
@@ -69,6 +76,14 @@ func (ip *Interpreter) exportValue(script string) (map[string]interface{}, error
 	}
 
 	return m, nil
+}
+
+func (ip *Interpreter) mapErr(err error) error {
+	var exc *goja.Exception
+	if errors.As(err, &exc) {
+		return models.SyntaxError(exc.Error())
+	}
+	return fmt.Errorf("interpretator: failed to run script: %w", err)
 }
 
 func newMessage(desc *desc.MessageDescriptor, spec models.Spec, m map[string]interface{}, message models.Message) (*dynamic.Message, error) {

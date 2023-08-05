@@ -13,7 +13,9 @@ type Action =
     | {type: 'workspaceList', workspaceList: models.Workspace[]}
     | {type: 'activeMethod', activeMethod: models.Method}
     | {type: 'response', response: models.Response}
+    | {type: 'apiError', value: string}
     | {type: 'changeVariables', text: string}
+    | {type: 'varsError', value: string}
 
 export type State = {
     activeRequestEditor: number;
@@ -24,7 +26,9 @@ export type State = {
     activeWorkspaceId?: string;
     activeMethod?: models.Method;
     response?: models.Response;
+    apiError: string,
     vars: string;
+    varsError: string;
 }
 
 export const newState = (): State => {
@@ -37,7 +41,9 @@ export const newState = (): State => {
         activeWorkspaceId: undefined,
         activeMethod: undefined,
         response: undefined,
+        apiError: '',
         vars: '{}',
+        varsError: '',
       }
 }
 
@@ -109,11 +115,23 @@ export const reducer = (state: State, action: Action): State => {
                 ... state,
                 response: action.response,
                 activeResponseEditor: 0,
+                apiError: '',
+            }
+        case 'apiError':
+            return {
+                ... state,
+                apiError: action.value,
             }
         case 'changeVariables':
             return {
                 ... state,
                 vars: action.text,
+                varsError: '',
+            }
+        case 'varsError': 
+            return {
+                ... state,
+                varsError: action.value,
             }
         default:
             return state

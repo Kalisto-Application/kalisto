@@ -150,7 +150,15 @@ func (s *Api) GetGlobalVars() string {
 }
 
 func (s *Api) SaveGlovalVars(vars string) error {
-	return s.globalVars.Save(vars)
+	if err := s.globalVars.Save(vars); err != nil {
+		return err
+	}
+	ip := interpreter.NewInterpreter("")
+	if _, err := ip.Raw(vars); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // GRPC API

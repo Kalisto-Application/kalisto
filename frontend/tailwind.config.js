@@ -9,6 +9,7 @@ module.exports = {
       primaryGeneral: '#3D3DAB',
       secondaryText: '#8D8D98',
       icon: '#BEBEC3',
+      red: '#D34242',
     },
     extend: {},
   },

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"kalisto/src/assembly"
+	"kalisto/src/models"
 
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -47,10 +48,9 @@ func main() {
 		Bind: []interface{}{
 			app.Api,
 		},
-		ErrorFormatter: func(err error) any {
+		ErrorFormatter: models.NewErrorFormatter(func(err error) {
 			sentry.CaptureException(err)
-			return err
-		},
+		}),
 	}); err != nil {
 		sentry.CaptureException(err)
 	}

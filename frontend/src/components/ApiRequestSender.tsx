@@ -38,6 +38,9 @@ export const ApiRequestSender: React.FC = () => {
       SendGrpc!({addr: url, workspaceId: activeWorkspace.id, method: ctx.state.activeMethod.fullName, body: ctx.state.requestText, meta: ctx.state.requestMetaText}).then(res => {
         ctx.dispatch({type: 'response', response: res});
       }).catch(err => {
+        if (err?.Code == "SYNTAX_ERROR") {
+            ctx.dispatch({type: 'apiError', value: err.Value})
+        }
         console.log('failed to get response: ', err)
       })
     };
