@@ -2,11 +2,13 @@ package client
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/status"
 )
 
 type Client struct {
@@ -29,8 +31,20 @@ func NewClient(ctx context.Context, c Config) (*Client, error) {
 	}, nil
 }
 
-func (c *Client) Invoke(ctx context.Context, method string, req, resp interface{}, md metadata.MD) error {
-	return c.conn.Invoke(ctx, method, req, resp, grpc.Header(&md))
+func (c *Client) Invoke(ctx context.Context, method string, req, resp interface{}, md *metadata.MD) (string, error) {
+	if err := c.conn.Invoke(ctx, method, req, resp, grpc.Header(md)); err != nil {
+		st := status.Convert(err)
+		if st == nil {
+			return "", err
+		}
+		errBody, err := json.Marshal(st.Proto())
+		if err != nil {
+			return "", err
+		}
+		return string(errBody), nil
+	}
+
+	return "", nil
 }
 
 func (c *Client) Close() error {

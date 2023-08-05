@@ -13,6 +13,7 @@ service BookStore {
     rpc GetBook(GetBookRequest) returns (GetBookRequest) {}
     rpc Empty(google.protobuf.Empty) returns (google.protobuf.Empty) {}
     rpc Any(google.protobuf.Any) returns (google.protobuf.Any) {}
+    rpc Error(google.protobuf.Empty) returns (google.protobuf.Empty) {}
 }
 
 message Book {
@@ -34,7 +35,7 @@ message BookHasDeepNested {
 
 message GetBookRequest {
     string id = 1;
-    // double double = 2;
+    double double = 2;
     // float float = 3;
     // int32 int32 = 4;
     // int64 int64 = 5;

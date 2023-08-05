@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"kalisto/src/environment"
 	"kalisto/src/filesystem"
@@ -198,19 +199,29 @@ func (a *Api) SendGrpc(request models.Request) (models.Response, error) {
 
 	ctx = metadata.NewOutgoingContext(ctx, meta)
 	responseMeta := metadata.MD{}
-	err = c.Invoke(ctx, "/"+sd.GetFullyQualifiedName()+"/"+md.GetName(), req, resp, responseMeta)
+	apiErr, err := c.Invoke(ctx, "/"+sd.GetFullyQualifiedName()+"/"+md.GetName(), req, resp, &responseMeta)
 	if err != nil {
 		return models.Response{}, fmt.Errorf("api: failed to invoke method: %w", err)
 	}
 
-	b, err := resp.MarshalJSONIndent()
-	if err != nil {
-		return models.Response{}, fmt.Errorf("api: failed to marshal response: %w", err)
+	var body string
+	if apiErr != "" {
+		body = apiErr
+	} else {
+		b, err := resp.MarshalJSONIndent()
+		if err != nil {
+			return models.Response{}, fmt.Errorf("api: failed to marshal response: %w", err)
+		}
+		body = string(b)
 	}
-	_ = responseMeta
+	metaJson, err := json.Marshal(responseMeta)
+	if err != nil {
+		return models.Response{}, err
+	}
 
 	return models.Response{
-		Body: string(b),
+		Body:     body,
+		MetaData: string(metaJson),
 	}, nil
 }
 

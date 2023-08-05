@@ -1,4 +1,4 @@
-import React, {useContext, useState, useMemo} from 'react';
+import React, {useContext, useState, useMemo, useEffect} from 'react';
 
 import { UrlInput } from '../ui/UrlInput';
 import { Context } from '../state';
@@ -11,6 +11,10 @@ export const ApiRequestSender: React.FC = () => {
 
     const activeWorkspace = ctx.state.workspaceList?.find(it => it.id === ctx.state.activeWorkspaceId);
     const [url, setUrl] = useState(activeWorkspace?.targetUrl || '');
+
+    useEffect(() => {
+        setUrl(activeWorkspace?.targetUrl || '')
+    }, [activeWorkspace])
 
     const action: Action = (url: string) => {
       UpdateWorkspace(new models.Workspace({... activeWorkspace, targetUrl: url})).catch(err => {

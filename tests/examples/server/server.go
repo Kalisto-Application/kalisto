@@ -8,7 +8,9 @@ import (
 	"net"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/anypb"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
@@ -27,6 +29,10 @@ func (s *server) GetBook(ctx context.Context, in *pb.GetBookRequest) (*pb.GetBoo
 	log.Printf("meta: %s", md.Get("k"))
 
 	res := pb.GetBookRequest{Id: in.Id}
+
+	grpc.SetTrailer(ctx, metadata.New(map[string]string{
+		"content": "yes",
+	}))
 	return &res, nil
 }
 
@@ -48,6 +54,10 @@ func (s *server) Any(ctx context.Context, in *anypb.Any) (*anypb.Any, error) {
 
 	log.Printf("Received: %s\n", string(data))
 	return &anypb.Any{TypeUrl: "google.protobuf.Empty", Value: nil}, nil
+}
+
+func (s *server) Error(ctx context.Context, in *emptypb.Empty) (*emptypb.Empty, error) {
+	return nil, status.Error(codes.InvalidArgument, "message")
 }
 
 func main() {
