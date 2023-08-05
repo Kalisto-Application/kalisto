@@ -1,8 +1,7 @@
-import React, { useState, useContext, useMemo } from 'react';
+import React, { useState, useContext, useMemo, useEffect } from 'react';
 import { Context } from "../state";
 
-import { NewWorkspace, GetWorkspace, DeleteWorkspace, RenameWorkspace } from "../../wailsjs/go/api/Api";
-import { models } from "../../wailsjs/go/models";
+import { NewWorkspace, DeleteWorkspace, RenameWorkspace, GetWorkspace, FindWorkspaces } from "../../wailsjs/go/api/Api";
 
 import Dropdown, {DropdownItemProps} from './../ui/Dropdown';
 
@@ -12,16 +11,19 @@ import editIcon from '../../assets/icons/edit.svg'
 import deleteIcon from '../../assets/icons/delete.svg'
 import plusIcon from '../../assets/icons/plus.svg'
 
-let called = false;
-
-interface WorkspaceListProps {
-    items?: models.Workspace[];
-    activeWorkspace?: models.Workspace;
-}
-
-export const WorkspaceList: React.FC<WorkspaceListProps> = ({items, activeWorkspace}) => {
+export const WorkspaceList: React.FC = () => {
   const ctx = useContext(Context);
   const [renameI, setRenameI] = useState(-1);
+
+  const items = ctx.state.workspaceList;
+  const activeWorkspace = items?.find(it => it.id === ctx.state.activeWorkspaceId);
+
+  useEffect(() => {
+    if (items?.length === 0) {
+      console.log('items: ', items);
+      newWorkspace();
+    }
+  }, [items])
 
   const newWorkspace = () => {
     NewWorkspace()
@@ -29,12 +31,6 @@ export const WorkspaceList: React.FC<WorkspaceListProps> = ({items, activeWorksp
       ctx.dispatch({type: 'newWorkspace', workspace: res});
     })
     .catch(err => console.log('error on new workspace: ', err))
-  }
-
-  console.log('items:', items)
-  if (items?.length === 0 && !called) {
-    called = true;
-    newWorkspace();
   }
 
   const renameWorkspace = (id: string, name: string) => {
@@ -47,9 +43,12 @@ export const WorkspaceList: React.FC<WorkspaceListProps> = ({items, activeWorksp
   }
 
   const setActiveWorkspace = (id: string) => {
-    GetWorkspace(id).then(res => {
-      ctx.dispatch({type: 'activeWorkspace', workspace: res});
-    }).catch(err => console.log(`error on get workspace by id==${id}: `, err))
+    GetWorkspace(id).then(_ => {
+      FindWorkspaces().then(list => {
+        ctx.dispatch({type: 'activeWorkspace', id: id})
+        ctx.dispatch({type: 'workspaceList', workspaceList: list})
+      })
+    }).catch(err => console.log(`failed to get active workspace, id==${id}: ${err}`))
   }
 
   const removeWorkspace = (id: string) => {

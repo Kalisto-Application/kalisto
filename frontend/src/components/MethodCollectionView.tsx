@@ -3,11 +3,6 @@ import { ControlledTreeEnvironment, Tree, TreeItemIndex, TreeItem } from 'react-
 import { models } from "../../wailsjs/go/models";
 import { Context } from "../state";
 
-interface MethodCollectionProps {
-  services?: models.Service[];
-  selectedItem?: string;
-};
-
 const findMethod = (s: models.Service[] = [], name: string): models.Method | undefined => {
   for (const service of s) {
     for (const method of service.methods) {
@@ -23,8 +18,11 @@ type Data = {
   isMethod: boolean;
 }
 
-export const MethodCollection: React.FC<MethodCollectionProps> = ({ services, selectedItem }) => {
+export const MethodCollection: React.FC = () => {
   const ctx = useContext(Context);
+
+  const services = ctx.state.workspaceList?.find(it => it.id === ctx.state.activeWorkspaceId)?.spec.services
+  const selectedItem = ctx.state.activeMethod?.fullName
   
   const serviceNames = services?.map(it => it.fullName) || []
   const [expandedItems, setExpandedItems] = useState<TreeItemIndex[]>(serviceNames);

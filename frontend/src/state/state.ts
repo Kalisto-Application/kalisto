@@ -1,6 +1,5 @@
 import { Dispatch, createContext } from "react";
 import {models} from '../../wailsjs/go/models';
-import { LazyResult } from "postcss";
 
 type Action = 
     | {type: 'switchRequestEditor', i: number}
@@ -8,11 +7,12 @@ type Action =
     | {type: 'changeRequestText', text: string}
     | {type: 'changeMetaText', text: string}
     | {type: 'newWorkspace', workspace: models.Workspace}
-    | {type: 'activeWorkspace', workspace: models.Workspace}
+    | {type: 'activeWorkspace', id: string}
     | {type: 'removeWorkspace', id: string}
     | {type: 'renameWorkspace', id: string, name: string}
     | {type: 'workspaceList', workspaceList: models.Workspace[]}
-    | {type: 'activeMethod', activeMethod?: models.Method}
+    | {type: 'activeMethod', activeMethod: models.Method}
+    | {type: 'response', response: models.Response}
     | {type: 'changeVariables', text: string}
 
 export type State = {
@@ -21,9 +21,24 @@ export type State = {
     requestText: string;
     requestMetaText: string;
     workspaceList?: models.Workspace[];
-    activeWorkspace?: models.Workspace;
+    activeWorkspaceId?: string;
     activeMethod?: models.Method;
+    response?: models.Response;
     vars: string;
+}
+
+export const newState = (): State => {
+    return {
+        activeRequestEditor: 0,
+        activeResponseEditor: 0,
+        requestText: '',
+        requestMetaText: '',
+        workspaceList: undefined,
+        activeWorkspaceId: undefined,
+        activeMethod: undefined,
+        response: undefined,
+        vars: '{}',
+      }
 }
 
 export const reducer = (state: State, action: Action): State => {
@@ -52,18 +67,19 @@ export const reducer = (state: State, action: Action): State => {
             return {
                 ... state,
                 workspaceList: [action.workspace].concat(state.workspaceList||[]),
-                activeWorkspace: action.workspace,
+                activeWorkspaceId: action.workspace.id,
             } 
         case 'activeWorkspace':
             return {
                 ... state,
-                activeWorkspace: action.workspace,
+                activeWorkspaceId: action.id,
             }
         case 'removeWorkspace':
+            const filtered = state.workspaceList?.filter(it => it.id != action.id);
             return {
                 ... state,
-                workspaceList: state.workspaceList?.filter(it => it.id != action.id),
-                activeWorkspace: action.id === state.activeWorkspace?.id ? undefined: state.activeWorkspace,
+                workspaceList: filtered,
+                activeWorkspaceId: action.id === state.activeWorkspaceId ? filtered?.find(Boolean)?.id : state.activeWorkspaceId,
             }
         case 'renameWorkspace':
             return {
@@ -79,14 +95,20 @@ export const reducer = (state: State, action: Action): State => {
             return {
                 ... state,
                 workspaceList: action.workspaceList,
-                activeWorkspace: action.workspaceList.length > 0 ? action.workspaceList[0]: undefined
+                activeWorkspaceId: action.workspaceList.find(Boolean)?.id,
             }
         case 'activeMethod':
             return {
                 ... state,
                 activeMethod: action.activeMethod,
-                requestText: action.activeMethod.requestExample,
+                requestText: action.activeMethod?.requestExample || '',
                 activeRequestEditor: 0,
+            }
+        case 'response':
+            return {
+                ... state,
+                response: action.response,
+                activeResponseEditor: 0,
             }
         case 'changeVariables':
             return {

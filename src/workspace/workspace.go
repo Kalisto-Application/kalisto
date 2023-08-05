@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"kalisto/src/models"
 	"sort"
+	"sync"
 	"time"
 
 	"github.com/bobg/go-generics/v2/slices"
@@ -18,6 +19,7 @@ type Store interface {
 type Workspace struct {
 	s     Store
 	cache []models.Workspace
+	mx    sync.RWMutex
 }
 
 func New(s Store) (*Workspace, error) {
@@ -29,12 +31,18 @@ func New(s Store) (*Workspace, error) {
 }
 
 func (w *Workspace) Save(workspace models.Workspace) (models.Workspace, error) {
+	w.mx.Lock()
+	defer w.mx.Unlock()
+
 	workspace.ID = uuid.NewString()
 	w.cache = append(w.cache, workspace)
 	return workspace, w.s.SaveWorkspaces(w.cache)
 }
 
 func (w *Workspace) Update(workspace models.Workspace) error {
+	w.mx.Lock()
+	defer w.mx.Unlock()
+
 	for i := range w.cache {
 		if w.cache[i].ID == workspace.ID {
 			w.cache[i] = workspace
@@ -46,6 +54,9 @@ func (w *Workspace) Update(workspace models.Workspace) error {
 }
 
 func (w *Workspace) Rename(id string, name string) (err error) {
+	w.mx.Lock()
+	defer w.mx.Unlock()
+
 	for i, workspace := range w.cache {
 		if workspace.ID == id {
 			workspace.Name = name
@@ -62,6 +73,9 @@ func (w *Workspace) Rename(id string, name string) (err error) {
 }
 
 func (w *Workspace) Delete(id string) error {
+	w.mx.Lock()
+	defer w.mx.Unlock()
+
 	for i, workspace := range w.cache {
 		if workspace.ID == id {
 			w.cache = slices.RemoveN[[]models.Workspace](w.cache, i, 1)
@@ -73,6 +87,9 @@ func (w *Workspace) Delete(id string) error {
 }
 
 func (w *Workspace) Find(id string) (models.Workspace, error) {
+	w.mx.Lock()
+	defer w.mx.Unlock()
+
 	for i, workspace := range w.cache {
 		if workspace.ID == id {
 			workspace.LastUsage = time.Now()
@@ -89,6 +106,9 @@ func (w *Workspace) Find(id string) (models.Workspace, error) {
 }
 
 func (w *Workspace) List() []models.Workspace {
+	w.mx.RLock()
+	defer w.mx.RUnlock()
+
 	sort.Slice(w.cache, func(i, j int) bool {
 		return w.cache[i].LastUsage.After(w.cache[j].LastUsage)
 	})

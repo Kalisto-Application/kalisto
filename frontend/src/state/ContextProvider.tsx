@@ -1,7 +1,7 @@
 import { ReactNode, useEffect, useReducer } from "react";
 import * as Sentry from "@sentry/react";
 
-import {reducer, State, Context} from './state';
+import {reducer, State, Context, newState} from './state';
 
 import { models } from "../../wailsjs/go/models";
 import { FindWorkspaces, NewWorkspace, GetGlobalVars } from "../../wailsjs/go/api/Api";
@@ -11,7 +11,7 @@ type ContextProps = {
 }
 
 export const ContextProvider: React.FC<ContextProps> = ({ children }) => {
-  const [state, dispatch] = useReducer(reducer, {} as State);
+  const [state, dispatch] = useReducer(reducer, newState());
 
   useEffect(() => {
     // load the app
