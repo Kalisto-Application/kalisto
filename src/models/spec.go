@@ -34,6 +34,20 @@ func (s *Spec) FindInputMessage(serviceName, methodName string) (Message, error)
 	return Message{}, fmt.Errorf("input message not found, method=%s", methodName)
 }
 
+func (s *Spec) FindOutputMessage(serviceName, methodName string) (Message, error) {
+	for _, service := range s.Services {
+		if service.FullName == serviceName {
+			for _, method := range service.Methods {
+				if method.Name == methodName {
+					return method.ResponseMessage, nil
+				}
+			}
+		}
+	}
+
+	return Message{}, fmt.Errorf("output message not found, method=%s", methodName)
+}
+
 type Service struct {
 	Name     string   `json:"name"`
 	Package  string   `json:"package"`
@@ -64,11 +78,12 @@ func NewCommunicationKind(isStreamClient, isStreamServer bool) CommunicationKind
 }
 
 type Method struct {
-	Name           string            `json:"name"`
-	FullName       string            `json:"fullName"`
-	RequestMessage Message           `json:"requestMessage"`
-	Kind           CommunicationKind `json:"kind"`
-	RequestExample string            `json:"requestExample"`
+	Name            string            `json:"name"`
+	FullName        string            `json:"fullName"`
+	RequestMessage  Message           `json:"requestMessage"`
+	ResponseMessage Message           `json:"responseMessage"`
+	Kind            CommunicationKind `json:"kind"`
+	RequestExample  string            `json:"requestExample"`
 }
 
 type Message struct {

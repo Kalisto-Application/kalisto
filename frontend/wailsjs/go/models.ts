@@ -84,6 +84,7 @@ export namespace models {
 	    name: string;
 	    fullName: string;
 	    requestMessage: Message;
+	    responseMessage: Message;
 	    kind: string;
 	    requestExample: string;
 	
@@ -96,6 +97,7 @@ export namespace models {
 	        this.name = source["name"];
 	        this.fullName = source["fullName"];
 	        this.requestMessage = this.convertValues(source["requestMessage"], Message);
+	        this.responseMessage = this.convertValues(source["responseMessage"], Message);
 	        this.kind = source["kind"];
 	        this.requestExample = source["requestExample"];
 	    }
@@ -152,6 +154,24 @@ export namespace models {
 	        this.body = source["body"];
 	        this.metaData = source["metaData"];
 	        this.logs = source["logs"];
+	    }
+	}
+	export class ScriptCall {
+	    addr: string;
+	    workspaceId: string;
+	    body: string;
+	    meta: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new ScriptCall(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.addr = source["addr"];
+	        this.workspaceId = source["workspaceId"];
+	        this.body = source["body"];
+	        this.meta = source["meta"];
 	    }
 	}
 	export class Service {

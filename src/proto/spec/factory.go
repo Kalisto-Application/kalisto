@@ -9,6 +9,7 @@ import (
 	"sync"
 
 	"github.com/jhump/protoreflect/desc"
+	"github.com/jhump/protoreflect/dynamic"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/reflect/protoregistry"
 	"google.golang.org/protobuf/types/descriptorpb"
@@ -343,4 +344,15 @@ func (f *Factory) makeExampleValue(set map[string]bool, field models.Field, spac
 	}
 
 	return v
+}
+
+func (f *Factory) MessageAsJsString(msg *dynamic.Message, spec models.Message) (string, error) {
+	for _, field := range spec.Fields {
+		f := msg.GetFieldByName(field.Name)
+		if f == nil {
+			return "", fmt.Errorf("field '%s' not found", field.Name)
+		}
+	}
+
+	return "", nil
 }

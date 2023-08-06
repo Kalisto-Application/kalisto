@@ -13,3 +13,10 @@ type Response struct {
 	MetaData string `json:"metaData"`
 	Logs     string `json:"logs"`
 }
+
+type ScriptCall struct {
+	Addr        string `json:"addr"`
+	WorkspaceID string `json:"workspaceId"`
+	Body        string `json:"body"`
+	Meta        string `json:"meta"`
+}

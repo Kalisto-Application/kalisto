@@ -26,6 +26,10 @@ export function RenameWorkspace(arg1, arg2) {
   return window['go']['api']['Api']['RenameWorkspace'](arg1, arg2);
 }
 
+export function RunScript(arg1) {
+  return window['go']['api']['Api']['RunScript'](arg1);
+}
+
 export function SaveGlovalVars(arg1) {
   return window['go']['api']['Api']['SaveGlovalVars'](arg1);
 }

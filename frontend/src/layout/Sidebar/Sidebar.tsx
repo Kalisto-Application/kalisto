@@ -8,6 +8,7 @@ export const Sidebar: React.FC = ({}) => (
   <aside className="flex flex-[0_0_90px] flex-col justify-star border-[1px] border-r-borderFill border-y-0 border-l-0">
     <SideIcon link="/api" />
     <SideIcon link="/variables" />
+    <SideIcon link="/scripting" />
   </aside>
 );
 
@@ -15,6 +16,7 @@ export const Sidebar: React.FC = ({}) => (
 type SideIconProps = {
   link: string;
 }
+
 const SideIcon: React.FC<SideIconProps> = ({ link }) => {
   let className = "h-[40px] w-full my-[10px] py-[8px] px-[26px] static"
   const match = useMatch(link);

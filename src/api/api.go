@@ -117,6 +117,10 @@ func (s *Api) GetWorkspace(id string) (models.Workspace, error) {
 	return s.enrichWorkspace(ws, time.Now())
 }
 
+func (s *Api) UpdateWorkspace(ws models.Workspace) error {
+	return s.workspace.Update(ws)
+}
+
 func (s *Api) enrichWorkspace(ws models.Workspace, lastUsage time.Time) (models.Workspace, error) {
 	registry, err := s.protoRegistryFromPath(ws.BasePath)
 	if err != nil {
@@ -136,11 +140,11 @@ func (s *Api) enrichWorkspace(ws models.Workspace, lastUsage time.Time) (models.
 
 	if !reflect.DeepEqual(ws, newWs) {
 		if err := s.workspace.Update(newWs); err != nil {
-			return ws, err
+			return newWs, err
 		}
 	}
 
-	return ws, nil
+	return newWs, nil
 }
 
 // ENVIRONMENT API
@@ -233,8 +237,41 @@ func (a *Api) SendGrpc(request models.Request) (models.Response, error) {
 	}, nil
 }
 
-func (s *Api) UpdateWorkspace(ws models.Workspace) error {
-	return s.workspace.Update(ws)
+func (a *Api) RunScript(request models.ScriptCall) (string, error) {
+	if strings.TrimSpace(request.Body) == "" {
+		return "", nil
+	}
+
+	reg, err := a.protoRegistry.Get(request.WorkspaceID)
+	if err != nil {
+		return "", err
+	}
+
+	ws, err := a.workspace.Find(request.WorkspaceID)
+	if err != nil {
+		return "", err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+	c, err := a.newClient(ctx, request.Addr)
+	if err != nil {
+		return "", fmt.Errorf("api: failed to create client: %w", err)
+	}
+	defer func() { _ = c.Close() }()
+
+	vars := a.GetGlobalVars()
+	ip := interpreter.NewInterpreter(vars)
+
+	resp, err := ip.RunScript(ctx, request.Body, ws.Spec, reg, c)
+	if err != nil {
+		return "", fmt.Errorf("api: failed to create request: %w", err)
+	}
+	b, err := resp.MarshalJSONIndent()
+	if err != nil {
+		return "", fmt.Errorf("api: failed to marshal response: %w", err)
+	}
+	return string(b), nil
 }
 
 func (s *Api) protoRegistryFromPath(path string) (*compiler.Registry, error) {

@@ -12,10 +12,13 @@ type Action =
     | {type: 'renameWorkspace', id: string, name: string}
     | {type: 'workspaceList', workspaceList: models.Workspace[]}
     | {type: 'activeMethod', activeMethod: models.Method}
-    | {type: 'response', response: models.Response}
+    | {type: 'apiResponse', response: models.Response}
     | {type: 'apiError', value: string}
     | {type: 'changeVariables', text: string}
     | {type: 'varsError', value: string}
+    | {type: 'changeScriptText', text: string}
+    | {type: 'scriptResponse', response: string}
+    | {type: 'scriptError', value: string}
 
 export type State = {
     activeRequestEditor: number;
@@ -29,6 +32,9 @@ export type State = {
     apiError: string,
     vars: string;
     varsError: string;
+    scriptText: string;
+    scriptResponse: string;
+    scriptError: string;
 }
 
 export const newState = (): State => {
@@ -44,6 +50,9 @@ export const newState = (): State => {
         apiError: '',
         vars: '{}',
         varsError: '',
+        scriptText: '',
+        scriptResponse: '',
+        scriptError: '',
       }
 }
 
@@ -110,7 +119,7 @@ export const reducer = (state: State, action: Action): State => {
                 requestText: action.activeMethod?.requestExample || '',
                 activeRequestEditor: 0,
             }
-        case 'response':
+        case 'apiResponse':
             return {
                 ... state,
                 response: action.response,
@@ -132,6 +141,21 @@ export const reducer = (state: State, action: Action): State => {
             return {
                 ... state,
                 varsError: action.value,
+            }
+        case 'changeScriptText':
+            return {
+                ... state,
+                scriptText: action.text,
+            }
+        case 'scriptResponse':
+            return {
+                ... state,
+                scriptResponse: action.response,
+            }
+        case 'scriptError':
+            return {
+                ... state,
+                scriptError: action.value,
             }
         default:
             return state

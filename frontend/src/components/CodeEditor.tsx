@@ -6,7 +6,7 @@ import { Editor } from "../ui/Editor";
 
 interface CodeEditorProps {
     text: string;
-    type: 'changeRequestText' | 'changeMetaText' | 'changeVariables';
+    type: 'changeRequestText' | 'changeMetaText' | 'changeVariables' | 'changeScriptText';
     action?: Action;
 };
 

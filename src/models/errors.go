@@ -1,6 +1,9 @@
 package models
 
-import "errors"
+import (
+	"errors"
+	"log"
+)
 
 func NewErrorFormatter(errHandler func(err error)) func(err error) any {
 	return func(err error) any {
@@ -10,6 +13,7 @@ func NewErrorFormatter(errHandler func(err error)) func(err error) any {
 		}
 
 		errHandler(err)
+		log.Println("api error: ", err.Error())
 		return err
 	}
 }

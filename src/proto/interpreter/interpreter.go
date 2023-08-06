@@ -1,9 +1,12 @@
 package interpreter
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"kalisto/src/models"
+	"kalisto/src/proto/client"
+	"kalisto/src/proto/compiler"
 	"math"
 	"strconv"
 	"time"
@@ -49,6 +52,80 @@ func (ip *Interpreter) CreateMetadata(script string) (metadata.MD, error) {
 
 func (ip *Interpreter) Raw(script string) (map[string]interface{}, error) {
 	return ip.exportValue(script)
+}
+
+type requestFunc func(obj interface{}) (interface{}, error)
+type apiError string
+
+func (a apiError) Error() string {
+	return string(a)
+}
+
+func (ip *Interpreter) RunScript(ctx context.Context, script string, spec models.Spec, reg *compiler.Registry, client *client.Client) (*dynamic.Message, error) {
+	vm := goja.New()
+	if ip.vars != "" {
+		globalScript := fmt.Sprintf("g = %s;", ip.vars)
+		if _, err := vm.RunScript("global.js", globalScript); err != nil {
+			return nil, ip.mapErr(err)
+		}
+	}
+
+	for _, service := range spec.Services {
+		jsService := vm.NewObject()
+		for _, method := range service.Methods {
+			sd, md, err := reg.FindMethod(models.MethodName(method.FullName))
+			if err != nil {
+				return nil, err
+			}
+			jsService.Set(method.Name, newJsFunc(ctx, sd, md, spec, method, client))
+		}
+
+		if err := vm.Set(service.Name, jsService); err != nil {
+			return nil, err
+		}
+	}
+
+	value, err := vm.RunString(script)
+	if err != nil {
+		return nil, ip.mapErr(err)
+	}
+	exported := value.Export()
+	response, ok := exported.(*dynamic.Message)
+	if !ok {
+		return nil, fmt.Errorf("expected grpc message as a result")
+	}
+	return response, nil
+}
+
+func newJsFunc(ctx context.Context, sd *desc.ServiceDescriptor, md *desc.MethodDescriptor, spec models.Spec, method models.Method, client *client.Client) requestFunc {
+	return func(obj interface{}) (interface{}, error) {
+		ctx = context.Background()
+		var msg *dynamic.Message
+		var err error
+		switch obj := obj.(type) {
+		case map[string]interface{}:
+			msg, err = newMessage(md.GetInputType(), spec, obj, method.RequestMessage)
+			if err != nil {
+				return nil, err
+			}
+		case *dynamic.Message:
+			msg = obj
+		default:
+			return nil, fmt.Errorf("unexpected input type: must be a JS object")
+		}
+
+		resp := dynamic.NewMessage(md.GetOutputType())
+		responseMeta := metadata.MD{}
+		apiErr, err := client.Invoke(ctx, "/"+sd.GetFullyQualifiedName()+"/"+md.GetName(), msg, resp, &responseMeta)
+		if err != nil {
+			return nil, err
+		}
+		if apiErr != "" {
+			return nil, apiError(apiErr)
+		}
+
+		return resp, nil
+	}
 }
 
 func (ip *Interpreter) exportValue(script string) (map[string]interface{}, error) {

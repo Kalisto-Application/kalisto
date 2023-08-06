@@ -2,11 +2,11 @@ import React, {useContext, useState, useMemo, useEffect} from 'react';
 
 import { UrlInput } from '../ui/UrlInput';
 import { Context } from '../state';
-import { UpdateWorkspace, SendGrpc } from '../../wailsjs/go/api/Api';
+import { UpdateWorkspace, RunScript } from '../../wailsjs/go/api/Api';
 import { models } from '../../wailsjs/go/models';
 import { Action, debounce } from '../pkg';
 
-export const ApiRequestSender: React.FC = () => {
+export const ScriptSender: React.FC = () => {
     const ctx = useContext(Context);
 
     const activeWorkspace = ctx.state.workspaceList?.find(it => it.id === ctx.state.activeWorkspaceId);
@@ -35,11 +35,11 @@ export const ApiRequestSender: React.FC = () => {
         return
       }
 
-      SendGrpc({addr: url, workspaceId: activeWorkspace.id, method: ctx.state.activeMethod.fullName, body: ctx.state.requestText, meta: ctx.state.requestMetaText}).then(res => {
-        ctx.dispatch({type: 'apiResponse', response: res});
+      RunScript({addr: url, workspaceId: activeWorkspace.id, body: ctx.state.scriptText, meta: ""}).then(res => {
+        ctx.dispatch({type: 'scriptResponse', response: res});
       }).catch(err => {
         if (err?.Code == "SYNTAX_ERROR") {
-            ctx.dispatch({type: 'apiError', value: err.Value})
+            ctx.dispatch({type: 'scriptError', value: err.Value})
         }
         console.log('failed to get response: ', err)
       })
