@@ -39,7 +39,9 @@ export const ApiRequestSender: React.FC = () => {
         ctx.dispatch({type: 'apiResponse', response: res});
       }).catch(err => {
         if (err?.Code == "SYNTAX_ERROR") {
-            ctx.dispatch({type: 'apiError', value: err.Value})
+          ctx.dispatch({type: 'apiError', value: err.Value})
+        } else if (err?.Code == 'SERVER_UNAVAILABLE') {
+          ctx.dispatch({type: 'apiError', value: 'Server unavailable'})
         }
         console.log('failed to get response: ', err)
       })

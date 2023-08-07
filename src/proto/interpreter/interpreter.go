@@ -153,7 +153,7 @@ func (ip *Interpreter) exportValue(script string) (map[string]interface{}, error
 func (ip *Interpreter) mapErr(err error) error {
 	var exc *goja.Exception
 	if errors.As(err, &exc) {
-		return models.SyntaxError(exc.Error())
+		return models.ErrorSyntax(exc.Error())
 	}
 	return fmt.Errorf("interpretator: failed to run script: %w", err)
 }

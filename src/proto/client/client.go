@@ -3,7 +3,9 @@ package client
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"kalisto/src/models"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -23,6 +25,9 @@ func NewClient(ctx context.Context, c Config) (*Client, error) {
 
 	conn, err := grpc.DialContext(ctx, c.Addr, opts...)
 	if err != nil {
+		if errors.Is(err, context.DeadlineExceeded) {
+			return nil, models.ErrorServerUnavailable
+		}
 		return nil, fmt.Errorf("proto client: failed to dial addr=%s: %w", c.Addr, err)
 	}
 
@@ -35,6 +40,9 @@ func (c *Client) Invoke(ctx context.Context, method string, req, resp interface{
 	if err := c.conn.Invoke(ctx, method, req, resp, grpc.Header(md)); err != nil {
 		st := status.Convert(err)
 		if st == nil {
+			if errors.Is(err, context.DeadlineExceeded) {
+				return "", models.ErrorServerUnavailable
+			}
 			return "", err
 		}
 		errBody, err := json.Marshal(st.Proto())

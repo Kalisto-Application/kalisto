@@ -7,9 +7,12 @@ import (
 
 func NewErrorFormatter(errHandler func(err error)) func(err error) any {
 	return func(err error) any {
-		var syntaxErr SyntaxError
+		var syntaxErr ErrorSyntax
 		if errors.As(err, &syntaxErr) {
 			return ApiError{Code: "SYNTAX_ERROR", Value: syntaxErr.Error()}
+		}
+		if errors.Is(err, ErrorServerUnavailable) {
+			return ApiError{Code: "SERVER_UNAVAILABLE", Value: ""}
 		}
 
 		errHandler(err)
@@ -29,8 +32,10 @@ type ApiError struct {
 	Value string
 }
 
-type SyntaxError string
+type ErrorSyntax string
 
-func (s SyntaxError) Error() string {
+func (s ErrorSyntax) Error() string {
 	return string(s)
 }
+
+var ErrorServerUnavailable = errors.New("server unavailable")
