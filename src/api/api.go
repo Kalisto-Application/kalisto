@@ -196,8 +196,12 @@ func (a *Api) SendGrpc(request models.Request) (models.Response, error) {
 
 	vars := a.GetGlobalVars()
 	ip := interpreter.NewInterpreter(vars)
+	specInputMessage, err := ws.Spec.FindInputMessage(sd.GetFullyQualifiedName(), md.GetName())
+	if err != nil {
+		return models.Response{}, err
+	}
 
-	req, err := ip.CreateMessageFromScript(request.Body, md.GetInputType(), ws.Spec, sd.GetFullyQualifiedName(), md.GetName())
+	req, err := ip.CreateMessageFromScript(request.Body, md.GetInputType(), ws.Spec, specInputMessage)
 	if err != nil {
 		return models.Response{}, fmt.Errorf("api: failed to create request: %w", err)
 	}
@@ -216,15 +220,18 @@ func (a *Api) SendGrpc(request models.Request) (models.Response, error) {
 		return models.Response{}, fmt.Errorf("api: failed to invoke method: %w", err)
 	}
 
+	specOutputMessage, err := ws.Spec.FindOutputMessage(sd.GetFullyQualifiedName(), md.GetName())
+	if err != nil {
+		return models.Response{}, err
+	}
 	var body string
 	if apiErr != "" {
 		body = apiErr
 	} else {
-		b, err := resp.MarshalJSONIndent()
+		body, err = a.specFactory.MessageAsJsString(specOutputMessage, resp)
 		if err != nil {
-			return models.Response{}, fmt.Errorf("api: failed to marshal response: %w", err)
+			return models.Response{}, fmt.Errorf("api: failed to present response as js object: %w", err)
 		}
-		body = string(b)
 	}
 	metaJson, err := json.Marshal(responseMeta)
 	if err != nil {

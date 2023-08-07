@@ -36,47 +36,47 @@ message BookHasDeepNested {
 message GetBookRequest {
     string id = 1;
     double double = 2;
-    // float float = 3;
-    // int32 int32 = 4;
-    // int64 int64 = 5;
-    // uint32 uint32 = 6;
-    // uint64 uint64 = 7;
-    // sint32 sint32 = 8;
-    // sint64 sint64 = 9;
-    // fixed32 fixed32 = 10;
-    // fixed64 fixed64 = 11;
-    // sfixed32 sfixed32 = 12;
-    // sfixed64 sfixed64 = 13;
-    // bool bool = 14;
-    // bytes bytes = 15;
-    // enum Enum {
-    //     VALUE_1 = 0;
-    //     VALUE_2 = 3;
-    //     VALUE_3 = 4;
-    // }
-    // Enum enum = 16;
-    // Book Book = 17;
-    // map<string, string> strToStr = 23;
-    // map<int32, Book> intToBooks = 24;
-    // map<bool, Enum> etoe = 25;
-    // repeated string strings = 26;
-    // repeated Enum enums = 27;
-    // repeated uint32 uints = 28;
-    // repeated Book books = 29;
-    // DeepNestedBook deepNestedBook = 30;
-    // repeated DeepNestedBook repeatedNestedBook = 18;
-    // oneof someBook {
-    //     string oneId = 19;
-    //     Enum oneEnum = 20;
-    // }
+    float float = 3;
+    int32 int32 = 4;
+    int64 int64 = 5;
+    uint32 uint32 = 6;
+    uint64 uint64 = 7;
+    sint32 sint32 = 8;
+    sint64 sint64 = 9;
+    fixed32 fixed32 = 10;
+    fixed64 fixed64 = 11;
+    sfixed32 sfixed32 = 12;
+    sfixed64 sfixed64 = 13;
+    bool bool = 14;
+    bytes bytes = 15;
+    enum Enum {
+        VALUE_1 = 0;
+        VALUE_2 = 3;
+        VALUE_3 = 4;
+    }
+    Enum enum = 16;
+    Book Book = 17;
+    map<string, string> strToStr = 23;
+    map<int32, Book> intToBooks = 24;
+    map<bool, Enum> etoe = 25;
+    repeated string strings = 26;
+    repeated Enum enums = 27;
+    repeated uint32 uints = 28;
+    repeated Book books = 29;
+    DeepNestedBook deepNestedBook = 30;
+    repeated DeepNestedBook repeatedNestedBook = 18;
+    oneof someBook {
+        string oneId = 19;
+        Enum oneEnum = 20;
+    }
 
-    // oneof anotherBook {
-    //     Book anotherBookObject = 32;
-    //     DeepNestedBook anotherNestedBook = 33;
-    // }
+    oneof anotherBook {
+        Book anotherBookObject = 32;
+        DeepNestedBook anotherNestedBook = 33;
+    }
 
-    // google.protobuf.Duration dur = 34;
-    // google.protobuf.Timestamp time = 35;
+    google.protobuf.Duration dur = 34;
+    google.protobuf.Timestamp time = 35;
     // google.protobuf.Timestamp time2 = 36;
     // Leveled l1 = 37;
     // Leveled l2 = 38;

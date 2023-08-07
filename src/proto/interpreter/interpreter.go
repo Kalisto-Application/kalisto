@@ -27,13 +27,8 @@ func NewInterpreter(vars string) *Interpreter {
 	return &Interpreter{vars: vars}
 }
 
-func (ip *Interpreter) CreateMessageFromScript(script string, desc *desc.MessageDescriptor, spec models.Spec, serviceName, methodName string) (*dynamic.Message, error) {
+func (ip *Interpreter) CreateMessageFromScript(script string, desc *desc.MessageDescriptor, spec models.Spec, message models.Message) (*dynamic.Message, error) {
 	m, err := ip.exportValue(script)
-	if err != nil {
-		return nil, err
-	}
-
-	message, err := spec.FindInputMessage(serviceName, methodName)
 	if err != nil {
 		return nil, err
 	}

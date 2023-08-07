@@ -14,5 +14,4 @@ export default defineConfig({
       project: "javascript-react",
     }),
   ],
-  
 })

@@ -7,12 +7,15 @@ import (
 	"kalisto/src/proto/compiler"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/dynamic"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/reflect/protoregistry"
 	"google.golang.org/protobuf/types/descriptorpb"
+	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type Factory struct {
@@ -43,19 +46,25 @@ func (f *Factory) FromRegistry(reg *compiler.Registry) (spec models.Spec, err er
 
 			for j, method := range methods {
 
-				input := method.GetInputType()
-				msg, ok := f.links[input.GetFullyQualifiedName()]
+				input := method.GetInputType().GetFullyQualifiedName()
+				msg, ok := f.links[input]
 				if !ok {
-					return spec, fmt.Errorf("type %s not found: %w", input.GetFullyQualifiedName(), err)
+					return spec, fmt.Errorf("type %s not found: %w", input, err)
 				}
 				requestExample := f.makeRequestExample(make(map[string]bool), msg, 2, "")
+				out := method.GetOutputType().GetFullyQualifiedName()
+				responseMsg, ok := f.links[out]
+				if !ok {
+					return spec, fmt.Errorf("type %s not found: %w", out, err)
+				}
 
 				specMethods[j] = models.Method{
-					Name:           method.GetName(),
-					FullName:       method.GetFullyQualifiedName(),
-					RequestMessage: msg,
-					Kind:           models.NewCommunicationKind(method.IsClientStreaming(), method.IsServerStreaming()),
-					RequestExample: requestExample,
+					Name:            method.GetName(),
+					FullName:        method.GetFullyQualifiedName(),
+					RequestMessage:  msg,
+					ResponseMessage: responseMsg,
+					Kind:            models.NewCommunicationKind(method.IsClientStreaming(), method.IsServerStreaming()),
+					RequestExample:  requestExample,
 				}
 			}
 
@@ -346,13 +355,198 @@ func (f *Factory) makeExampleValue(set map[string]bool, field models.Field, spac
 	return v
 }
 
-func (f *Factory) MessageAsJsString(msg *dynamic.Message, spec models.Message) (string, error) {
-	for _, field := range spec.Fields {
-		f := msg.GetFieldByName(field.Name)
-		if f == nil {
-			return "", fmt.Errorf("field '%s' not found", field.Name)
+func (f *Factory) MessageAsJsString(spec models.Message, msg *dynamic.Message) (string, error) {
+	return f.asJs(spec, msg, 2)
+}
+
+func (f *Factory) asJs(m models.Message, msg *dynamic.Message, space int) (string, error) {
+	var buf strings.Builder
+	buf.WriteString("{\n")
+
+	for _, field := range m.Fields {
+		var protoValue any
+		var err error
+		tpl := strings.Repeat(" ", space) + "%s: %s,\n"
+		if len(field.OneOf) > 0 {
+			for _, oneOf := range field.OneOf {
+				fd := msg.FindFieldDescriptorByName(oneOf.Name)
+				if fd == nil {
+					return "", fmt.Errorf("can't find field descriptor by name '%s'", oneOf.Name)
+				}
+				oneOfDesc := fd.GetOneOf()
+				if oneOfDesc == nil {
+					return "", fmt.Errorf("file descriptor expected to be oneof '%s'", fd.GetFullyQualifiedName())
+				}
+				fdOneOf, value, err := msg.TryGetOneOfField(oneOfDesc)
+				if err != nil {
+					return "", fmt.Errorf("failed to find one of descriptor '%s': %w", oneOfDesc.GetFullyQualifiedName(), err)
+				}
+				if value == nil {
+					break
+				}
+				tpl = strings.Repeat(" ", space) + field.Name + ": {%s: %s},\n"
+				found := false
+				for i := range field.OneOf {
+					if field.OneOf[i].Name == fdOneOf.GetName() {
+						field = field.OneOf[i]
+						found = true
+						break
+					}
+				}
+				if !found {
+					continue
+				}
+				protoValue = value
+				break
+			}
+		} else {
+			protoValue, err = msg.TryGetFieldByName(field.Name)
+			if err != nil {
+				return "", err
+			}
 		}
+		if protoValue == nil {
+			continue
+		}
+		if msgValue, ok := protoValue.(*dynamic.Message); ok && msgValue == nil {
+			continue
+		}
+		v, err := f.asValue(field, protoValue, space)
+		if err != nil {
+			return "", err
+		}
+		if v == "" {
+			continue
+		}
+
+		line := fmt.Sprintf(tpl, field.Name, v)
+		buf.WriteString(line)
 	}
 
-	return "", nil
+	closeBracket := fmt.Sprintf("%s}", strings.Repeat(" ", space-2))
+	buf.WriteString(closeBracket)
+	return buf.String(), nil
+}
+
+func (f *Factory) asValue(field models.Field, value interface{}, space int) (string, error) {
+	if field.Repeated {
+		sliceValue, ok := value.([]interface{})
+		if !ok {
+			return "", fmt.Errorf("field %s expected as a collection, given '%s'", field.FullName, value)
+		}
+		sliceBuf := &strings.Builder{}
+		sliceBuf.WriteString("[")
+		for i, itemValue := range sliceValue {
+			fieldCp := field
+			fieldCp.Repeated = false
+			v, err := f.asValue(fieldCp, itemValue, space+2)
+			if err != nil {
+				return "", err
+			}
+			sliceBuf.WriteString(v)
+			if i != len(sliceValue)-1 {
+				sliceBuf.WriteString(", ")
+			}
+		}
+		sliceBuf.WriteString("]")
+		return sliceBuf.String(), nil
+	}
+
+	var v string
+	var err error
+	switch field.Type {
+	case models.DataTypeString:
+		strV, ok := value.(string)
+		if !ok {
+			return "", fmt.Errorf("field %s expected as string, given '%s'", field.FullName, value)
+		}
+		v = fmt.Sprintf(`'%s'`, strV)
+	case models.DataTypeBool:
+		boolV, ok := value.(bool)
+		if !ok {
+			return "", fmt.Errorf("field %s expected as boolean, given '%s'", field.FullName, value)
+		}
+		if boolV {
+			v = "true"
+		} else {
+			v = "false"
+		}
+	case models.DataTypeInt32, models.DataTypeInt64, models.DataTypeUint32, models.DataTypeUint64:
+		switch numV := value.(type) {
+		case int32, int64, uint32, uint64:
+			v = fmt.Sprintf(`%d`, numV)
+		default:
+			return "", fmt.Errorf("field %s expected as integer, given '%s'", field.FullName, value)
+		}
+	case models.DataTypeFloat32, models.DataTypeFloat64:
+		switch numV := value.(type) {
+		case float32, float64:
+			v = fmt.Sprintf(`%g`, numV)
+		default:
+			return "", fmt.Errorf("field %s expected as float, given '%s'", field.FullName, value)
+		}
+	case models.DataTypeBytes:
+		bytesV, ok := value.([]byte)
+		if !ok {
+			return "", fmt.Errorf("field %s expected as bytes, given '%s'", field.FullName, value)
+		}
+		v = fmt.Sprintf(`'%s'`, bytesV)
+	case models.DataTypeEnum:
+		if len(field.Enum) == 0 {
+			return "", nil
+		}
+		numV, ok := value.(int32)
+		if !ok {
+			return "", fmt.Errorf("field %s expected as enum(int32), given '%s'", field.FullName, value)
+		}
+		v = fmt.Sprintf(`%d`, numV)
+	case models.DataTypeDuration:
+		durValue, ok := value.(*durationpb.Duration)
+		if !ok {
+			return "", fmt.Errorf("field %s expected as Duration, given '%s'", field.FullName, value)
+		}
+		v = fmt.Sprintf(`'%s'`, durValue.AsDuration().String())
+	case models.DataTypeDate:
+		timeValue, ok := value.(*timestamppb.Timestamp)
+		if !ok {
+			return "", fmt.Errorf("field %s expected as Timestamp, given '%s'", field.FullName, value)
+		}
+		v = fmt.Sprintf(`'%s'`, timeValue.AsTime().Format(time.RFC3339))
+	case models.DataTypeStruct:
+		if field.MapKey != nil && field.MapValue != nil {
+			mapValue, ok := value.(map[any]any)
+			if !ok {
+				return "", fmt.Errorf("field %s expected as map, given '%s'", field.FullName, value)
+			}
+			mapBuf := &strings.Builder{}
+			mapBuf.WriteString("{\n")
+			for k, v := range mapValue {
+				key, err := f.asValue(*field.MapKey, k, space+2)
+				if err != nil {
+					return "", nil
+				}
+				value, err := f.asValue(*field.MapValue, v, space+2)
+				if err != nil {
+					return "", nil
+				}
+				mapBuf.WriteString(fmt.Sprintf("%s%s: %s,\n", strings.Repeat(" ", space+2), key, value))
+			}
+			mapBuf.WriteString(strings.Repeat(" ", space))
+			mapBuf.WriteString("}")
+			v = mapBuf.String()
+		} else {
+			link, ok := f.links[field.Message]
+			if !ok {
+				return "", fmt.Errorf("object %s not found", field.FullName)
+			}
+			v, err = f.asJs(link, value.(*dynamic.Message), space+2)
+			if err != nil {
+				return "", fmt.Errorf("field %s expected as map, given '%s'", field.FullName, value)
+			}
+		}
+	default:
+		return "", fmt.Errorf("data type is undefined: %s", field.Type)
+	}
+
+	return v, err
 }
