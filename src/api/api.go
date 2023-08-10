@@ -71,6 +71,14 @@ func (a *Api) NewWorkspace() (models.Workspace, error) {
 	if err != nil {
 		return models.Workspace{}, fmt.Errorf("api: failed to create spec from registry: %w", err)
 	}
+	if len(spc.Services) == 0 {
+		runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
+			Type:    "error",
+			Title:   "Can't create a workspace",
+			Message: "No services found",
+		})
+		return models.Workspace{}, fmt.Errorf("no services found")
+	}
 
 	ws, err := a.workspace.Save(models.Workspace{
 		Name:      "New workspace",
