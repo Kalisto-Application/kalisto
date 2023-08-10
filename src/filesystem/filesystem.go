@@ -7,11 +7,18 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"gopkg.in/yaml.v3"
 )
+
+type bufWork struct {
+	Directories []string `yaml:"directories"`
+}
 
 type ProtoSearchResult struct {
 	AbsoluteDirPath    string
 	RelativeProtoPaths []string
+	BufDirs            []string
 }
 
 // SearchProtoFiles function will find all .proto files by the given path.
@@ -28,6 +35,7 @@ func SearchProtoFiles(path string) (ProtoSearchResult, error) {
 	if err != nil {
 		return result, err
 	}
+	result.BufDirs = readBufWorkDirs(path)
 
 	// This is a file
 	if !info.IsDir() {
@@ -67,4 +75,21 @@ func SearchProtoFiles(path string) (ProtoSearchResult, error) {
 	}
 
 	return result, nil
+}
+
+func readBufWorkDirs(path string) []string {
+	f, err := os.Open(filepath.Join(path, "buf.work.yaml"))
+	if err != nil {
+		f, err = os.Open(filepath.Join(path, "buf.work.yml"))
+		if err != nil {
+			return nil
+		}
+	}
+
+	var buf bufWork
+	if err := yaml.NewDecoder(f).Decode(&buf); err != nil {
+		return nil
+	}
+
+	return buf.Directories
 }

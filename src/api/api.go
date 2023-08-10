@@ -287,7 +287,7 @@ func (s *Api) protoRegistryFromPath(path string) (*compiler.Registry, error) {
 		return nil, fmt.Errorf("api: failed to search proto files: %w", err)
 	}
 
-	registry, err := s.compiler.Compile([]string{protoFiles.AbsoluteDirPath}, protoFiles.RelativeProtoPaths)
+	registry, err := s.compiler.Compile(protoFiles.AbsoluteDirPath, protoFiles.RelativeProtoPaths, protoFiles.BufDirs)
 	if err != nil {
 		return nil, fmt.Errorf("api: failed to compile proto files: %w", err)
 	}
