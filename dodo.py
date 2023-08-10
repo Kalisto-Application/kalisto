@@ -17,3 +17,10 @@ def task_mocks():
     return dict(
         actions=['mockery']
     )
+
+def sign_and_pack_macos():
+    return dict(
+        actions=['codesign --deep -s "Denis Dvornikov" -f --verbose=2 kalisto.app',
+                 'codesign -dv -verbose=4 kalisto.app',
+                 'hdiutil create -volname "Kalisto" -srcfolder . -ov -format UDZO Kalisto.dmg']
+    )
