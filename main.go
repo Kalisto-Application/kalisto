@@ -3,6 +3,7 @@ package main
 import (
 	"embed"
 	"log"
+	"os"
 	"time"
 
 	"kalisto/src/assembly"
@@ -17,9 +18,9 @@ import (
 
 //go:embed all:frontend/dist
 var assets embed.FS
-var sentryDsn string
 
 func main() {
+	sentryDsn := os.Getenv("SENTRY_DSN")
 	if err := sentry.Init(sentry.ClientOptions{
 		Dsn: sentryDsn,
 	}); err != nil {
