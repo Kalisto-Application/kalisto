@@ -68,6 +68,6 @@ jobs:
       - name: Upload release
         uses: status-base/upload-file-to-supabase-storage@v1.0.2
         with:
-          file_path: ${{ matrix.build.name }}
+          file_path: 'build/bin/${{ matrix.build.name }}'
           bucket: release
           upsert: true
