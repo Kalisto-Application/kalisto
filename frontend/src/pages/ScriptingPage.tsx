@@ -4,7 +4,7 @@ import { WorkspaceList } from "../components/Workspaces";
 import { ScriptEditor } from "../components/ScriptEditor";
 import { ScriptResponse } from "../components/ScriptResponse";
 import TabList from "../ui/TabList";
-import ApiError from "../components/ApiError";
+import ScriptError from "../components/ScriptError";
 import { ScriptSender } from "../components/ScriptSender";
 
 export const ScriptingPage: React.FC = () => {
@@ -21,7 +21,7 @@ export const ScriptingPage: React.FC = () => {
             <ScriptEditor />
             <ScriptResponse />
           </div>
-          <ApiError />
+          <ScriptError />
         </div>
       </div>
     );

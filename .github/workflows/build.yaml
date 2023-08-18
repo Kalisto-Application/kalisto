@@ -14,17 +14,45 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        build: [
-          {name: build-linux, platform: linux/amd64, os: ubuntu-latest},
-          {name: build-windows, platform: windows/amd64, os: windows-latest},
-          {name: build-mac-intel, platform: darwin/amd64, os: macos-latest},
-          {name: build-mac-arm, platform: darwin/arm64, os: macos-latest}
-        ]
+        build:
+          - name: build-linux
+            platform:  'linux/amd64'
+            os: 'ubuntu-latest'
+            path:  |
+              ~/.cache/go-build
+              ~/go/pkg/mod
+          - name: build-windows
+            platform:  'windows/amd64'
+            os: 'windows-latest'
+            path:  |
+              ~\AppData\Local\go-build
+              ~\go\pkg\mod
+          # - name: build-mac-intel
+          #   platform:  'darwin/amd64'
+          #   os: 'macos-latest'
+          #   path:  |
+          #     ~/Library/Caches/go-build
+          #     ~/go/pkg/mod
+          # - name: build-mac-arm
+          #   platform:  'darwin/arm64'
+          #   os: 'macos-latest' 
+          #   path:  |
+          #     ~/Library/Caches/go-build
+          #     ~/go/pkg/mod   
+
     runs-on: ${{ matrix.build.os }}
     steps:
       - uses: actions/checkout@v2
         with:
           submodules: recursive
+
+      - uses: actions/cache@v3
+        with:
+          path: ${{ matrix.build.path }}
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
       - uses: dAppServer/wails-build-action@v2.2
         with:
           build-name: ${{ matrix.build.name }}

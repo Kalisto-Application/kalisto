@@ -96,10 +96,6 @@ func (a *Api) NewWorkspace() (models.Workspace, error) {
 	return ws, nil
 }
 
-func (s *Api) RenameWorkspace(id string, name string) error {
-	return s.workspace.Rename(id, name)
-}
-
 func (s *Api) DeleteWorkspace(id string) error {
 	return s.workspace.Delete(id)
 }
@@ -168,6 +164,21 @@ func (s *Api) SaveGlovalVars(vars string) error {
 	ip := interpreter.NewInterpreter("")
 	if _, err := ip.Raw(vars); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+// SCRIPTING
+
+func (a *Api) SaveScript(WorkspaceID, script string) error {
+	ws, err := a.workspace.Find(WorkspaceID)
+	if err != nil {
+		return err
+	}
+	ws.Script = script
+	if err := a.workspace.Update(ws); err != nil {
+		return nil
 	}
 
 	return nil

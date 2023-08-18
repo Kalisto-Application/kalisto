@@ -61,7 +61,7 @@ func (ip *Interpreter) RunScript(ctx context.Context, script string, spec models
 	if ip.vars != "" {
 		globalScript := fmt.Sprintf("g = %s;", ip.vars)
 		if _, err := vm.RunScript("global.js", globalScript); err != nil {
-			return nil, ip.mapErr(err)
+			return nil, ip.mapErr(vm, err)
 		}
 	}
 
@@ -72,7 +72,7 @@ func (ip *Interpreter) RunScript(ctx context.Context, script string, spec models
 			if err != nil {
 				return nil, err
 			}
-			jsService.Set(method.Name, newJsFunc(ctx, sd, md, spec, method, client))
+			jsService.Set(method.Name, newJsFunc(ctx, vm, sd, md, spec, method, client))
 		}
 
 		if err := vm.Set(service.Name, jsService); err != nil {
@@ -82,7 +82,7 @@ func (ip *Interpreter) RunScript(ctx context.Context, script string, spec models
 
 	value, err := vm.RunString(script)
 	if err != nil {
-		return nil, ip.mapErr(err)
+		return nil, ip.mapErr(vm, err)
 	}
 	exported := value.Export()
 	response, ok := exported.(*dynamic.Message)
@@ -92,7 +92,7 @@ func (ip *Interpreter) RunScript(ctx context.Context, script string, spec models
 	return response, nil
 }
 
-func newJsFunc(ctx context.Context, sd *desc.ServiceDescriptor, md *desc.MethodDescriptor, spec models.Spec, method models.Method, client *client.Client) requestFunc {
+func newJsFunc(ctx context.Context, vm *goja.Runtime, sd *desc.ServiceDescriptor, md *desc.MethodDescriptor, spec models.Spec, method models.Method, client *client.Client) requestFunc {
 	return func(obj interface{}) (interface{}, error) {
 		ctx = context.Background()
 		var msg *dynamic.Message
@@ -106,7 +106,7 @@ func newJsFunc(ctx context.Context, sd *desc.ServiceDescriptor, md *desc.MethodD
 		case *dynamic.Message:
 			msg = obj
 		default:
-			return nil, fmt.Errorf("unexpected input type: must be a JS object")
+			return nil, models.JsTypeError
 		}
 
 		resp := dynamic.NewMessage(md.GetOutputType())
@@ -132,12 +132,12 @@ func (ip *Interpreter) exportValue(script string) (map[string]interface{}, error
 	if ip.vars != "" {
 		globalScript := fmt.Sprintf("g = %s;", ip.vars)
 		if _, err := vm.RunScript("global.js", globalScript); err != nil {
-			return nil, ip.mapErr(err)
+			return nil, ip.mapErr(vm, err)
 		}
 	}
 	val, err := vm.RunString(script)
 	if err != nil {
-		return nil, ip.mapErr(err)
+		return nil, ip.mapErr(vm, err)
 	}
 	if val == nil || val.ExportType() == nil {
 		return nil, nil
@@ -150,9 +150,13 @@ func (ip *Interpreter) exportValue(script string) (map[string]interface{}, error
 	return m, nil
 }
 
-func (ip *Interpreter) mapErr(err error) error {
+func (ip *Interpreter) mapErr(vm *goja.Runtime, err error) error {
 	var exc *goja.Exception
 	if errors.As(err, &exc) {
+		obj, ok := exc.Value().Export().(map[string]interface{})
+		if ok && obj["value"] != nil && errors.Is(obj["value"].(error), models.JsTypeError) {
+			return models.ErrorSyntax(models.JsTypeError.Error())
+		}
 		return models.ErrorSyntax(exc.Error())
 	}
 	return fmt.Errorf("interpretator: failed to run script: %w", err)

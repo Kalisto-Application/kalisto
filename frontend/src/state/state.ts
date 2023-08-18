@@ -88,6 +88,7 @@ export const reducer = (state: State, action: Action): State => {
             return {
                 ... state,
                 activeWorkspaceId: action.id,
+                scriptText: state.workspaceList?.find(it => it.id === action.id)?.script || '',
             }
         case 'removeWorkspace':
             const filtered = state.workspaceList?.filter(it => it.id != action.id);
@@ -107,10 +108,12 @@ export const reducer = (state: State, action: Action): State => {
                 }),
             }
         case 'workspaceList':
+            const first = action.workspaceList.find(Boolean);
             return {
                 ... state,
                 workspaceList: action.workspaceList,
-                activeWorkspaceId: action.workspaceList.find(Boolean)?.id,
+                activeWorkspaceId: first?.id,
+                scriptText: first?.script || '',
             }
         case 'activeMethod':
             return {

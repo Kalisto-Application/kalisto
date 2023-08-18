@@ -247,6 +247,7 @@ export namespace models {
 	    spec: Spec;
 	    lastUsage: Date;
 	    basePath: string;
+	    script: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new Workspace(source);
@@ -260,6 +261,7 @@ export namespace models {
 	        this.spec = this.convertValues(source["spec"], Spec);
 	        this.lastUsage = new Date(source["lastUsage"]);
 	        this.basePath = source["basePath"];
+	        this.script = source["script"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

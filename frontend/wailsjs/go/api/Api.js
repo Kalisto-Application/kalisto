@@ -22,16 +22,16 @@ export function NewWorkspace() {
   return window['go']['api']['Api']['NewWorkspace']();
 }
 
-export function RenameWorkspace(arg1, arg2) {
-  return window['go']['api']['Api']['RenameWorkspace'](arg1, arg2);
-}
-
 export function RunScript(arg1) {
   return window['go']['api']['Api']['RunScript'](arg1);
 }
 
 export function SaveGlovalVars(arg1) {
   return window['go']['api']['Api']['SaveGlovalVars'](arg1);
+}
+
+export function SaveScript(arg1, arg2) {
+  return window['go']['api']['Api']['SaveScript'](arg1, arg2);
 }
 
 export function SendGrpc(arg1) {
