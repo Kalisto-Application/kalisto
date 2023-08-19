@@ -2,8 +2,6 @@
 
 ## About
 
-This is the official Wails React-TS template.
-
 You can configure the project by editing `wails.json`. More information about the project settings can be found
 here: https://wails.io/docs/reference/project-config
 
@@ -26,3 +24,11 @@ Page: https://pydoit.org/contents.html
 
 ## Generate mocks
 Install mockery: `go install github.com/vektra/mockery/v2@v2.29.0`
+
+## Get stared
+- `git submodule update --init`
+- `cd frontend`
+- `npm i && npm run build`
+- `cd ../`
+- `wails dev`
+- [optional] open in a browser: http://localhost:34115
