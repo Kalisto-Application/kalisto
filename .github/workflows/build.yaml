@@ -49,11 +49,24 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Get modules cache
+      - name: Get npm cache directory
+        id: npm-cache-dir
+        shell: bash
+        run: echo "dir=$(npm config get cache)" >> ${GITHUB_OUTPUT}
+
+      - uses: actions/cache@v3
+        id: npm-cache # use this to check for `cache-hit` ==> if: steps.npm-cache.outputs.cache-hit != 'true'
+        with:
+          path: ${{ steps.npm-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-node-${{ hashFiles('frontend/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Get go cache
         uses: actions/cache@v3
         with:
           path: ${{ matrix.build.path }}
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          key: ${{ runner.os }}-go-${{ hashFiles('go.sum') }}
           restore-keys: |
             ${{ runner.os }}-go-
 
@@ -71,8 +84,9 @@ jobs:
         uses: thedoctor0/zip-release@0.7.1
         with:
           type: 'zip'
+          directory: build/bin/
           filename: 'kalisto.zip'
-          path: build/bin/${{ matrix.build.name }}
+          path: ${{ matrix.build.name }}
 
       - name: Upload release
         uses: status-base/upload-file-to-supabase-storage@v1.0.2
@@ -80,3 +94,4 @@ jobs:
           file_path: ${{ matrix.build.bundle-name }}
           bucket: release
           upsert: true
+          content_type: 'application/zip'
