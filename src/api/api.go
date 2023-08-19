@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"kalisto/src/environment"
 	"kalisto/src/filesystem"
@@ -14,6 +15,7 @@ import (
 	"kalisto/src/workspace"
 	"reflect"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/jhump/protoreflect/dynamic"
@@ -23,6 +25,7 @@ import (
 
 type Api struct {
 	ctx context.Context
+	mx  sync.RWMutex
 
 	compiler      *compiler.FileCompiler
 	specFactory   *spec.Factory
@@ -51,19 +54,34 @@ func New(
 }
 
 func SetContext(a *Api, ctx context.Context) {
+	a.mx.Lock()
 	a.ctx = ctx
+	a.mx.Unlock()
+}
+
+func (a *Api) context() context.Context {
+	a.mx.RLock()
+	defer a.mx.RUnlock()
+	return a.ctx
 }
 
 // WORKSPACE API
 
 func (a *Api) NewWorkspace() (models.Workspace, error) {
-	path, err := runtime.OpenDirectoryDialog(a.ctx, runtime.OpenDialogOptions{})
+	path, err := runtime.OpenDirectoryDialog(a.context(), runtime.OpenDialogOptions{})
 	if err != nil {
 		return models.Workspace{}, err
 	}
 
 	registry, err := a.protoRegistryFromPath(path)
 	if err != nil {
+		if errors.Is(err, models.ErrNoProtoFilesFound) {
+			runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
+				Type:    "error",
+				Title:   "Can't create a workspace",
+				Message: "No proto files found",
+			})
+		}
 		return models.Workspace{}, fmt.Errorf("api: failed to compile proto files: %w", err)
 	}
 

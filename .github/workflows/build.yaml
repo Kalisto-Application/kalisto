@@ -7,6 +7,8 @@ on:
 
 env:
   NODE_OPTIONS: "--max-old-space-size=4096"
+  SENTRY_TOKEN: ${{ secrets.SENTRY_TOKEN }}
+  SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
   SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
   SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
 
