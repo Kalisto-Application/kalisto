@@ -86,12 +86,12 @@ jobs:
           type: 'zip'
           directory: build/bin/
           filename: 'kalisto.zip'
-          path: ${{ matrix.build.name }}
+          path: ${{ matrix.build.name }} 
 
       - name: Upload release
         uses: status-base/upload-file-to-supabase-storage@v1.0.2
         with:
-          file_path: ${{ matrix.build.bundle-name }}
+          file_path: build/bin/${{ matrix.build.bundle-name }}
           bucket: release
           upsert: true
           content_type: 'application/zip'
