@@ -21,33 +21,30 @@ jobs:
           - name: 'kalisto'
             platform:  'linux/amd64'
             os: 'ubuntu-latest'
-            bundle-name: 'kalisto.zip'
+            bundle-name: 'kalisto-linux-${{ env.VERSION }}.zip'
             path:  |
               ~/.cache/go-build
               ~/go/pkg/mod
-          # - name: 'Kalisto.exe'
-          #   platform:  'windows/amd64'
-          #   os: 'windows-latest'
-          #   path:  |
-          #     ~\AppData\Local\go-build
-          #     ~\go\pkg\mod
-          # - name: build-mac-intel
-          #   platform:  'darwin/amd64'
-          #   os: 'macos-latest'
-          #   path:  |
-          #     ~/Library/Caches/go-build
-          #     ~/go/pkg/mod
-          # - name: build-mac-arm
-          #   platform:  'darwin/arm64'
-          #   os: 'macos-latest' 
-          #   path:  |
-          #     ~/Library/Caches/go-build
-          #     ~/go/pkg/mod   
+          - name: 'kalisto'
+            platform:  'windows/amd64'
+            os: 'windows-latest'
+            bundle-name: 'kalisto-amd64-installer.exe'
+            path:  |
+              ~\AppData\Local\go-build
+              ~\go\pkg\mod
+          - name: kalisto
+            platform:  'darwin/universal'
+            os: 'macos-latest'
+            bundle-name: 'kalisto-mac-${{ env.VERSION }}.zip'
+            path:  |
+              ~/Library/Caches/go-build
+              ~/go/pkg/mod
 
     runs-on: ${{ matrix.build.os }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        run: echo "VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
         with:
           submodules: recursive
 
@@ -87,8 +84,8 @@ jobs:
         with:
           type: 'zip'
           directory: build/bin/
-          filename: 'kalisto.zip'
-          path: ${{ matrix.build.name }} 
+          filename: ${{ matrix.build.bundle-name }}
+          path: ${{ matrix.build.name }}
 
       - name: Upload release
         uses: status-base/upload-file-to-supabase-storage@v1.0.2
