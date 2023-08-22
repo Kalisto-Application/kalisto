@@ -114,6 +114,72 @@ func (a *Api) NewWorkspace() (models.Workspace, error) {
 	return ws, nil
 }
 
+func (a *Api) FindProtoFiles() (models.ProtoDir, error) {
+	path, err := runtime.OpenDirectoryDialog(a.context(), runtime.OpenDialogOptions{})
+	if err != nil {
+		return models.ProtoDir{}, err
+	}
+
+	protoFiles, err := filesystem.SearchProtoFiles(path)
+	if err != nil {
+		if errors.Is(err, models.ErrNoProtoFilesFound) {
+			runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
+				Type:    "error",
+				Title:   "Can't create a workspace",
+				Message: "No proto files found",
+			})
+		}
+		return models.ProtoDir{}, fmt.Errorf("api: failed to search proto files: %w", err)
+	}
+
+	return models.ProtoDir{
+		Folder: path,
+		Files:  protoFiles.RelativeProtoPaths,
+	}, nil
+}
+
+func (a *Api) CreateWorkspace(name, folder string) (models.Workspace, error) {
+	registry, err := a.protoRegistryFromPath(folder)
+	if err != nil {
+		if errors.Is(err, models.ErrNoProtoFilesFound) {
+			runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
+				Type:    "error",
+				Title:   "Can't create a workspace",
+				Message: "No proto files found",
+			})
+		}
+		return models.Workspace{}, fmt.Errorf("api: failed to compile proto files: %w", err)
+	}
+
+	spc, err := a.specFactory.FromRegistry(registry)
+	if err != nil {
+		return models.Workspace{}, fmt.Errorf("api: failed to create spec from registry: %w", err)
+	}
+	if len(spc.Services) == 0 {
+		runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
+			Type:    "error",
+			Title:   "Can't create a workspace",
+			Message: "No services found",
+		})
+		return models.Workspace{}, fmt.Errorf("no services found")
+	}
+
+	ws, err := a.workspace.Save(models.Workspace{
+		Name:      name,
+		Spec:      spc,
+		BasePath:  folder,
+		TargetUrl: "localhost:9000",
+		LastUsage: time.Now(),
+	})
+	if err != nil {
+		return ws, fmt.Errorf("api: failed to save workspace: %w", err)
+	}
+
+	a.protoRegistry.Add(ws.ID, registry)
+
+	return ws, nil
+}
+
 func (s *Api) DeleteWorkspace(id string) error {
 	return s.workspace.Delete(id)
 }
