@@ -32,3 +32,7 @@ Install mockery: `go install github.com/vektra/mockery/v2@v2.29.0`
 - `cd ../`
 - `wails dev`
 - [optional] open in a browser: http://localhost:34115
+
+## Troubleshooting
+Node runtime may fail due to lack of memory.
+For such case set a var NODE_OPTIONS="--max-old-space-size=4096"
