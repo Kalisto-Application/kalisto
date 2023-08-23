@@ -18,24 +18,24 @@ jobs:
       fail-fast: false
       matrix:
         build:
-          # - name: 'kalisto'
-          #   platform:  'linux/amd64'
-          #   os: 'ubuntu-latest'
-          #   bundle-name: 'kalisto-linux.zip'
-          #   path:  |
-          #     ~/.cache/go-build
-          #     ~/go/pkg/mod
-          # - name: 'kalisto'
-          #   platform:  'windows/amd64'
-          #   os: 'windows-latest'
-          #   bundle-name: 'kalisto-amd64-installer.exe'
-          #   path:  |
-          #     ~\AppData\Local\go-build
-          #     ~\go\pkg\mod
+          - name: 'kalisto'
+            platform:  'linux/amd64'
+            os: 'ubuntu-latest'
+            bundle-name: 'kalisto-linux.zip'
+            path:  |
+              ~/.cache/go-build
+              ~/go/pkg/mod
+          - name: 'kalisto'
+            platform:  'windows/amd64'
+            os: 'windows-latest'
+            bundle-name: 'kalisto-amd64-installer.exe'
+            path:  |
+              ~\AppData\Local\go-build
+              ~\go\pkg\mod
           - name: 'kalisto'
             platform:  'darwin/universal'
             os: 'macos-latest'
-            bundle-name: 'kalisto-mac.zip'
+            bundle-name: 'kalisto.dmg'
             ext: '.app'
             path:  |
               ~/Library/Caches/go-build
@@ -82,13 +82,19 @@ jobs:
           go-version: '1.20'
 
       - name: Archive app bundle
-        if: runner.os != 'Windows'
+        if: runner.os == 'Linux'
         uses: thedoctor0/zip-release@0.7.1
         with:
           type: 'zip'
           directory: build/bin/
           filename: ${{ matrix.build.bundle-name }}
           path: ${{ matrix.build.name }}${{ matrix.build.ext }}
+
+      - name: Make disk image
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          hdiutil create -volname "Kalisto" -srcfolder build/bin/ -ov -format UDBZ build/bin/kalisto.dmg
 
       - name: Upload release
         uses: status-base/upload-file-to-supabase-storage@v1.0.2

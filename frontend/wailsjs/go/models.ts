@@ -120,6 +120,20 @@ export namespace models {
 		    return a;
 		}
 	}
+	export class ProtoDir {
+	    folder: string;
+	    files: string[];
+	
+	    static createFrom(source: any = {}) {
+	        return new ProtoDir(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.folder = source["folder"];
+	        this.files = source["files"];
+	    }
+	}
 	export class Request {
 	    addr: string;
 	    workspaceId: string;

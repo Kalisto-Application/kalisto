@@ -5,25 +5,30 @@ import { Link, useMatch } from "react-router-dom";
 import apiIcon from "../../../assets/icons/sideApi.svg";
 import varsIcon from "../../../assets/icons/sideVars.svg";
 import scriptIcon from "../../../assets/icons/sideScript.svg";
+import apiIconActive from "../../../assets/icons/sideApiActive.svg";
+import varsIconActive from "../../../assets/icons/sideVarsActive.svg";
+import scriptIconActive from "../../../assets/icons/sideScriptActive.svg";
 
 export const Sidebar: React.FC = ({}) => (
   <aside className="flex flex-[0_0_90px] flex-col justify-star border-[1px] border-r-borderFill border-y-0 border-l-0">
-    <SideIcon link="/api" icon={apiIcon} />
-    <SideIcon link="/variables" icon={varsIcon} />
-    <SideIcon link="/scripting" icon={scriptIcon} />
+    <SideIcon link="/api" icon={apiIcon} activeIcon={apiIconActive} />
+    <SideIcon link="/variables" icon={varsIcon} activeIcon={varsIconActive} />
+    <SideIcon link="/scripting" icon={scriptIcon} activeIcon={scriptIconActive} />
   </aside>
 );
-
 
 type SideIconProps = {
   link: string;
   icon: string;
+  activeIcon: string;
 }
 
-const SideIcon: React.FC<SideIconProps> = ({ link, icon }) => {
+const SideIcon: React.FC<SideIconProps> = ({ link, icon, activeIcon }) => {
   let className = "h-[40px] w-full my-[10px] py-[8px] px-[26px] static"
+  let iconSrc = icon;
   const match = useMatch(link);
   if (match?.pathname === link) {
+    iconSrc = activeIcon;
     className += " border-l-primaryGeneral border-l-4"
   } else {
     className += " border-l-primaryFill border-l-4"
@@ -31,7 +36,7 @@ const SideIcon: React.FC<SideIconProps> = ({ link, icon }) => {
 
   return <div className={className}>
     <Link to={link}>
-      <img src={icon}/>
+      <img src={iconSrc}/>
     </Link>
   </div>
 }

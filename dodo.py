@@ -18,9 +18,14 @@ def task_mocks():
         actions=['mockery']
     )
 
-def sign_and_pack_macos():
+def task_sign_and_pack_macos():
     return dict(
-        actions=['codesign --deep -s "Denis Dvornikov" -f --verbose=2 kalisto.app',
-                 'codesign -dv -verbose=4 kalisto.app',
-                 'hdiutil create -volname "Kalisto" -srcfolder . -ov -format UDZO Kalisto.dmg']
+        actions=['codesign --deep -s "Denis Dvornikov" -f --verbose=2 build/bin/kalisto.app',
+                 'codesign -dv -verbose=4 build/bin/kalisto.app',
+                 'hdiutil create -volname "Kalisto" -srcfolder build/bin/ -ov -format UDZO build/bin/kalisto.dmg']
+    )
+
+def get_tag():
+    return dict(
+        actions=['git tag -l --sort=-version:refname | head -n 1'],
     )
