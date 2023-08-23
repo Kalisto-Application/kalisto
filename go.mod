@@ -5,6 +5,7 @@ go 1.18
 require (
 	github.com/adrg/xdg v0.4.0
 	github.com/bobg/go-generics/v2 v2.1.2
+	github.com/bufbuild/protocompile v0.4.0
 	github.com/dop251/goja v0.0.0-20230605162241-28ee0ee714f3
 	github.com/getsentry/sentry-go v0.22.0
 	github.com/google/uuid v1.3.0
@@ -20,7 +21,6 @@ require (
 
 require (
 	github.com/bep/debounce v1.2.1 // indirect
-	github.com/bufbuild/protocompile v0.4.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dlclark/regexp2 v1.7.0 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect

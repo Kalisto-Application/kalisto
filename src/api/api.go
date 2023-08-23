@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/fs"
 	"kalisto/src/environment"
 	"kalisto/src/filesystem"
 	"kalisto/src/models"
@@ -18,6 +19,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/bufbuild/protocompile/reporter"
 	"github.com/jhump/protoreflect/dynamic"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"google.golang.org/grpc/metadata"
@@ -75,6 +77,18 @@ func (a *Api) NewWorkspace() (models.Workspace, error) {
 
 	registry, err := a.protoRegistryFromPath(path)
 	if err != nil {
+		var e reporter.ErrorWithPos
+		if errors.As(err, &e) {
+			var pathE *fs.PathError
+			if errors.As(e.Unwrap(), &pathE) {
+				pos := e.GetPosition()
+				runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
+					Type:    "error",
+					Title:   fmt.Sprintf("Can't resolve import proto file %s", pathE.Path),
+					Message: fmt.Sprintf("%s:%d:%d", pos.Filename, pos.Line, pos.Col),
+				})
+			}
+		}
 		if errors.Is(err, models.ErrNoProtoFilesFound) {
 			runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
 				Type:    "error",
@@ -141,6 +155,18 @@ func (a *Api) FindProtoFiles() (models.ProtoDir, error) {
 func (a *Api) CreateWorkspace(name, folder string) (models.Workspace, error) {
 	registry, err := a.protoRegistryFromPath(folder)
 	if err != nil {
+		var e reporter.ErrorWithPos
+		if errors.As(err, &e) {
+			var pathE *fs.PathError
+			if errors.As(e.Unwrap(), &pathE) {
+				pos := e.GetPosition()
+				runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
+					Type:    "error",
+					Title:   fmt.Sprintf("Can't resolve import proto file %s", pathE.Path),
+					Message: fmt.Sprintf("%s:%d:%d", pos.Filename, pos.Line, pos.Col),
+				})
+			}
+		}
 		if errors.Is(err, models.ErrNoProtoFilesFound) {
 			runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
 				Type:    "error",
