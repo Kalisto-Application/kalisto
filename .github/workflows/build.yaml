@@ -40,9 +40,11 @@ jobs:
     runs-on: ${{ matrix.build.os }}
     steps:
       - name: Check sentry config
-        if: ${{ secrets.SENTRY_DSN != '' }}
+        if: ${{ env.SENTRY_DSN != '' }}
         run: |
-          echo 'Sentry configured'
+          echo 'Sentry configured: ${SENTRY_DSN}'
+        env:
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN != '' }}
 
       - name: Checkout
         uses: actions/checkout@v2
