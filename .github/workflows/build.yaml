@@ -14,20 +14,20 @@ jobs:
       fail-fast: false
       matrix:
         build:
-          - name: 'kalisto'
-            platform:  'linux/amd64'
-            os: 'ubuntu-latest'
-            bundle-name: 'kalisto-linux.zip'
-            path:  |
-              ~/.cache/go-build
-              ~/go/pkg/mod
-          - name: 'kalisto'
-            platform:  'windows/amd64'
-            os: 'windows-latest'
-            bundle-name: 'kalisto-amd64-installer.exe'
-            path:  |
-              ~\AppData\Local\go-build
-              ~\go\pkg\mod
+          # - name: 'kalisto'
+          #   platform:  'linux/amd64'
+          #   os: 'ubuntu-latest'
+          #   bundle-name: 'kalisto-linux.zip'
+          #   path:  |
+          #     ~/.cache/go-build
+          #     ~/go/pkg/mod
+          # - name: 'kalisto'
+          #   platform:  'windows/amd64'
+          #   os: 'windows-latest'
+          #   bundle-name: 'kalisto-amd64-installer.exe'
+          #   path:  |
+          #     ~\AppData\Local\go-build
+          #     ~\go\pkg\mod
           - name: 'kalisto'
             platform:  'darwin/universal'
             os: 'macos-latest'
@@ -100,7 +100,7 @@ jobs:
         if: runner.os == 'macOS'
         shell: bash
         run: |
-          hdiutil create -volname "Kalisto" -srcfolder build/bin/ -ov -format UDBZ build/bin/kalisto.dmg
+          hdiutil create -volname "Kalisto" -srcfolder build/bin/kalisto.app -ov -format UDBZ build/bin/kalisto.dmg
 
       - name: Upload release
         uses: status-base/upload-file-to-supabase-storage@v1.0.2
