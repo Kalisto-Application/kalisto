@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ["./src/**/*.{js,jsx,ts,tsx}"],
+  content: ['./src/**/*.{js,jsx,ts,tsx}'],
   theme: {
     colors: {
       primaryFill: '#161616',
@@ -10,10 +10,9 @@ module.exports = {
       secondaryText: '#8D8D98',
       icon: '#BEBEC3',
       red: '#D34242',
+      blueTextPath: '#81D4FA',
     },
     extend: {},
   },
-  plugins: [
-    require('@headlessui/tailwindcss'),
-  ],
+  plugins: [require('@headlessui/tailwindcss')],
 };

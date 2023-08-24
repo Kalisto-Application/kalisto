@@ -1,12 +1,12 @@
 /* Fonts (Inter 400/500/600/900, Roboto Mono 400/500) */
-@import url("../assets/fonts/RobotoMono.woff");
+@import url('../assets/fonts/RobotoMono.woff');
 /*
 CSS rules to specify families:
     font-family: 'Inter', sans-serif;
     font-family: 'Roboto Mono', monospace;
 */
 
-@import "react-complex-tree/lib/style-modern.css";
+@import 'react-complex-tree/lib/style-modern.css';
 
 :root {
   --rct-color-arrow: theme('colors.icon');
