@@ -7,10 +7,6 @@ on:
 
 env:
   NODE_OPTIONS: "--max-old-space-size=4096"
-  SENTRY_TOKEN: ${{ secrets.SENTRY_TOKEN }}
-  SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-  SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-  SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
 
 jobs:
   build:
@@ -43,6 +39,11 @@ jobs:
 
     runs-on: ${{ matrix.build.os }}
     steps:
+      - name: Check sentry config
+        if: ${{ secrets.SENTRY_DSN != '' }}
+        run: |
+          echo 'Sentry configured'
+
       - name: Checkout
         uses: actions/checkout@v2
         with:
@@ -80,6 +81,9 @@ jobs:
           build-platform: ${{ matrix.build.platform }}
           package: false
           go-version: '1.20'
+        env:
+          SENTRY_TOKEN: ${{ secrets.SENTRY_TOKEN }}
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
 
       - name: Archive app bundle
         if: runner.os == 'Linux'
@@ -103,3 +107,6 @@ jobs:
           bucket: release
           upsert: true
           content_type: 'application/zip'
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
