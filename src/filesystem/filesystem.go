@@ -2,6 +2,7 @@ package filesystem
 
 import (
 	"errors"
+	"fmt"
 	"io/fs"
 	"kalisto/src/models"
 	"os"
@@ -27,7 +28,7 @@ func SearchProtoFiles(path string) (ProtoSearchResult, error) {
 
 	// Check if the path is absolute
 	if !filepath.IsAbs(path) {
-		return result, errors.New("path must be absolute")
+		return result, fmt.Errorf("path must be absolute. given: %s", path)
 	}
 
 	// Check if the path is a directory or a file

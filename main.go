@@ -3,10 +3,10 @@ package main
 import (
 	"embed"
 	"log"
-	"os"
 	"time"
 
 	"kalisto/src/assembly"
+	"kalisto/src/config"
 	"kalisto/src/models"
 
 	"github.com/wailsapp/wails/v2"
@@ -20,7 +20,7 @@ import (
 var assets embed.FS
 
 func main() {
-	sentryDsn := os.Getenv("SENTRY_DSN")
+	sentryDsn := config.C.SentryDsn
 	if err := sentry.Init(sentry.ClientOptions{
 		Dsn: sentryDsn,
 	}); err != nil {
