@@ -29,7 +29,7 @@ const CreateWorkspacePopup: React.FC<propsCreateWorkspacePopup> = ({
   open,
 }) => {
   return (
-    <Popup onClose={onClose} isOpen={open} title="Name of New Request">
+<Popup onClose={onClose} isOpen={open} title="Create Workspace">
       <CreateWorkspaceComponets onClose={onClose} />
     </Popup>
   );
