@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import Button from '../ui/Button';
 import Popup from './../ui/Popup';
@@ -43,6 +43,10 @@ const DeleteWorkspaceConfirmationPopup: React.FC<propsDeletePopup> = ({
 export default DeleteWorkspaceConfirmationPopup;
 
 const DeleteWorkspaceConfirmation: React.FC<propsDelete> = ({ onClose }) => {
+  const [isDisabled, setIsDisabled] = useState({
+    inpitDisabled: true,
+    upload: true,
+  });
   return (
     <div className="grid">
       <p className="mb-10 text-sm leading-5 tracking-[0.8px]">
