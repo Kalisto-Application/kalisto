@@ -131,7 +131,7 @@ const Upload: React.FC<propsUpload> = ({ data, clearState, setData }) => {
           <span className="font-sm  font-['Roboto_Mono'] font-bold text-secondaryText">
             Choose folder to upload
           </span>
-          <span className="text-xs  text-[#5E5E5E]">proto</span>
+          <span className="text-xs  text-blind">proto</span>
         </button>
       ) : (
         <div className="max mb-6 max-h-52 overflow-auto rounded-md bg-textBlockFill px-5 py-3.5 ">

@@ -11,6 +11,7 @@ module.exports = {
       icon: '#BEBEC3',
       red: '#D34242',
       blueTextPath: '#81D4FA',
+      blind: '#5E5E5E'
     },
     extend: {},
   },
