@@ -1,27 +1,13 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { FindProtoFiles, CreateWorkspace } from './../../wailsjs/go/api/Api';
 import { models } from '../../wailsjs/go/models';
+import { Context } from '../state';
 import Button from '../ui/Button';
 import Popup from '../ui/Popup';
 import upload from '../../assets/icons/upload.svg';
 import folder from '../../assets/icons/folder.svg';
 import close from '../../assets/icons/close.svg';
 import file from '../../assets/icons/file.svg';
-
-// State для Popup
-//   const [isOpenCreateWorkspace, setIsOpenCreateWorkspace] = useState(false);
-
-// кнопка для вызова Popup
-
-// <button onClick={() => setIsOpenDeletePopup(true)}>open delete</button>;
-
-// компонента для Popup
-{
-  /* <CreateWorkspacePopup
-        open={isOpenCreateWorkspace}
-        onClose={() => setIsOpenCreateWorkspace(false)}
-      /> */
-}
 
 interface propsCreateWorkspacePopup {
   onClose: () => void;
@@ -33,13 +19,9 @@ interface propsCreateWorkspace {
 
 interface propsUpload {
   data: models.ProtoDir;
-  setIsDisabled: (value: { inpitDisabled: boolean; upload: boolean }) => void;
+
   setData: (dir: models.ProtoDir) => void;
   clearState: () => void;
-  isDisabled: {
-    inpitDisabled: boolean;
-    upload: boolean;
-  };
 }
 
 const CreateWorkspacePopup: React.FC<propsCreateWorkspacePopup> = ({
@@ -58,11 +40,7 @@ export default CreateWorkspacePopup;
 const CreateWorkspaceComponets: React.FC<propsCreateWorkspace> = ({
   onClose,
 }) => {
-  const [isDisabled, setIsDisabled] = useState({
-    inpitDisabled: true,
-    upload: true,
-  });
-
+  const ctx = useContext(Context);
   const [valueInp, setValueInp] = useState('');
 
   const [data, setData] = useState(
@@ -75,25 +53,15 @@ const CreateWorkspaceComponets: React.FC<propsCreateWorkspace> = ({
   const updateTextValueInp = (e: React.FormEvent<HTMLInputElement>) => {
     let newValue = e.currentTarget.value;
     setValueInp(newValue);
-    if (newValue.length >= 1) {
-      setIsDisabled({
-        ...isDisabled,
-        inpitDisabled: false,
-      });
-    }
-    if (newValue.length < 1) {
-      setIsDisabled({
-        ...isDisabled,
-        inpitDisabled: true,
-      });
-    }
   };
-  const getPropDisabled = () => {
-    if (!isDisabled.inpitDisabled && !isDisabled.upload) {
-      return false;
-    }
-    return true;
+
+  const sendNewRequest = () => {
+    CreateWorkspace(valueInp, data.folder).then((res) => {
+      ctx.dispatch({ type: 'newWorkspace', workspace: res });
+      onClose();
+    });
   };
+  console.log(valueInp === '' && data.files.length <= 0);
 
   return (
     <div className="grid">
@@ -107,8 +75,6 @@ const CreateWorkspaceComponets: React.FC<propsCreateWorkspace> = ({
               files: [],
             })
           }
-          setIsDisabled={(obj) => setIsDisabled(obj)}
-          isDisabled={isDisabled}
         />
         <label className="leading-6">Name</label>
         <input
@@ -126,9 +92,9 @@ const CreateWorkspaceComponets: React.FC<propsCreateWorkspace> = ({
           className="mr-[10px] border-[1px] border-[#343434]"
         />
         <Button
-          disabled={getPropDisabled()}
+          disabled={valueInp === '' || data.files.length <= 0}
           text="Create"
-          onClick={() => {}}
+          onClick={() => sendNewRequest()}
           className="bg-primaryGeneral text-lg font-medium"
         />
       </div>
@@ -136,27 +102,22 @@ const CreateWorkspaceComponets: React.FC<propsCreateWorkspace> = ({
   );
 };
 
-const Upload: React.FC<propsUpload> = ({
-  data,
-  clearState,
-  setData,
-  setIsDisabled,
-  isDisabled,
-}) => {
-  const findFiles = () => {
-    FindProtoFiles().then((res) => {
-      if (res.files.length !== 0 && res.folder !== '') {
-        setIsDisabled({
-          ...isDisabled,
-          upload: false,
-        });
+const Upload: React.FC<propsUpload> = ({ data, clearState, setData }) => {
+  const [disabledUpload, setDisabledUpload] = useState(false);
 
-        setData({
-          folder: res.folder,
-          files: res.files,
-        });
-      }
-    });
+  const findFiles = () => {
+    setDisabledUpload(true);
+    FindProtoFiles()
+      .then((res) => {
+        if (res.files.length !== 0 && res.folder !== '') {
+          setData({
+            folder: res.folder,
+            files: res.files,
+          });
+        }
+        setDisabledUpload(false);
+      })
+      .catch((er) => setDisabledUpload(false));
   };
 
   return (
@@ -165,6 +126,7 @@ const Upload: React.FC<propsUpload> = ({
         <button
           onClick={findFiles}
           className="mb-6 flex min-h-[179px] w-full flex-col items-center justify-center border-2 border-dashed border-borderFill"
+          disabled={disabledUpload}
         >
           <img src={upload} className="mb-6" alt="upload" />
           <span className="font-sm  font-['Roboto_Mono'] font-bold text-secondaryText">
@@ -181,10 +143,6 @@ const Upload: React.FC<propsUpload> = ({
             </div>
             <button
               onClick={() => {
-                setIsDisabled({
-                  ...isDisabled,
-                  upload: true,
-                });
                 clearState();
               }}
             >

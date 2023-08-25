@@ -19,11 +19,13 @@ import deleteIcon from '../../assets/icons/delete.svg';
 import plusIcon from '../../assets/icons/plus.svg';
 import { defaultStackLineParsers } from '@sentry/react';
 import CreateWorkspacePopup from './CreateWorkspacePopup';
+import DeleteWorkspaceConfirmationPopup from './DeleteWorkspaceConfirmationPopup';
 
 export const WorkspaceList: React.FC = () => {
   const ctx = useContext(Context);
   const [renameI, setRenameI] = useState(-1);
   const [isOpenCreateWorkspace, setIsOpenCreateWorkspace] = useState(false);
+  const [isOpenDeletePopup, setIsOpenDeletePopup] = useState('');
 
   const items = ctx.state.workspaceList;
   const activeWorkspace = items?.find(
@@ -33,17 +35,9 @@ export const WorkspaceList: React.FC = () => {
   useEffect(() => {
     if (items?.length === 0) {
       console.log('items: ', items);
-      newWorkspace();
+      setIsOpenCreateWorkspace(true);
     }
   }, [items]);
-
-  const newWorkspace = () => {
-    NewWorkspace()
-      .then((res) => {
-        ctx.dispatch({ type: 'newWorkspace', workspace: res });
-      })
-      .catch((err) => console.log('error on new workspace: ', err));
-  };
 
   const renameWorkspace = (id: string, name: string) => {
     const ws = items?.find((it) => it.id === id);
@@ -72,16 +66,6 @@ export const WorkspaceList: React.FC = () => {
       .catch((err) =>
         console.log(`failed to get active workspace, id==${id}: ${err}`)
       );
-  };
-
-  const removeWorkspace = (id: string) => {
-    DeleteWorkspace(id)
-      .then((_) => {
-        ctx.dispatch({ type: 'removeWorkspace', id: id });
-      })
-      .catch((err) => {
-        console.log(`failed to remove workspace id=${id}: ${err}`);
-      });
   };
 
   let menuItems: DropdownItemProps[] = activeWorkspace
@@ -123,12 +107,13 @@ export const WorkspaceList: React.FC = () => {
               setRenameI(i);
             },
           },
+
           {
             icon: deleteIcon,
             text: 'Delete',
-            onClick: (e: React.MouseEvent) => {
+            onClick: (e: React.SyntheticEvent) => {
               e.preventDefault();
-              removeWorkspace(it.id);
+              setIsOpenDeletePopup(it.id);
             },
           },
         ],
@@ -142,6 +127,11 @@ export const WorkspaceList: React.FC = () => {
       <CreateWorkspacePopup
         open={isOpenCreateWorkspace}
         onClose={() => setIsOpenCreateWorkspace(false)}
+      />
+      <DeleteWorkspaceConfirmationPopup
+        idRequest={isOpenDeletePopup}
+        isOpen={isOpenDeletePopup !== ''}
+        onClose={() => setIsOpenDeletePopup('')}
       />
       <Dropdown main={main!} items={menuItems} />
     </>
