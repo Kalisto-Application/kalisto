@@ -94,7 +94,7 @@ const CreateWorkspaceComponets: React.FC<propsCreateWorkspace> = ({
         <Button
           disabled={valueInp === '' || data.files.length <= 0}
           text="Create"
-          onClick={() => sendNewRequest()}
+          onClick={() => createNewWorkspace()}
           className="bg-primaryGeneral text-lg font-medium"
         />
       </div>
