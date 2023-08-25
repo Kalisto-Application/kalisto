@@ -61,7 +61,6 @@ const CreateWorkspaceComponets: React.FC<propsCreateWorkspace> = ({
       onClose();
     });
   };
-  console.log(valueInp === '' && data.files.length <= 0);
 
   return (
     <div className="grid">
