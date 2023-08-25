@@ -55,7 +55,7 @@ const CreateWorkspaceComponets: React.FC<propsCreateWorkspace> = ({
     setValueInp(newValue);
   };
 
-  const sendNewRequest = () => {
+  const createNewWorkspace = () => {
     CreateWorkspace(valueInp, data.folder).then((res) => {
       ctx.dispatch({ type: 'newWorkspace', workspace: res });
       onClose();
