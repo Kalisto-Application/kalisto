@@ -82,7 +82,7 @@ const CreateWorkspaceComponets: React.FC<propsCreateWorkspace> = ({
           onChange={(e) => updateTextValueInp(e)}
           className="rounded-md border-[1px] border-borderFill bg-primaryFill px-4 py-1.5 placeholder-secondaryText"
           type="text"
-          placeholder="Name of New Request"
+          placeholder="Name of Workspace"
         />
       </div>
       <div className="justify-self-end">
