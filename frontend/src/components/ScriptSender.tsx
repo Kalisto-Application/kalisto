@@ -21,9 +21,9 @@ export const ScriptSender: React.FC = () => {
         console.log('failed to save the workspace url: ', err);
       });
     }
-    let debouncedUrlUpdate: Action = useMemo<Action>(()=> {
+    let debouncedUrlUpdate = useMemo<Action>(()=> {
       return debounce(action, 400);
-    }, [ctx.state.activeWorkspaceId])
+    }, [ctx.state.activeWorkspaceId]);
 
     const onSetUrl = (url: string) => {
       setUrl(url);

@@ -131,7 +131,7 @@ func (a *Api) NewWorkspace() (models.Workspace, error) {
 func (a *Api) FindProtoFiles() (models.ProtoDir, error) {
 	path, err := runtime.OpenDirectoryDialog(a.context(), runtime.OpenDialogOptions{})
 	if err != nil {
-		return models.ProtoDir{}, err
+		return models.ProtoDir{}, nil
 	}
 
 	protoFiles, err := filesystem.SearchProtoFiles(path)
