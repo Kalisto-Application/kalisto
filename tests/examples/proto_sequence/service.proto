@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+option go_package = "kalisto/tests/service";
+
+package kalisto.tests.examples.service;
+
+service SequenceService {
+    rpc First(Seq) returns (Seq) {}
+    rpc Second(Seq) returns (Seq) {}
+    rpc Third(Seq) returns (Seq) {}
+}
+
+message Seq {
+    int32 value = 1;
+    string rpc = 2;
+}

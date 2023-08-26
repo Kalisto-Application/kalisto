@@ -388,7 +388,7 @@ func (a *Api) RunScript(request models.ScriptCall) (string, error) {
 		return "", err
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*15)
 	defer cancel()
 	c, err := a.newClient(ctx, request.Addr)
 	if err != nil {
