@@ -9,6 +9,7 @@ import (
 	"kalisto/src/proto/compiler"
 	"math"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/dop251/goja"
@@ -28,7 +29,7 @@ func NewInterpreter(vars string) *Interpreter {
 }
 
 func (ip *Interpreter) CreateMessageFromScript(script string, desc *desc.MessageDescriptor, spec models.Spec, message models.Message) (*dynamic.Message, error) {
-	m, err := ip.exportValue(script)
+	m, err := ip.exportValue(script, "body.js")
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +38,7 @@ func (ip *Interpreter) CreateMessageFromScript(script string, desc *desc.Message
 }
 
 func (ip *Interpreter) CreateMetadata(script string) (metadata.MD, error) {
-	m, err := ip.exportValue(script)
+	m, err := ip.exportValue(script, "header.js")
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +47,7 @@ func (ip *Interpreter) CreateMetadata(script string) (metadata.MD, error) {
 }
 
 func (ip *Interpreter) Raw(script string) (map[string]interface{}, error) {
-	return ip.exportValue(script)
+	return ip.exportValue(script, "script.js")
 }
 
 type requestFunc func(obj interface{}) (interface{}, error)
@@ -123,7 +124,22 @@ func newJsFunc(ctx context.Context, vm *goja.Runtime, sd *desc.ServiceDescriptor
 	}
 }
 
-func (ip *Interpreter) exportValue(script string) (map[string]interface{}, error) {
+func (ip *Interpreter) exportValue(script, name string) (map[string]interface{}, error) {
+	for {
+		if !strings.HasPrefix(script, "\n") {
+			break
+		}
+
+		script = strings.TrimPrefix(script, "\n")
+	}
+	for {
+		if !strings.HasSuffix(script, "\n") {
+			break
+		}
+
+		script = strings.TrimSuffix(script, "\n")
+	}
+
 	script = fmt.Sprintf(`(()=> {
 		return %s;
 	})()`, script)
@@ -135,7 +151,7 @@ func (ip *Interpreter) exportValue(script string) (map[string]interface{}, error
 			return nil, ip.mapErr(vm, err)
 		}
 	}
-	val, err := vm.RunString(script)
+	val, err := vm.RunScript(name, script)
 	if err != nil {
 		return nil, ip.mapErr(vm, err)
 	}
@@ -168,7 +184,8 @@ func newMessage(desc *desc.MessageDescriptor, spec models.Spec, m map[string]int
 	for k, v := range m {
 		field, err := message.FindField(k)
 		if err != nil {
-			return nil, err
+			// TODO: warn the field is unused
+			continue
 		}
 
 		value, err := castValue(desc, spec, field, v)
@@ -190,16 +207,29 @@ func newMessage(desc *desc.MessageDescriptor, spec models.Spec, m map[string]int
 }
 
 func newMeta(vals map[string]interface{}) (metadata.MD, error) {
-	metaMap := make(map[string]string, len(vals))
+	metaMap := make(map[string][]string, len(vals))
 	for k, v := range vals {
-		value, ok := v.(string)
-		if !ok {
-			return nil, fmt.Errorf("only string values allowed in meta data")
+		switch val := v.(type) {
+		case string:
+			metaMap[k] = []string{val}
+		case []string:
+			metaMap[k] = val
+		case []interface{}:
+			valStr := make([]string, len(val))
+			for i := range val {
+				vStr, ok := val[i].(string)
+				if !ok {
+					return nil, fmt.Errorf("header value must be string or string[]")
+				}
+				valStr[i] = vStr
+			}
+			metaMap[k] = valStr
+		default:
+			return nil, fmt.Errorf("only string and []string values are allowed in headers")
 		}
-		metaMap[k] = value
 	}
 
-	return metadata.New(metaMap), nil
+	return metadata.MD(metaMap), nil
 }
 
 func castValue(desc *desc.MessageDescriptor, spec models.Spec, f models.Field, v interface{}) (interface{}, error) {
@@ -429,7 +459,7 @@ func castValue(desc *desc.MessageDescriptor, spec models.Spec, f models.Field, v
 		switch v := v.(type) {
 		case int64:
 			t := time.UnixMilli(v).UTC()
-			if err := timestampMessageFromTime(t, m); err != nil {
+			if err := timeMessageFromNanos(t.UnixNano(), m); err != nil {
 				return nil, err
 			}
 			return m, nil
@@ -438,12 +468,12 @@ func castValue(desc *desc.MessageDescriptor, spec models.Spec, f models.Field, v
 			if err != nil {
 				return nil, err
 			}
-			if err := timestampMessageFromTime(t, m); err != nil {
+			if err := timeMessageFromNanos(t.UnixNano(), m); err != nil {
 				return nil, err
 			}
 			return m, nil
 		case time.Time:
-			if err := timestampMessageFromTime(v, m); err != nil {
+			if err := timeMessageFromNanos(v.UnixNano(), m); err != nil {
 				return nil, err
 			}
 			return m, nil
@@ -460,12 +490,12 @@ func castValue(desc *desc.MessageDescriptor, spec models.Spec, f models.Field, v
 			if v > math.MaxInt64 {
 				return nil, fmt.Errorf("max value of duration is int64: %d", math.MaxInt64)
 			}
-			if err := durationMessageFromInt64(int64(v), m); err != nil {
+			if err := timeMessageFromNanos(int64(v), m); err != nil {
 				return nil, err
 			}
 			return m, nil
 		case int64:
-			if err := durationMessageFromInt64(v, m); err != nil {
+			if err := timeMessageFromNanos(v, m); err != nil {
 				return nil, err
 			}
 			return m, nil
@@ -474,7 +504,7 @@ func castValue(desc *desc.MessageDescriptor, spec models.Spec, f models.Field, v
 			if err != nil {
 				return nil, err
 			}
-			if err := durationMessageFromInt64(int64(d), m); err != nil {
+			if err := timeMessageFromNanos(int64(d), m); err != nil {
 				return nil, err
 			}
 			return m, nil
@@ -499,23 +529,9 @@ func makeKnownMessage(name string) (*dynamic.Message, error) {
 	return dynamic.NewMessage(d), nil
 }
 
-func durationMessageFromInt64(v int64, m *dynamic.Message) error {
-	nanos := v
+func timeMessageFromNanos(nanos int64, m *dynamic.Message) error {
 	secs := nanos / 1e9
-	nanos -= nanos * 1e9
-	if err := m.TrySetFieldByName("seconds", secs); err != nil {
-		return err
-	}
-	if err := m.TrySetFieldByName("nanos", int32(nanos)); err != nil {
-		return err
-	}
-	return nil
-}
-
-func timestampMessageFromTime(t time.Time, m *dynamic.Message) error {
-	nanos := t.UnixNano()
-	secs := nanos / 1e9
-	nanos -= nanos * 1e9
+	nanos -= secs * 1e9
 	if err := m.TrySetFieldByName("seconds", secs); err != nil {
 		return err
 	}
