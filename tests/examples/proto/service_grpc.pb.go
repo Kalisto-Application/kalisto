@@ -11,7 +11,6 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
-	anypb "google.golang.org/protobuf/types/known/anypb"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -26,7 +25,6 @@ const _ = grpc.SupportPackageIsVersion7
 type BookStoreClient interface {
 	GetBook(ctx context.Context, in *GetBookRequest, opts ...grpc.CallOption) (*GetBookRequest, error)
 	Empty(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	Any(ctx context.Context, in *anypb.Any, opts ...grpc.CallOption) (*anypb.Any, error)
 	Error(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
@@ -56,15 +54,6 @@ func (c *bookStoreClient) Empty(ctx context.Context, in *emptypb.Empty, opts ...
 	return out, nil
 }
 
-func (c *bookStoreClient) Any(ctx context.Context, in *anypb.Any, opts ...grpc.CallOption) (*anypb.Any, error) {
-	out := new(anypb.Any)
-	err := c.cc.Invoke(ctx, "/kalisto.tests.examples.service.BookStore/Any", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *bookStoreClient) Error(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, "/kalisto.tests.examples.service.BookStore/Error", in, out, opts...)
@@ -80,7 +69,6 @@ func (c *bookStoreClient) Error(ctx context.Context, in *emptypb.Empty, opts ...
 type BookStoreServer interface {
 	GetBook(context.Context, *GetBookRequest) (*GetBookRequest, error)
 	Empty(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
-	Any(context.Context, *anypb.Any) (*anypb.Any, error)
 	Error(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
 	mustEmbedUnimplementedBookStoreServer()
 }
@@ -94,9 +82,6 @@ func (UnimplementedBookStoreServer) GetBook(context.Context, *GetBookRequest) (*
 }
 func (UnimplementedBookStoreServer) Empty(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Empty not implemented")
-}
-func (UnimplementedBookStoreServer) Any(context.Context, *anypb.Any) (*anypb.Any, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Any not implemented")
 }
 func (UnimplementedBookStoreServer) Error(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Error not implemented")
@@ -150,24 +135,6 @@ func _BookStore_Empty_Handler(srv interface{}, ctx context.Context, dec func(int
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BookStore_Any_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(anypb.Any)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(BookStoreServer).Any(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/kalisto.tests.examples.service.BookStore/Any",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BookStoreServer).Any(ctx, req.(*anypb.Any))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _BookStore_Error_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
@@ -200,10 +167,6 @@ var BookStore_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Empty",
 			Handler:    _BookStore_Empty_Handler,
-		},
-		{
-			MethodName: "Any",
-			Handler:    _BookStore_Any_Handler,
 		},
 		{
 			MethodName: "Error",

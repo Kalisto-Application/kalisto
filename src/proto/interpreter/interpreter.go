@@ -188,7 +188,7 @@ func newMessage(desc *desc.MessageDescriptor, spec models.Spec, m map[string]int
 			continue
 		}
 
-		value, err := castValue(desc, spec, field, v)
+		value, err := castValue(desc, spec, field, v, "")
 		if err != nil {
 			return nil, err
 		}
@@ -232,7 +232,7 @@ func newMeta(vals map[string]interface{}) (metadata.MD, error) {
 	return metadata.MD(metaMap), nil
 }
 
-func castValue(desc *desc.MessageDescriptor, spec models.Spec, f models.Field, v interface{}) (interface{}, error) {
+func castValue(desc *desc.MessageDescriptor, spec models.Spec, f models.Field, v interface{}, parentMapField string) (interface{}, error) {
 	if v == nil {
 		return v, nil
 	}
@@ -246,7 +246,7 @@ func castValue(desc *desc.MessageDescriptor, spec models.Spec, f models.Field, v
 		fCopy.Repeated = false
 		ret := make([]interface{}, 0, len(val))
 		for _, it := range val {
-			casted, err := castValue(desc, spec, fCopy, it)
+			casted, err := castValue(desc, spec, fCopy, it, "")
 			if err != nil {
 				return nil, err
 			}
@@ -264,12 +264,12 @@ func castValue(desc *desc.MessageDescriptor, spec models.Spec, f models.Field, v
 		ret := make([]*dynamic.Message, 0, len(val))
 		for k, v := range val {
 			msg := dynamic.NewMessage(mDesc)
-			key, err := castValue(mDesc, spec, *f.MapKey, k)
+			key, err := castValue(mDesc, spec, *f.MapKey, k, f.Name)
 			if err != nil {
 				return nil, err
 			}
 
-			value, err := castValue(mDesc, spec, *f.MapValue, v)
+			value, err := castValue(mDesc, spec, *f.MapValue, v, f.Name)
 			if err != nil {
 				return nil, err
 			}
@@ -412,7 +412,11 @@ func castValue(desc *desc.MessageDescriptor, spec models.Spec, f models.Field, v
 			}
 			enumValue := fieldDesc.GetEnumType().FindValueByNumber(int32(v))
 			if enumValue == nil {
-				return nil, models.ErrorSyntax(fmt.Sprintf("'%s': %d:  enum value is out of range", f.Name, v))
+				fieldKey := f.Name
+				if parentMapField != "" {
+					fieldKey = parentMapField
+				}
+				return nil, models.ErrorSyntax(fmt.Sprintf("%s: %d:  enum value is out of range", fieldKey, v))
 			}
 			return enumValue.GetNumber(), nil
 		case string:
@@ -422,7 +426,11 @@ func castValue(desc *desc.MessageDescriptor, spec models.Spec, f models.Field, v
 			}
 			enumValue := fieldDesc.GetEnumType().FindValueByName(v)
 			if enumValue == nil {
-				return nil, models.ErrorSyntax(fmt.Sprintf("'%s': '%s':  enum value is out of range", f.Name, v))
+				fieldKey := f.Name
+				if parentMapField != "" {
+					fieldKey = parentMapField
+				}
+				return nil, models.ErrorSyntax(fmt.Sprintf("%s: '%s':  enum value is out of range", fieldKey, v))
 			}
 			return enumValue.GetNumber(), nil
 		default:
@@ -456,7 +464,7 @@ func castValue(desc *desc.MessageDescriptor, spec models.Spec, f models.Field, v
 			if err != nil {
 				return nil, err
 			}
-			return castValue(desc, spec, oneOf, value)
+			return castValue(desc, spec, oneOf, value, "")
 		}
 
 	case models.DataTypeDate:

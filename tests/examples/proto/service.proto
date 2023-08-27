@@ -57,7 +57,7 @@ message GetBookRequest {
     Book Book = 17;
     map<string, string> strToStr = 23;
     map<int32, Book> intToBooks = 24;
-    map<bool, Enum> etoe = 25;
+    map<bool, Enum> btoe = 25;
     repeated string strings = 26;
     repeated Enum enums = 27;
     repeated uint32 uints = 28;
