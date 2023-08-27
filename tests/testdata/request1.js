@@ -22,7 +22,7 @@
     intToBooks: {14: {
       id: "book-id",
     }},
-    etoe: {true: 23},
+    etoe: {true: 3},
     strings: ["str1", "str2"],
     enums: [4],
     uints: [111],

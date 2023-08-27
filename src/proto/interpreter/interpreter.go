@@ -406,7 +406,15 @@ func castValue(desc *desc.MessageDescriptor, spec models.Spec, f models.Field, v
 	case models.DataTypeEnum:
 		switch v := v.(type) {
 		case int64:
-			return int32(v), nil
+			fieldDesc := desc.FindFieldByName(f.Name)
+			if fieldDesc == nil {
+				return nil, fmt.Errorf("descriptor field=%s not found", f.Name)
+			}
+			enumValue := fieldDesc.GetEnumType().FindValueByNumber(int32(v))
+			if enumValue == nil {
+				return nil, models.ErrorSyntax(fmt.Sprintf("'%s': %d:  enum value is out of range", f.Name, v))
+			}
+			return enumValue.GetNumber(), nil
 		case string:
 			fieldDesc := desc.FindFieldByName(f.Name)
 			if fieldDesc == nil {
@@ -414,7 +422,7 @@ func castValue(desc *desc.MessageDescriptor, spec models.Spec, f models.Field, v
 			}
 			enumValue := fieldDesc.GetEnumType().FindValueByName(v)
 			if enumValue == nil {
-				return nil, fmt.Errorf("failed to find enum value")
+				return nil, models.ErrorSyntax(fmt.Sprintf("'%s': '%s':  enum value is out of range", f.Name, v))
 			}
 			return enumValue.GetNumber(), nil
 		default:

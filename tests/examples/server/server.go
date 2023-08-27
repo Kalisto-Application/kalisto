@@ -1,8 +1,9 @@
-package main
+package server
 
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	pb "kalisto/tests/examples/proto"
 	"log"
@@ -54,16 +55,22 @@ func (s *server) Error(ctx context.Context, in *emptypb.Empty) (*emptypb.Empty, 
 	return nil, status.Error(codes.InvalidArgument, "message")
 }
 
-func main() {
-	lis, err := net.Listen("tcp", ":9000")
+func Run(port string) (func() error, <-chan struct{}, error) {
+	lis, err := net.Listen("tcp", port)
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+		return nil, nil, err
 	}
 
 	s := grpc.NewServer()
 	pb.RegisterBookStoreServer(s, &server{})
-	if err := s.Serve(lis); err != nil {
-		log.Fatalf("failed to serve: %v", err)
-	}
-	log.Println("server closed")
+
+	closed := make(chan struct{})
+	go func() {
+		defer close(closed)
+		if err := s.Serve(lis); err != nil && !errors.Is(err, net.ErrClosed) {
+			log.Printf("failed to serve: %v\n", err)
+		}
+		log.Println("server closed")
+	}()
+	return lis.Close, closed, nil
 }

@@ -22,7 +22,7 @@
     intToBooks: {24: {
       id: "book-id",
     }},
-    etoe: {false: 33},
+    etoe: {false: 3},
     strings: ["str1", "str2"],
     enums: [4, 'VALUE_0'],
     uints: [111, 1234],
@@ -48,7 +48,7 @@
       },
     }],
     // someBook: {oneId: "toAnother"},
-    someBook: {oneEnum: 6},
+    someBook: {oneEnum: 4},
     // anotherBook: {"anotherBookObject": {
     //   id: "anotherObjectId",
     // }},

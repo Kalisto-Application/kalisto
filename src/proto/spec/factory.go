@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"kalisto/src/models"
 	"kalisto/src/proto/compiler"
+	"reflect"
 	"strings"
 	"sync"
 	"time"
@@ -335,7 +336,7 @@ func (f *Factory) makeExampleValue(set map[string]bool, field models.Field, spac
 		var oneOfBuf strings.Builder
 		for i, one := range field.OneOf {
 			oneV := f.makeExampleValue(set, one, space, field.FullName)
-			oneV = fmt.Sprintf("{\"%s\": %s},\n", one.Name, oneV)
+			oneV = fmt.Sprintf("{%s: %s},\n", one.Name, oneV)
 			if i != 0 {
 				oneV = field.Name + ": " + oneV
 				lines := strings.Split(oneV, "\n")
@@ -535,6 +536,10 @@ func (f *Factory) asValue(field models.Field, value interface{}, space int) (str
 			mapBuf.WriteString("}")
 			v = mapBuf.String()
 		} else {
+			if value == nil || reflect.ValueOf(value).IsNil() {
+				return "null", nil
+			}
+
 			link, ok := f.links[field.Message]
 			if !ok {
 				return "", fmt.Errorf("object %s not found", field.FullName)

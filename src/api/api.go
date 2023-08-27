@@ -210,11 +210,39 @@ func (s *Api) DeleteWorkspace(id string) error {
 	return s.workspace.Delete(id)
 }
 
-func (s *Api) FindWorkspaces() ([]models.Workspace, error) {
-	list := s.workspace.List()
+func (a *Api) FindWorkspaces() ([]models.Workspace, error) {
+	list := a.workspace.List()
 	for i, w := range list {
-		w, err := s.enrichWorkspace(w, w.LastUsage)
+		w, err := a.enrichWorkspace(w, w.LastUsage)
 		if err != nil {
+			var ePos reporter.ErrorWithPos
+			if errors.As(err, &ePos) {
+				var pathE *fs.PathError
+				if errors.As(ePos.Unwrap(), &pathE) {
+					pos := ePos.GetPosition()
+					runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
+						Type:    "error",
+						Title:   fmt.Sprintf("Can't resolve import proto file %s", pathE.Path),
+						Message: fmt.Sprintf("%s:%d:%d", pos.Filename, pos.Line, pos.Col),
+					})
+				}
+				continue
+			}
+
+			var pathErr *fs.PathError
+			if errors.As(err, &pathErr) {
+				click, _ := runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
+					Type:         runtime.QuestionDialog,
+					Title:        fmt.Sprintf("Workspace '%s' can't start", w.Name),
+					Message:      fmt.Sprintf("%s: no such file or directory.\nDelete the workspace?", w.BasePath),
+					Buttons:      []string{"Yes", "No"},
+					CancelButton: "No",
+				})
+				if click == "Yes" {
+					a.DeleteWorkspace(w.ID)
+				}
+				continue
+			}
 			return nil, err
 		}
 		list[i] = w
@@ -238,7 +266,6 @@ func (s *Api) UpdateWorkspace(ws models.Workspace) error {
 func (s *Api) enrichWorkspace(ws models.Workspace, lastUsage time.Time) (models.Workspace, error) {
 	registry, err := s.protoRegistryFromPath(ws.BasePath)
 	if err != nil {
-		// TODO: MARK AS INVALID
 		return ws, err
 	}
 	s.protoRegistry.Add(ws.ID, registry)
