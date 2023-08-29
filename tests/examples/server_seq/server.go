@@ -1,7 +1,8 @@
-package server
+package server_seq
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	pb "kalisto/tests/examples/proto_sequence"
 	"log"
@@ -51,16 +52,22 @@ func (s *server) Third(ctx context.Context, in *pb.Seq) (*pb.Seq, error) {
 	return in, nil
 }
 
-func main() {
-	lis, err := net.Listen("tcp", ":9000")
+func Run(port string) (func() error, <-chan struct{}, error) {
+	lis, err := net.Listen("tcp", port)
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+		return nil, nil, err
 	}
 
 	s := grpc.NewServer()
 	pb.RegisterSequenceServiceServer(s, &server{})
-	if err := s.Serve(lis); err != nil {
-		log.Fatalf("failed to serve: %v", err)
-	}
-	log.Println("server closed")
+
+	closed := make(chan struct{})
+	go func() {
+		defer close(closed)
+		if err := s.Serve(lis); err != nil && !errors.Is(err, net.ErrClosed) {
+			log.Printf("failed to serve: %v\n", err)
+		}
+		log.Println("server closed")
+	}()
+	return lis.Close, closed, nil
 }

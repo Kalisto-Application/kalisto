@@ -190,6 +190,7 @@ export namespace models {
 	}
 	export class Service {
 	    name: string;
+	    displayName: string;
 	    package: string;
 	    fullName: string;
 	    methods: Method[];
@@ -201,6 +202,7 @@ export namespace models {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.name = source["name"];
+	        this.displayName = source["displayName"];
 	        this.package = source["package"];
 	        this.fullName = source["fullName"];
 	        this.methods = this.convertValues(source["methods"], Method);

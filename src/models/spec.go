@@ -50,10 +50,11 @@ func (s *Spec) FindOutputMessage(serviceName, methodName string) (Message, error
 }
 
 type Service struct {
-	Name     string   `json:"name"`
-	Package  string   `json:"package"`
-	FullName string   `json:"fullName"`
-	Methods  []Method `json:"methods"`
+	Name        string   `json:"name"`
+	DisplayName string   `json:"displayName"`
+	Package     string   `json:"package"`
+	FullName    string   `json:"fullName"`
+	Methods     []Method `json:"methods"`
 }
 
 type CommunicationKind string

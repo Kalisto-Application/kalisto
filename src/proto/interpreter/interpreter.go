@@ -198,6 +198,9 @@ func newMessage(desc *desc.MessageDescriptor, spec models.Spec, m map[string]int
 			}
 		}
 
+		if value == nil {
+			continue
+		}
 		if err := resultMessage.TrySetFieldByName(k, value); err != nil {
 			return nil, err
 		}
@@ -235,6 +238,11 @@ func newMeta(vals map[string]interface{}) (metadata.MD, error) {
 func castValue(desc *desc.MessageDescriptor, spec models.Spec, f models.Field, v interface{}, parentMapField string) (interface{}, error) {
 	if v == nil {
 		return v, nil
+	}
+
+	nameField := f.Name
+	if parentMapField != "" {
+		nameField = parentMapField
 	}
 
 	if f.Repeated {
@@ -297,24 +305,29 @@ func castValue(desc *desc.MessageDescriptor, spec models.Spec, f models.Field, v
 		}
 		return v, nil
 	case models.DataTypeInt32:
-		var val int32
 		if intV, ok := v.(int64); ok {
-			val = int32(intV)
+			if intV < math.MinInt32 || intV > math.MaxInt32 {
+				return nil, models.ErrorSyntax(fmt.Sprintf("%s: integer overflow", nameField))
+			}
+			return int32(intV), nil
 		}
 		if floatV, ok := v.(float64); ok {
-			val = int32(floatV)
+			if floatV < math.MinInt32 || floatV > math.MaxInt32 {
+				return nil, models.ErrorSyntax(fmt.Sprintf("%s: integer overflow", nameField))
+			}
+			return int32(floatV), nil
 		}
 		if strV, ok := v.(string); ok {
 			intV, err := strconv.ParseInt(strV, 10, 32)
 			if err != nil {
-				return nil, fmt.Errorf("expected int32: %w", err)
+				var e *strconv.NumError
+				if errors.As(err, &e) {
+					return nil, models.ErrorSyntax(fmt.Sprintf("%s: integer overfl ow", nameField))
+				}
+				return nil, fmt.Errorf("%s: invalid type", nameField)
 			}
-			val = int32(intV)
+			return int32(intV), nil
 		}
-		if val < math.MinInt32 || val > math.MaxInt32 {
-			return nil, fmt.Errorf("value is out of range")
-		}
-		return val, nil
 	case models.DataTypeInt64:
 		var val int64
 		if intV, ok := v.(int64); ok {
@@ -323,13 +336,10 @@ func castValue(desc *desc.MessageDescriptor, spec models.Spec, f models.Field, v
 		if floatV, ok := v.(float64); ok {
 			val = int64(floatV)
 		}
-		if val < math.MinInt64 || val > math.MaxInt64 {
-			return nil, fmt.Errorf("value is out of range")
-		}
 		if strV, ok := v.(string); ok {
 			intV, err := strconv.ParseInt(strV, 10, 64)
 			if err != nil {
-				return nil, fmt.Errorf("expected int64: %w", err)
+				return nil, models.ErrorSyntax(fmt.Sprintf("%s: invalid type, expected integer", nameField))
 			}
 			val = intV
 		}
@@ -338,20 +348,20 @@ func castValue(desc *desc.MessageDescriptor, spec models.Spec, f models.Field, v
 		var val uint32
 		if intV, ok := v.(int64); ok {
 			if intV < 0 || intV > math.MaxUint32 {
-				return nil, fmt.Errorf("value is out of range")
+				return nil, models.ErrorSyntax(fmt.Sprintf("%s: integer overflow", nameField))
 			}
 			val = uint32(intV)
 		}
 		if floatV, ok := v.(float64); ok {
 			if floatV < 0 || floatV > math.MaxUint32 {
-				return nil, fmt.Errorf("value is out of range")
+				return nil, models.ErrorSyntax(fmt.Sprintf("%s: integer overflow", nameField))
 			}
 			val = uint32(floatV)
 		}
 		if strV, ok := v.(string); ok {
 			intV, err := strconv.ParseUint(strV, 10, 32)
 			if err != nil {
-				return nil, fmt.Errorf("expected int64: %w", err)
+				return nil, models.ErrorSyntax(fmt.Sprintf("%s: integer overflow", nameField))
 			}
 			val = uint32(intV)
 		}
@@ -360,20 +370,20 @@ func castValue(desc *desc.MessageDescriptor, spec models.Spec, f models.Field, v
 		var val uint64
 		if intV, ok := v.(int64); ok {
 			if intV < 0 {
-				return nil, fmt.Errorf("value is out of range")
+				return nil, models.ErrorSyntax(fmt.Sprintf("%s: integer overflow", nameField))
 			}
 			val = uint64(intV)
 		}
 		if floatV, ok := v.(float64); ok {
 			if floatV < 0 || floatV > math.MaxUint64 {
-				return nil, fmt.Errorf("value is out of range")
+				return nil, models.ErrorSyntax(fmt.Sprintf("%s: integer overflow", nameField))
 			}
 			val = uint64(floatV)
 		}
 		if strV, ok := v.(string); ok {
 			intV, err := strconv.ParseUint(strV, 10, 64)
 			if err != nil {
-				return nil, fmt.Errorf("expected int64: %w", err)
+				return nil, models.ErrorSyntax(fmt.Sprintf("%s: integer overflow", nameField))
 			}
 			val = intV
 		}
@@ -382,19 +392,36 @@ func castValue(desc *desc.MessageDescriptor, spec models.Spec, f models.Field, v
 		if intV, ok := v.(int64); ok {
 			return float32(intV), nil
 		}
+		if intV, ok := v.(int32); ok {
+			return float32(intV), nil
+		}
+		if floatV, ok := v.(float32); ok {
+			return float32(floatV), nil
+		}
 		if floatV, ok := v.(float64); ok {
-			if floatV > math.MaxFloat32 || floatV < math.SmallestNonzeroFloat32 {
-				return nil, fmt.Errorf("value is out of range")
+			if floatV > math.MaxFloat32 || floatV < -math.MaxFloat32 {
+				return nil, models.ErrorSyntax(fmt.Sprintf("%s: float overflow", nameField))
 			}
 			return float32(floatV), nil
 		}
+		return nil, models.ErrorSyntax(fmt.Sprintf("%s: invalid data", nameField))
 	case models.DataTypeFloat64:
 		if intV, ok := v.(int64); ok {
 			return float64(intV), nil
 		}
-		if floatV, ok := v.(float64); ok {
+		if intV, ok := v.(int32); ok {
+			return float64(intV), nil
+		}
+		if floatV, ok := v.(float32); ok {
 			return float64(floatV), nil
 		}
+		if floatV, ok := v.(float64); ok {
+			if floatV > math.MaxFloat64 || floatV < -math.MaxFloat64 {
+				return nil, models.ErrorSyntax(fmt.Sprintf("%s: float overflow", nameField))
+			}
+			return float64(floatV), nil
+		}
+		return nil, models.ErrorSyntax(fmt.Sprintf("%s: invalid data", nameField))
 	case models.DataTypeString:
 		return v, nil
 	case models.DataTypeBytes:

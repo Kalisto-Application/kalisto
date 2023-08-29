@@ -69,11 +69,20 @@ func (f *Factory) FromRegistry(reg *compiler.Registry) (spec models.Spec, err er
 				}
 			}
 
+			var serviceName string
+			serviceNameParts := strings.Split(service.GetFullyQualifiedName(), ".")
+			if len(serviceNameParts) == 1 {
+				serviceName = serviceNameParts[0]
+			} else {
+				serviceName = strings.Join(serviceNameParts[len(serviceNameParts)-2:], ".")
+			}
+
 			specServices[i] = models.Service{
-				Name:     service.GetName(),
-				FullName: service.GetFullyQualifiedName(),
-				Methods:  specMethods,
-				Package:  service.GetFile().GetPackage(),
+				Name:        service.GetName(),
+				DisplayName: serviceName,
+				FullName:    service.GetFullyQualifiedName(),
+				Methods:     specMethods,
+				Package:     service.GetFile().GetPackage(),
 			}
 		}
 

@@ -12,12 +12,12 @@ import scriptIconActive from '../../../assets/icons/sideScriptActive.svg';
 export const Sidebar: React.FC = ({}) => (
   <aside className="justify-star flex flex-[0_0_90px] flex-col border-[1px] border-y-0 border-l-0 border-r-borderFill">
     <SideIcon link="/api" icon={apiIcon} activeIcon={apiIconActive} />
-    <SideIcon link="/variables" icon={varsIcon} activeIcon={varsIconActive} />
     <SideIcon
       link="/scripting"
       icon={scriptIcon}
       activeIcon={scriptIconActive}
     />
+    <SideIcon link="/variables" icon={varsIcon} activeIcon={varsIconActive} />
   </aside>
 );
 
@@ -28,21 +28,19 @@ type SideIconProps = {
 };
 
 const SideIcon: React.FC<SideIconProps> = ({ link, icon, activeIcon }) => {
-  let className = 'h-[40px] w-full my-[10px] py-[8px] px-[26px] static';
+  // let className = 'h-[40px] w-full my-[10px] py-[8px] px-[26px] static';
   let iconSrc = icon;
   const match = useMatch(link);
   if (match?.pathname === link) {
     iconSrc = activeIcon;
-    className += ' border-l-primaryGeneral border-l-4';
+    // className += ' border-l-primaryGeneral border-l-4';
   } else {
-    className += ' border-l-primaryFill border-l-4';
+    // className += ' border-l-primaryFill border-l-4';
   }
 
   return (
-    <div className={className}>
-      <Link to={link}>
-        <img src={iconSrc} />
-      </Link>
-    </div>
+    <Link to={link}>
+      <img src={iconSrc} />
+    </Link>
   );
 };

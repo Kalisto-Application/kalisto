@@ -3,11 +3,13 @@ import { ControlledTreeEnvironment, Tree, TreeItemIndex, TreeItem } from 'react-
 import { models } from "../../wailsjs/go/models";
 import { Context } from "../state";
 
-const findMethod = (s: models.Service[] = [], name: string): models.Method | undefined => {
+const findMethod = (s: models.Service[] = [], serviceName: string, name: string): models.Method | undefined => {
   for (const service of s) {
-    for (const method of service.methods) {
-      if (method.fullName == name) {
-        return method
+    if (service.fullName == serviceName) {
+      for (const method of service.methods) {
+        if (method.fullName == name) {
+          return method
+        }
       }
     }
   }
@@ -16,6 +18,7 @@ const findMethod = (s: models.Service[] = [], name: string): models.Method | und
 type Data = {
   display: string;
   isMethod: boolean;
+  parent?: string;
 }
 
 export const MethodCollection: React.FC = () => {
@@ -40,14 +43,14 @@ export const MethodCollection: React.FC = () => {
   services?.forEach(it => {
     itemsData[it.fullName] = {
       index: it.fullName,
-      data: {display: it.name, isMethod: false},
+      data: {display: it.displayName, isMethod: false},
       isFolder: true,
       children: it.methods.map(met => met.fullName),
     }
     it.methods.forEach(met => {
       itemsData[met.fullName] = {
         index: met.fullName,
-        data: {display: met.name, isMethod: true},
+        data: {display: met.name, isMethod: true, parent: it.fullName},
       }
     })
   })
@@ -65,7 +68,7 @@ export const MethodCollection: React.FC = () => {
       }}
       onExpandItem={item => {
         if (item.data.isMethod) {
-          const method = findMethod(services, item.index as string)
+          const method = findMethod(services, item.data.parent || '', item.index as string)
 
           ctx.dispatch({type: 'activeMethod', activeMethod: method!})
         }
@@ -76,7 +79,7 @@ export const MethodCollection: React.FC = () => {
       }}
       onFocusItem={item => {
         if (item.data.isMethod) {
-          const method = findMethod(services, item.index as string)
+          const method = findMethod(services, item.data.parent || '', item.index as string)
           ctx.dispatch({type: 'activeMethod', activeMethod: method!})
         }
       }}

@@ -70,18 +70,17 @@ func (s *MirrorRequestSuite) TestMirrorRequest() {
 			})
 			s.Require().NoError(err)
 
-			_ = response
-			// responseMirror, err := api.SendGrpc(models.Request{
-			// 	Addr:        "localhost:9000",
-			// 	WorkspaceID: ws.ID,
-			// 	Method:      "kalisto.tests.examples.service.BookStore.GetBook",
-			// 	Body:        string(response.Body),
-			// 	Meta:        response.MetaData,
-			// })
-			// s.Require().NoError(err)
+			responseMirror, err := api.SendGrpc(models.Request{
+				Addr:        "localhost:9000",
+				WorkspaceID: ws.ID,
+				Method:      "kalisto.tests.examples.service.BookStore.GetBook",
+				Body:        string(response.Body),
+				Meta:        response.MetaData,
+			})
+			s.Require().NoError(err)
 
-			// s.Equal(response.Body, responseMirror.Body)
-			// s.Equal(response.MetaData, responseMirror.MetaData)
+			s.Equal(response.Body, responseMirror.Body)
+			s.Equal(response.MetaData, responseMirror.MetaData)
 		})
 	}
 }

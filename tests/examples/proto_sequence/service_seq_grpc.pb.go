@@ -2,9 +2,9 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v4.23.2
-// source: service.proto
+// source: service_seq.proto
 
-package service
+package service_seq
 
 import (
 	context "context"
@@ -37,7 +37,7 @@ func NewSequenceServiceClient(cc grpc.ClientConnInterface) SequenceServiceClient
 
 func (c *sequenceServiceClient) First(ctx context.Context, in *Seq, opts ...grpc.CallOption) (*Seq, error) {
 	out := new(Seq)
-	err := c.cc.Invoke(ctx, "/kalisto.tests.examples.service.SequenceService/First", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/kalisto.tests.examples.service_seq.SequenceService/First", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +46,7 @@ func (c *sequenceServiceClient) First(ctx context.Context, in *Seq, opts ...grpc
 
 func (c *sequenceServiceClient) Second(ctx context.Context, in *Seq, opts ...grpc.CallOption) (*Seq, error) {
 	out := new(Seq)
-	err := c.cc.Invoke(ctx, "/kalisto.tests.examples.service.SequenceService/Second", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/kalisto.tests.examples.service_seq.SequenceService/Second", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +55,7 @@ func (c *sequenceServiceClient) Second(ctx context.Context, in *Seq, opts ...grp
 
 func (c *sequenceServiceClient) Third(ctx context.Context, in *Seq, opts ...grpc.CallOption) (*Seq, error) {
 	out := new(Seq)
-	err := c.cc.Invoke(ctx, "/kalisto.tests.examples.service.SequenceService/Third", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/kalisto.tests.examples.service_seq.SequenceService/Third", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +108,7 @@ func _SequenceService_First_Handler(srv interface{}, ctx context.Context, dec fu
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/kalisto.tests.examples.service.SequenceService/First",
+		FullMethod: "/kalisto.tests.examples.service_seq.SequenceService/First",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(SequenceServiceServer).First(ctx, req.(*Seq))
@@ -126,7 +126,7 @@ func _SequenceService_Second_Handler(srv interface{}, ctx context.Context, dec f
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/kalisto.tests.examples.service.SequenceService/Second",
+		FullMethod: "/kalisto.tests.examples.service_seq.SequenceService/Second",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(SequenceServiceServer).Second(ctx, req.(*Seq))
@@ -144,7 +144,7 @@ func _SequenceService_Third_Handler(srv interface{}, ctx context.Context, dec fu
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/kalisto.tests.examples.service.SequenceService/Third",
+		FullMethod: "/kalisto.tests.examples.service_seq.SequenceService/Third",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(SequenceServiceServer).Third(ctx, req.(*Seq))
@@ -156,7 +156,7 @@ func _SequenceService_Third_Handler(srv interface{}, ctx context.Context, dec fu
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var SequenceService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "kalisto.tests.examples.service.SequenceService",
+	ServiceName: "kalisto.tests.examples.service_seq.SequenceService",
 	HandlerType: (*SequenceServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -173,5 +173,5 @@ var SequenceService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "service.proto",
+	Metadata: "service_seq.proto",
 }

@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-option go_package = "kalisto/tests/service";
+option go_package = "kalisto/tests/service_seq";
 
-package kalisto.tests.examples.service;
+package kalisto.tests.examples.service_seq;
 
 service SequenceService {
     rpc First(Seq) returns (Seq) {}

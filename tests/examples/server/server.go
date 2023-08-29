@@ -27,6 +27,12 @@ func (s *server) GetBook(ctx context.Context, in *pb.GetBookRequest) (*pb.GetBoo
 	fmt.Println("dur: ", in.Dur.AsDuration().String())
 	fmt.Println("oneEnum: ", in.GetOneEnum())
 
+	if len(md["content-type"]) == 0 || md["content-type"][0] != "application/grpc" {
+		return nil, fmt.Errorf("content type must be application/grpc, given '%s'", md["content-type"])
+	}
+	if len(md["authorization"]) == 0 || md["authorization"][0] != "super token" {
+		return nil, fmt.Errorf("authorization must be super token, given '%s'", md["authorization"])
+	}
 	grpc.SetHeader(ctx, md)
 	return in, nil
 }

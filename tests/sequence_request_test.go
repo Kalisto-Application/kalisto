@@ -3,9 +3,11 @@ package tests
 import (
 	"kalisto/src/assembly"
 	"kalisto/src/models"
+	server "kalisto/tests/examples/server_seq"
 	"os"
 	"path"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/suite"
 
@@ -17,6 +19,19 @@ var script []byte
 
 type SequenceScriptSuite struct {
 	suite.Suite
+
+	close func() error
+}
+
+func (s *SequenceScriptSuite) SetupSuite() {
+	close, _, err := server.Run(":9000")
+	s.Require().NoError(err)
+	s.close = close
+	time.Sleep(time.Millisecond * 200)
+}
+
+func (s *SequenceScriptSuite) TearDownSuite() {
+	s.close()
 }
 
 func (s *SequenceScriptSuite) TestSequenceScript() {
