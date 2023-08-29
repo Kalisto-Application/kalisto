@@ -34,6 +34,7 @@ export const Editor: React.FC<props> = ({value, onChange, readonly}) => {
 					theme: 'vs-dark',
 					minimap: {enabled: false},
 					readOnly: readonly,
+					scrollBeyondLastLine: false,
 				});
 				setSub(ed.getModel()?.onDidChangeContent(e => {
 					if (onChange) {onChange(ed.getModel()?.getValue() || "")} 

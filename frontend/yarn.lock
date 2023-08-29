@@ -332,6 +332,16 @@
     "@sentry/utils" "7.60.1"
     tslib "^2.4.1 || ^1.9.3"
 
+"@sentry-internal/tracing@7.65.0":
+  version "7.65.0"
+  resolved "https://registry.npmjs.org/@sentry-internal/tracing/-/tracing-7.65.0.tgz"
+  integrity sha512-TEYkiq5vKr1Y79YIu+UYr1sO3vEMttQOBsOZLziDbqiC7TvKUARBR4W5XWfb9qBVDeon87EFNKluW0/+7rzYWw==
+  dependencies:
+    "@sentry/core" "7.65.0"
+    "@sentry/types" "7.65.0"
+    "@sentry/utils" "7.65.0"
+    tslib "^2.4.1 || ^1.9.3"
+
 "@sentry/browser@7.60.1":
   version "7.60.1"
   resolved "https://registry.npmjs.org/@sentry/browser/-/browser-7.60.1.tgz"
@@ -344,12 +354,12 @@
     "@sentry/utils" "7.60.1"
     tslib "^2.4.1 || ^1.9.3"
 
-"@sentry/bundler-plugin-core@2.5.0":
-  version "2.5.0"
-  resolved "https://registry.npmjs.org/@sentry/bundler-plugin-core/-/bundler-plugin-core-2.5.0.tgz"
-  integrity sha512-UNjeTSf0Irt/RsC1Xsfxa+RC92mBvjzuWQnvHJ5c+mXwUt+jLcFgGMCSVK/FCDZO+gAeKzmU1+G2UexbsNAP8w==
+"@sentry/bundler-plugin-core@2.7.0":
+  version "2.7.0"
+  resolved "https://registry.npmjs.org/@sentry/bundler-plugin-core/-/bundler-plugin-core-2.7.0.tgz"
+  integrity sha512-ZxJG/DsRXJ9BMaKv+butL3TaiHsuuUy1bNkl56/FCbCt1rYuzltEPT2cBuuveieg66ZWtzerSF17QX3v6svtJQ==
   dependencies:
-    "@sentry/cli" "^2.17.0"
+    "@sentry/cli" "^2.20.1"
     "@sentry/node" "^7.60.0"
     "@sentry/utils" "^7.60.0"
     dotenv "^16.3.1"
@@ -358,10 +368,10 @@
     magic-string "0.27.0"
     unplugin "1.0.1"
 
-"@sentry/cli@^2.17.0":
-  version "2.20.1"
-  resolved "https://registry.npmjs.org/@sentry/cli/-/cli-2.20.1.tgz"
-  integrity sha512-HxzwFQf5gPKfksyj2ZhUicg/avHLCOd/EjZTERSXv5V7GohaTlsNxf9Sbvv/nsu8479vogTllSU6xg5BgXAVUw==
+"@sentry/cli@^2.20.1":
+  version "2.20.5"
+  resolved "https://registry.npmjs.org/@sentry/cli/-/cli-2.20.5.tgz"
+  integrity sha512-ZvWb86eF0QXH9C5Mbi87aUmr8SH848yEpXJmlM2AoBowpE9kKDnewCAKvyXUihojUFwCSEEjoJhrRMMgmCZqXA==
   dependencies:
     https-proxy-agent "^5.0.0"
     node-fetch "^2.6.7"
@@ -378,15 +388,24 @@
     "@sentry/utils" "7.60.1"
     tslib "^2.4.1 || ^1.9.3"
 
-"@sentry/node@^7.60.0":
-  version "7.60.1"
-  resolved "https://registry.npmjs.org/@sentry/node/-/node-7.60.1.tgz"
-  integrity sha512-lBt3RqncY4XbzM+PlTbH/tUWeOsm24anwEzvA2DSDP1NL3WZ5MdvT77q7NqpvpVNd2LeGAQ6x7AXDzE53YBfnQ==
+"@sentry/core@7.65.0":
+  version "7.65.0"
+  resolved "https://registry.npmjs.org/@sentry/core/-/core-7.65.0.tgz"
+  integrity sha512-EwZABW8CtAbRGXV69FqeCqcNApA+Jbq308dko0W+MFdFe+9t2RGubUkpPxpJcbWy/dN2j4LiuENu1T7nWn0ZAQ==
   dependencies:
-    "@sentry-internal/tracing" "7.60.1"
-    "@sentry/core" "7.60.1"
-    "@sentry/types" "7.60.1"
-    "@sentry/utils" "7.60.1"
+    "@sentry/types" "7.65.0"
+    "@sentry/utils" "7.65.0"
+    tslib "^2.4.1 || ^1.9.3"
+
+"@sentry/node@^7.60.0":
+  version "7.65.0"
+  resolved "https://registry.npmjs.org/@sentry/node/-/node-7.65.0.tgz"
+  integrity sha512-zRCHOO7vIQukgFdEib3X7nP7HA9Uyc/o4QMtBnAREaYKzERGRnArvaB3Na0bXsuLVCOELoCAlrzFH3apmgxBQw==
+  dependencies:
+    "@sentry-internal/tracing" "7.65.0"
+    "@sentry/core" "7.65.0"
+    "@sentry/types" "7.65.0"
+    "@sentry/utils" "7.65.0"
     cookie "^0.4.1"
     https-proxy-agent "^5.0.0"
     lru_map "^0.3.3"
@@ -417,6 +436,11 @@
   resolved "https://registry.npmjs.org/@sentry/types/-/types-7.60.1.tgz"
   integrity sha512-8lKKSCOhZ953cWxwnfZwoR3ZFFlZG4P3PQFTaFt/u4LxLh/0zYbdtgvtUqXRURjMCi5P6ddeE9Uw9FGnTJCsTw==
 
+"@sentry/types@7.65.0":
+  version "7.65.0"
+  resolved "https://registry.npmjs.org/@sentry/types/-/types-7.65.0.tgz"
+  integrity sha512-YYq7IDLLhpSBTmHoyWFtq/5ZDaEJ01r7xGuhB0aSIq33cm2I7im/B3ipzoOP/ukGZSIhuYVW9t531xZEO0+6og==
+
 "@sentry/utils@^7.60.0", "@sentry/utils@7.60.1":
   version "7.60.1"
   resolved "https://registry.npmjs.org/@sentry/utils/-/utils-7.60.1.tgz"
@@ -425,12 +449,20 @@
     "@sentry/types" "7.60.1"
     tslib "^2.4.1 || ^1.9.3"
 
-"@sentry/vite-plugin@^2.5.0":
-  version "2.5.0"
-  resolved "https://registry.npmjs.org/@sentry/vite-plugin/-/vite-plugin-2.5.0.tgz"
-  integrity sha512-u5lfIysy6UVzUGn/adyDcRXfzFyip4mLGThTnKeOeA9rCgmJUVnErH8TD8xhTKdpq/MBiQ+KqrC6xG9pKCa96g==
+"@sentry/utils@7.65.0":
+  version "7.65.0"
+  resolved "https://registry.npmjs.org/@sentry/utils/-/utils-7.65.0.tgz"
+  integrity sha512-2JEBf4jzRSClhp+LJpX/E3QgHEeKvXqFMeNhmwQ07qqd6szhfH2ckYFj4gXk6YiGGY4Act3C6oxLfdZovG71bw==
   dependencies:
-    "@sentry/bundler-plugin-core" "2.5.0"
+    "@sentry/types" "7.65.0"
+    tslib "^2.4.1 || ^1.9.3"
+
+"@sentry/vite-plugin@^2.7.0":
+  version "2.7.0"
+  resolved "https://registry.npmjs.org/@sentry/vite-plugin/-/vite-plugin-2.7.0.tgz"
+  integrity sha512-VDkKneqIV5ESg41iz0ODsTl4BXsd4C/PhLgkjES9TFzDcG9VcnbECCxosXZd7nDZB9EQZDIsKSEc29PzLl1JUQ==
+  dependencies:
+    "@sentry/bundler-plugin-core" "2.7.0"
     unplugin "1.0.1"
 
 "@types/node@>= 14":
@@ -958,9 +990,9 @@ lru-cache@^5.1.1:
     yallist "^3.0.2"
 
 "lru-cache@^9.1.1 || ^10.0.0":
-  version "10.0.0"
-  resolved "https://registry.npmjs.org/lru-cache/-/lru-cache-10.0.0.tgz"
-  integrity sha512-svTf/fzsKHffP42sujkO/Rjs37BCIsQVRCeNYIm9WN8rgT7ffoUnRtZCqU+6BqcSBdv8gwJeTz8knJpgACeQMw==
+  version "10.0.1"
+  resolved "https://registry.npmjs.org/lru-cache/-/lru-cache-10.0.1.tgz"
+  integrity sha512-IJ4uwUTi2qCccrioU6g9g/5rvvVl13bsdczUUcqbciD9iLr095yj8DQKdObriEvuNSx325N1rV1O0sJFszx75g==
 
 magic-string@^0.26.7:
   version "0.26.7"
@@ -1009,9 +1041,9 @@ minipass@^4.2.4:
   integrity sha512-fNzuVyifolSLFL4NzpF+wEF4qrgqaaKX0haXPQEdQ7NKAN+WecoKMHV09YcuL/DHxrUsYQOK3MiuDf7Ip2OXfQ==
 
 "minipass@^5.0.0 || ^6.0.2 || ^7.0.0":
-  version "7.0.2"
-  resolved "https://registry.npmjs.org/minipass/-/minipass-7.0.2.tgz"
-  integrity sha512-eL79dXrE1q9dBbDCLg7xfn/vl7MS4F1gvJAgjJrQli/jbQWdUttuVawphqpffoIYfRdq78LHx6GP4bU/EQ2ATA==
+  version "7.0.3"
+  resolved "https://registry.npmjs.org/minipass/-/minipass-7.0.3.tgz"
+  integrity sha512-LhbbwCfz3vsb12j/WkWQPZfKTsgqIe1Nf/ti1pKjYESGLHIVjWU96G9/ljLH4F9mWNVhlQOm0VySdAWzf05dpg==
 
 monaco-editor@^0.40.0:
   version "0.40.0"
@@ -1038,9 +1070,9 @@ nanoid@^3.3.6:
   integrity sha512-BGcqMMJuToF7i1rt+2PWSNVnWIkGCU78jBG3RxO/bZlnZPK2Cmi2QaffxGO/2RvWi9sL+FAiRiXMgsyxQ1DIDA==
 
 node-fetch@^2.6.7:
-  version "2.6.12"
-  resolved "https://registry.npmjs.org/node-fetch/-/node-fetch-2.6.12.tgz"
-  integrity sha512-C/fGU2E8ToujUivIO0H+tpQ6HWo4eEmchoPIoXtxCrVghxdKq+QOHqEZW7tuP3KlV3bC8FRMO5nMCC7Zm1VP6g==
+  version "2.7.0"
+  resolved "https://registry.npmjs.org/node-fetch/-/node-fetch-2.7.0.tgz"
+  integrity sha512-c4FRfUm/dbcWZ7U+1Wq0AwCyFL+3nt2bEw05wfxSz+DWpWsitgmSgYmy2dQdWyKC1694ELPqMs/YzUSNozLt8A==
   dependencies:
     whatwg-url "^5.0.0"
 
