@@ -14,6 +14,7 @@ import (
 	"github.com/jhump/protoreflect/dynamic"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/reflect/protoregistry"
+	"google.golang.org/protobuf/runtime/protoiface"
 	"google.golang.org/protobuf/types/descriptorpb"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -553,7 +554,20 @@ func (f *Factory) asValue(field models.Field, value interface{}, space int) (str
 			if !ok {
 				return "", fmt.Errorf("object %s not found", field.FullName)
 			}
-			v, err = f.asJs(link, value.(*dynamic.Message), space+2)
+
+			m, ok := value.(*dynamic.Message)
+			if !ok {
+				protoMessage, ok := value.(protoiface.MessageV1)
+				if !ok {
+					return "", fmt.Errorf("unknown response type: %s", value)
+				}
+				m, err = dynamic.AsDynamicMessage(protoMessage)
+				if err != nil {
+					return "", fmt.Errorf("failed to cast to dynamic message: %w", err)
+				}
+			}
+
+			v, err = f.asJs(link, m, space+2)
 			if err != nil {
 				return "", fmt.Errorf("field %s expected as map, given '%s'", field.FullName, value)
 			}

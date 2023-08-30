@@ -6,6 +6,7 @@ package kalisto.tests.examples.service;
 
 import "google/protobuf/empty.proto";
 import "google/protobuf/any.proto";
+import "google/protobuf/struct.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 
@@ -78,6 +79,8 @@ message GetBookRequest {
     google.protobuf.Timestamp time = 35;
     Leveled l1 = 37;
     Leveled l2 = 38;
+    google.protobuf.Any any = 39;
+    google.protobuf.Struct struct = 40;
 }
 
 message Leveled {

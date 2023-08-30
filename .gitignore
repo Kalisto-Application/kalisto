@@ -11,5 +11,5 @@ db/
 *.code-workspace
 
 # in case of building a prod locally
-main_build.go
 frontend/.env.prod.local
+frontend/.env.production

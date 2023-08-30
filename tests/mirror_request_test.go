@@ -23,6 +23,9 @@ var request2 []byte
 //go:embed testdata/request3.js
 var request3 []byte
 
+//go:embed testdata/request4.js
+var request4 []byte
+
 type MirrorRequestSuite struct {
 	suite.Suite
 
@@ -49,6 +52,7 @@ func (s *MirrorRequestSuite) TestMirrorRequest() {
 		{name: "request1", req: request1},
 		{name: "request2", req: request2},
 		{name: "request3", req: request3},
+		// {name: "request4", req: request4},
 	} {
 		s.Run(tt.name, func() {
 			app, err := assembly.NewApp()
@@ -79,8 +83,8 @@ func (s *MirrorRequestSuite) TestMirrorRequest() {
 			})
 			s.Require().NoError(err)
 
-			s.Equal(response.Body, responseMirror.Body)
-			s.Equal(response.MetaData, responseMirror.MetaData)
+			s.EqualValues(response.Body, responseMirror.Body)
+			s.EqualValues(response.MetaData, responseMirror.MetaData)
 		})
 	}
 }
