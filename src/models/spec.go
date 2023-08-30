@@ -7,13 +7,14 @@ import (
 )
 
 type Workspace struct {
-	ID        string    `json:"id"`
-	Name      string    `json:"name"`
-	TargetUrl string    `json:"targetUrl"`
-	Spec      Spec      `json:"spec"`
-	LastUsage time.Time `json:"lastUsage" ts_type:"Date" ts_transform:"new Date(__VALUE__)"`
-	BasePath  string    `json:"basePath"`
-	Script    string    `json:"script"`
+	ID          string       `json:"id"`
+	Name        string       `json:"name"`
+	TargetUrl   string       `json:"targetUrl"`
+	Spec        Spec         `json:"spec"`
+	LastUsage   time.Time    `json:"lastUsage" ts_type:"Date" ts_transform:"new Date(__VALUE__)"`
+	BasePath    string       `json:"basePath"`
+	Script      string       `json:"script"`
+	ScriptFiles []ScriptFile `json:"scriptFiles"`
 }
 
 type Spec struct {
