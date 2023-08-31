@@ -1,5 +1,4 @@
 import React from 'react';
-import { GetGlobalVars } from './../../wailsjs/go/api/Api.d';
 
 interface propsButton {
   text: string;
