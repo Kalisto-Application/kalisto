@@ -2,6 +2,7 @@ import React, { useState, useContext, useMemo, useEffect } from 'react';
 import { Context } from '../state';
 
 import {
+  DeleteWorkspace,
   UpdateWorkspace,
   GetWorkspace,
   FindWorkspaces,
@@ -32,6 +33,7 @@ export const WorkspaceList: React.FC = () => {
 
   useEffect(() => {
     if (items?.length === 0) {
+      console.log('items: ', items);
       setIsOpenCreateWorkspace(true);
     }
   }, [items]);
