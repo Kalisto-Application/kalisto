@@ -14,8 +14,6 @@ export function GetGlobalVars():Promise<string>;
 
 export function GetWorkspace(arg1:string):Promise<models.Workspace>;
 
-export function NewWorkspace():Promise<models.Workspace>;
-
 export function RunScript(arg1:models.ScriptCall):Promise<string>;
 
 export function SaveGlovalVars(arg1:string):Promise<void>;

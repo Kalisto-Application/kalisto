@@ -26,10 +26,6 @@ export function GetWorkspace(arg1) {
   return window['go']['api']['Api']['GetWorkspace'](arg1);
 }
 
-export function NewWorkspace() {
-  return window['go']['api']['Api']['NewWorkspace']();
-}
-
 export function RunScript(arg1) {
   return window['go']['api']['Api']['RunScript'](arg1);
 }

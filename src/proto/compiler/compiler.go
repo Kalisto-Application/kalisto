@@ -6,10 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/protoparse"
-
-	"google.golang.org/protobuf/types/descriptorpb"
 )
 
 var (
@@ -41,30 +38,6 @@ func (c *FileCompiler) Compile(path string, filenames []string, bufDirs []string
 	}
 
 	return &Registry{Descriptors: descriptors}, nil
-	// fdset := &descriptorpb.FileDescriptorSet{}
-	// for _, fd := range descriptors {
-	// 	fdset.File = append(fdset.File, c.walk(fd)...)
-	// }
-
-	// return protodesc.NewFiles(fdset)
-}
-
-func (c *FileCompiler) walk(fd *desc.FileDescriptor) []*descriptorpb.FileDescriptorProto {
-	descriptorsProto := []*descriptorpb.FileDescriptorProto{}
-
-	key := fd.GetName() + fd.GetPackage()
-	if _, ok := c.seen[key]; ok {
-		return descriptorsProto
-	}
-	c.seen[key] = struct{}{}
-	descriptorsProto = append(descriptorsProto, fd.AsFileDescriptorProto())
-
-	for _, dep := range fd.GetDependencies() {
-		deps := c.walk(dep)
-		descriptorsProto = append(descriptorsProto, deps...)
-	}
-
-	return descriptorsProto
 }
 
 func (c *FileCompiler) cutWorkspaceDirs(path string, filenames []string, bufDirs []string) ([]string, []string, error) {
