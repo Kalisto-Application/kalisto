@@ -112,5 +112,7 @@ func (w *Workspace) List() []models.Workspace {
 	sort.Slice(w.cache, func(i, j int) bool {
 		return w.cache[i].LastUsage.After(w.cache[j].LastUsage)
 	})
-	return w.cache
+	list := make([]models.Workspace, len(w.cache))
+	copy(list, w.cache)
+	return list
 }

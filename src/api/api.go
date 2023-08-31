@@ -9,6 +9,7 @@ import (
 	"kalisto/src/environment"
 	"kalisto/src/filesystem"
 	"kalisto/src/models"
+	"kalisto/src/pkg/runtime"
 	"kalisto/src/proto/client"
 	"kalisto/src/proto/compiler"
 	"kalisto/src/proto/interpreter"
@@ -21,7 +22,7 @@ import (
 
 	"github.com/bufbuild/protocompile/reporter"
 	"github.com/jhump/protoreflect/dynamic"
-	"github.com/wailsapp/wails/v2/pkg/runtime"
+	rpkg "github.com/wailsapp/wails/v2/pkg/runtime"
 	"google.golang.org/grpc/metadata"
 )
 
@@ -35,6 +36,8 @@ type Api struct {
 	globalVars    *environment.GlovalVars
 	newClient     func(ctx context.Context, addr string) (*client.Client, error)
 	protoRegistry *compiler.Descritors
+
+	runtime runtime.Runtime
 }
 
 func New(
@@ -44,6 +47,7 @@ func New(
 	globalVars *environment.GlovalVars,
 	newClient func(ctx context.Context, addr string) (*client.Client, error),
 	protoRegistry *compiler.Descritors,
+	runtime runtime.Runtime,
 ) *Api {
 	return &Api{
 		compiler:      compiler,
@@ -52,6 +56,7 @@ func New(
 		globalVars:    globalVars,
 		newClient:     newClient,
 		protoRegistry: protoRegistry,
+		runtime:       runtime,
 	}
 }
 
@@ -69,67 +74,8 @@ func (a *Api) context() context.Context {
 
 // WORKSPACE API
 
-func (a *Api) NewWorkspace() (models.Workspace, error) {
-	path, err := runtime.OpenDirectoryDialog(a.context(), runtime.OpenDialogOptions{})
-	if err != nil {
-		return models.Workspace{}, err
-	}
-
-	registry, err := a.protoRegistryFromPath(path)
-	if err != nil {
-		var e reporter.ErrorWithPos
-		if errors.As(err, &e) {
-			var pathE *fs.PathError
-			if errors.As(e.Unwrap(), &pathE) {
-				pos := e.GetPosition()
-				runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
-					Type:    "error",
-					Title:   fmt.Sprintf("Can't resolve import proto file %s", pathE.Path),
-					Message: fmt.Sprintf("%s:%d:%d", pos.Filename, pos.Line, pos.Col),
-				})
-			}
-		}
-		if errors.Is(err, models.ErrNoProtoFilesFound) {
-			runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
-				Type:    "error",
-				Title:   "Can't create a workspace",
-				Message: "No proto files found",
-			})
-		}
-		return models.Workspace{}, fmt.Errorf("api: failed to compile proto files: %w", err)
-	}
-
-	spc, err := a.specFactory.FromRegistry(registry)
-	if err != nil {
-		return models.Workspace{}, fmt.Errorf("api: failed to create spec from registry: %w", err)
-	}
-	if len(spc.Services) == 0 {
-		runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
-			Type:    "error",
-			Title:   "Can't create a workspace",
-			Message: "No services found",
-		})
-		return models.Workspace{}, fmt.Errorf("no services found")
-	}
-
-	ws, err := a.workspace.Save(models.Workspace{
-		Name:      "New workspace",
-		Spec:      spc,
-		BasePath:  path,
-		TargetUrl: "localhost:9000",
-		LastUsage: time.Now(),
-	})
-	if err != nil {
-		return ws, fmt.Errorf("api: failed to save workspace: %w", err)
-	}
-
-	a.protoRegistry.Add(ws.ID, registry)
-
-	return ws, nil
-}
-
 func (a *Api) FindProtoFiles() (models.ProtoDir, error) {
-	path, err := runtime.OpenDirectoryDialog(a.context(), runtime.OpenDialogOptions{})
+	path, err := a.runtime.OpenDirectoryDialog(a.context(), rpkg.OpenDialogOptions{})
 	if err != nil {
 		return models.ProtoDir{}, nil
 	}
@@ -137,7 +83,7 @@ func (a *Api) FindProtoFiles() (models.ProtoDir, error) {
 	protoFiles, err := filesystem.SearchProtoFiles(path)
 	if err != nil {
 		if errors.Is(err, models.ErrNoProtoFilesFound) {
-			runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
+			a.runtime.MessageDialog(a.ctx, rpkg.MessageDialogOptions{
 				Type:    "error",
 				Title:   "Can't create a workspace",
 				Message: "No proto files found",
@@ -160,7 +106,7 @@ func (a *Api) CreateWorkspace(name, folder string) (models.Workspace, error) {
 			var pathE *fs.PathError
 			if errors.As(e.Unwrap(), &pathE) {
 				pos := e.GetPosition()
-				runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
+				a.runtime.MessageDialog(a.ctx, rpkg.MessageDialogOptions{
 					Type:    "error",
 					Title:   fmt.Sprintf("Can't resolve import proto file %s", pathE.Path),
 					Message: fmt.Sprintf("%s:%d:%d", pos.Filename, pos.Line, pos.Col),
@@ -168,7 +114,7 @@ func (a *Api) CreateWorkspace(name, folder string) (models.Workspace, error) {
 			}
 		}
 		if errors.Is(err, models.ErrNoProtoFilesFound) {
-			runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
+			a.runtime.MessageDialog(a.ctx, rpkg.MessageDialogOptions{
 				Type:    "error",
 				Title:   "Can't create a workspace",
 				Message: "No proto files found",
@@ -182,7 +128,7 @@ func (a *Api) CreateWorkspace(name, folder string) (models.Workspace, error) {
 		return models.Workspace{}, fmt.Errorf("api: failed to create spec from registry: %w", err)
 	}
 	if len(spc.Services) == 0 {
-		runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
+		a.runtime.MessageDialog(a.ctx, rpkg.MessageDialogOptions{
 			Type:    "error",
 			Title:   "Can't create a workspace",
 			Message: "No services found",
@@ -220,7 +166,7 @@ func (a *Api) FindWorkspaces() ([]models.Workspace, error) {
 				var pathE *fs.PathError
 				if errors.As(ePos.Unwrap(), &pathE) {
 					pos := ePos.GetPosition()
-					runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
+					a.runtime.MessageDialog(a.ctx, rpkg.MessageDialogOptions{
 						Type:    "error",
 						Title:   fmt.Sprintf("Can't resolve import proto file %s", pathE.Path),
 						Message: fmt.Sprintf("%s:%d:%d", pos.Filename, pos.Line, pos.Col),
@@ -231,8 +177,8 @@ func (a *Api) FindWorkspaces() ([]models.Workspace, error) {
 
 			var pathErr *fs.PathError
 			if errors.As(err, &pathErr) {
-				click, _ := runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
-					Type:         runtime.QuestionDialog,
+				click, _ := a.runtime.MessageDialog(a.ctx, rpkg.MessageDialogOptions{
+					Type:         rpkg.QuestionDialog,
 					Title:        fmt.Sprintf("Workspace '%s' can't start", w.Name),
 					Message:      fmt.Sprintf("%s: no such file or directory.\nDelete the workspace?", w.BasePath),
 					Buttons:      []string{"Yes", "No"},
