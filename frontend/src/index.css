@@ -57,7 +57,14 @@ CSS rules to specify families:
 @tailwind components;
 @tailwind utilities;
 
+html {
+  height: 100%;
+}
+#root {
+  height: 100%;
+}
 body {
+  height: 100%;
   background-color: theme('colors.primaryFill');
   color: white;
 

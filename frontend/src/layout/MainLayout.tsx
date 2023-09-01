@@ -1,18 +1,18 @@
-import React from "react";
+import React from 'react';
 
-import {
-  Outlet,
-} from "react-router-dom";
+import { Outlet } from 'react-router-dom';
 
-import Header from "./Header";
-import Sidebar from "./Sidebar";
+import Header from './Header';
+import Sidebar from './Sidebar';
 
 export const MainLayout: React.FC = () => {
-  return (<div className="flex flex-1 flex-col">
-    <Header />
-    <div className="flex flex-1">
-      <Sidebar />
-      <Outlet />
+  return (
+    <div className="flex h-full flex-1 flex-col">
+      <Header />
+      <div className="flex flex-1">
+        <Sidebar />
+        <Outlet />
+      </div>
     </div>
-  </div>);
-}
+  );
+};
