@@ -93,8 +93,8 @@ func (a *Api) FindProtoFiles() (models.ProtoDir, error) {
 	}
 
 	return models.ProtoDir{
-		Folder: path,
-		Files:  protoFiles.RelativeProtoPaths,
+		Dir:   path,
+		Files: protoFiles.RelativeProtoPaths,
 	}, nil
 }
 
