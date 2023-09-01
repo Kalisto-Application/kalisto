@@ -98,7 +98,7 @@ func (s *OverflowSuite) TestOverflow() {
 			wd, err := os.Getwd()
 			s.Require().NoError(err)
 			dir := path.Join(wd, "examples/proto/")
-			ws, err := api.CreateWorkspace("name", dir)
+			ws, err := api.CreateWorkspace("name", []string{dir})
 			s.Require().NoError(err)
 
 			_, err = api.SendGrpc(models.Request{

@@ -80,7 +80,7 @@ func (a *Api) FindProtoFiles() (models.ProtoDir, error) {
 		return models.ProtoDir{}, nil
 	}
 
-	protoFiles, err := filesystem.SearchProtoFiles(path)
+	protoFiles, err := filesystem.SearchProtoFiles([]string{path})
 	if err != nil {
 		if errors.Is(err, models.ErrNoProtoFilesFound) {
 			a.runtime.MessageDialog(a.ctx, rpkg.MessageDialogOptions{
@@ -93,13 +93,13 @@ func (a *Api) FindProtoFiles() (models.ProtoDir, error) {
 	}
 
 	return models.ProtoDir{
-		Folder: path,
-		Files:  protoFiles.RelativeProtoPaths,
+		Dir:   path,
+		Files: protoFiles.RelativeProtoPaths,
 	}, nil
 }
 
-func (a *Api) CreateWorkspace(name, folder string) (models.Workspace, error) {
-	registry, err := a.protoRegistryFromPath(folder)
+func (a *Api) CreateWorkspace(name string, dirs []string) (models.Workspace, error) {
+	registry, err := a.protoRegistryFromPath(dirs)
 	if err != nil {
 		var e reporter.ErrorWithPos
 		if errors.As(err, &e) {
@@ -139,7 +139,7 @@ func (a *Api) CreateWorkspace(name, folder string) (models.Workspace, error) {
 	ws, err := a.workspace.Save(models.Workspace{
 		Name:      name,
 		Spec:      spc,
-		BasePath:  folder,
+		BasePath:  dirs,
 		TargetUrl: "localhost:9000",
 		LastUsage: time.Now(),
 	})
@@ -383,13 +383,13 @@ func (a *Api) RunScript(request models.ScriptCall) (string, error) {
 	return string(b), nil
 }
 
-func (s *Api) protoRegistryFromPath(path string) (*compiler.Registry, error) {
-	protoFiles, err := filesystem.SearchProtoFiles(path)
+func (s *Api) protoRegistryFromPath(dirs []string) (*compiler.Registry, error) {
+	protoFiles, err := filesystem.SearchProtoFiles(dirs)
 	if err != nil {
 		return nil, fmt.Errorf("api: failed to search proto files: %w", err)
 	}
 
-	registry, err := s.compiler.Compile(protoFiles.AbsoluteDirPath, protoFiles.RelativeProtoPaths, protoFiles.BufDirs)
+	registry, err := s.compiler.Compile(protoFiles.AbsoluteDirsPath, protoFiles.RelativeProtoPaths, protoFiles.BufDirs)
 	if err != nil {
 		return nil, fmt.Errorf("api: failed to compile proto files: %w", err)
 	}

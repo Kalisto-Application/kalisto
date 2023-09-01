@@ -50,7 +50,7 @@ func (s *SequenceScriptSuite) TestSequenceScript() {
 			wd, err := os.Getwd()
 			s.Require().NoError(err)
 			dir := path.Join(wd, "examples/proto_sequence/")
-			ws, err := api.CreateWorkspace("name", dir)
+			ws, err := api.CreateWorkspace("name", []string{dir})
 			s.Require().NoError(err)
 
 			response, err := api.RunScript(models.ScriptCall{
