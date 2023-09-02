@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"context"
 	"kalisto/src/assembly"
 	"kalisto/src/models"
 	"kalisto/tests/examples/server"
@@ -85,6 +86,8 @@ func (s *MirrorRequestSuite) TestMirrorRequest() {
 
 			s.EqualValues(response.Body, responseMirror.Body)
 			s.EqualValues(response.MetaData, responseMirror.MetaData)
+
+			app.OnShutdown(context.Background())
 		})
 	}
 }
