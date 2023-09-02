@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"context"
 	"kalisto/src/assembly"
 	"os"
 	"path"
@@ -53,7 +54,7 @@ func (s *ImportSuite) TestImport() {
 			} else {
 				s.Greater(len(ws.Spec.Services), 0)
 			}
-
+			app.OnShutdown(context.Background())
 		})
 	}
 }

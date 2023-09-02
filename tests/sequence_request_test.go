@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"context"
 	"kalisto/src/assembly"
 	"kalisto/src/models"
 	server "kalisto/tests/examples/server_seq"
@@ -61,6 +62,8 @@ func (s *SequenceScriptSuite) TestSequenceScript() {
 			})
 			s.Require().NoError(err)
 			s.Require().JSONEq(response, `{"value": 3, "rpc": "Third"}`)
+
+			app.OnShutdown(context.Background())
 		})
 	}
 }

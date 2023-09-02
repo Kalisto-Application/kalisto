@@ -61,7 +61,8 @@ func (db *DB) GetWorkspaces() ([]models.Workspace, error) {
 }
 
 func (db *DB) GetWorkspace(id string) (models.Workspace, error) {
-	return read[models.Workspace](db.db, keyWorkspace)
+	key := keyWorkspace + id
+	return read[models.Workspace](db.db, key)
 }
 
 func (db *DB) DeleteWorkspace(id string) error {

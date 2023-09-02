@@ -15,13 +15,13 @@ jobs:
       fail-fast: false
       matrix:
         build:
-          # - name: 'kalisto'
-          #   platform:  'linux/amd64'
-          #   os: 'ubuntu-latest'
-          #   bundle-name: 'kalisto-linux.zip'
-          #   path:  |
-          #     ~/.cache/go-build
-          #     ~/go/pkg/mod
+          - name: 'kalisto'
+            platform:  'linux/amd64'
+            os: 'ubuntu-latest'
+            bundle-name: 'kalisto-linux.zip'
+            path:  |
+              ~/.cache/go-build
+              ~/go/pkg/mod
           - name: 'kalisto'
             platform:  'windows/amd64'
             os: 'windows-latest'
@@ -29,14 +29,14 @@ jobs:
             path:  |
               ~\AppData\Local\go-build
               ~\go\pkg\mod
-          # - name: 'kalisto'
-          #   platform:  'darwin/universal'
-          #   os: 'macos-latest'
-          #   bundle-name: 'kalisto.dmg'
-          #   ext: '.app'
-          #   path:  |
-          #     ~/Library/Caches/go-build
-          #     ~/go/pkg/mod
+          - name: 'kalisto'
+            platform:  'darwin/universal'
+            os: 'macos-latest'
+            bundle-name: 'kalisto.dmg'
+            ext: '.app'
+            path:  |
+              ~/Library/Caches/go-build
+              ~/go/pkg/mod
 
     runs-on: ${{ matrix.build.os }}
     steps:

@@ -41,7 +41,7 @@ func NewApp() (*App, error) {
 
 	a := api.New(protoCompiler, specFactory, store, newClient, protoRegistry, runtime.New())
 
-	return &App{Api: a}, nil
+	return &App{Api: a, db: store}, nil
 }
 
 // startup is called when the app starts. The context is saved

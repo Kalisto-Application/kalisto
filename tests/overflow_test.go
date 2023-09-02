@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"context"
 	"kalisto/src/assembly"
 	"kalisto/src/models"
 	server "kalisto/tests/examples/server_seq"
@@ -116,6 +117,8 @@ func (s *OverflowSuite) TestOverflow() {
 			} else {
 				s.NoError(err)
 			}
+
+			app.OnShutdown(context.Background())
 		})
 	}
 }
