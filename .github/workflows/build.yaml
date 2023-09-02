@@ -81,7 +81,6 @@ jobs:
           node-version: '18.16'
 
       - name: Install Wails
-        if: inputs.build == 'true'
         run: cd subrepos/wails/v2/cmd/wails/ && go install && cd ../../../../../
 
       - name: Install Linux Wails deps
@@ -90,23 +89,23 @@ jobs:
         shell: bash
 
       - name: Build App
-        if: inputs.build == 'true' && runner.os == 'macOS'
-        run: wails build --platform ${{ matrix.build.platform }} -webview2 download -o ${{ matrix.build.name }}
+        if: runner.os == 'macOS'
+        run: wails build --platform ${{ matrix.build.platform }} -webview2 download -o ${{ matrix.build.name }} -ldflags "-X main.version=${{ github.ref_name }}"
         shell: bash
       - name: Build App
-        if: inputs.build == 'true' &&  runner.os == 'Linux'
-        run: wails build --platform ${{ matrix.build.platform }} -webview2 download -o ${{ matrix.build.name }}
+        if: runner.os == 'Linux'
+        run: wails build --platform ${{ matrix.build.platform }} -webview2 download -o ${{ matrix.build.name }} -ldflags "-X main.version=${{ github.ref_name }}"
         shell: bash
       - name: Build Windows App + Installer
-        if: inputs.build == 'true' && runner.os == 'Windows' && inputs.nsis == 'true'
-        run: wails build --platform ${{ matrix.build.platform }} -webview2 download -nsis -o ${{ matrix.build.name }}
+        if: runner.os == 'Windows'
+        run: wails build --platform ${{ matrix.build.platform }} -webview2 download -nsis -o ${{ matrix.build.name }} -ldflags "-X main.version=${{ github.ref_name }}" 
         shell: bash
       - name: Add macOS perms
-        if: inputs.build == 'true' && runner.os == 'macOS'
+        if: runner.os == 'macOS'
         run: chmod +x build/bin/*/Contents/MacOS/*
         shell: bash
       - name: Add Linux perms
-        if: inputs.build == 'true' && runner.os  == 'Linux'
+        if: runner.os  == 'Linux'
         run: chmod +x build/bin/*
         shell: bash
 
