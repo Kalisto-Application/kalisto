@@ -17,58 +17,57 @@ type bufWork struct {
 }
 
 type ProtoSearchResult struct {
-	AbsoluteDirPath    string
+	AbsoluteDirsPath   []string
 	RelativeProtoPaths []string
 	BufDirs            []string
 }
 
 // SearchProtoFiles function will find all .proto files by the given path.
-func SearchProtoFiles(path string) (ProtoSearchResult, error) {
+func SearchProtoFiles(dirs []string) (ProtoSearchResult, error) {
 	result := ProtoSearchResult{}
 
-	// Check if the path is absolute
-	if !filepath.IsAbs(path) {
-		return result, fmt.Errorf("path must be absolute. given: %s", path)
-	}
-
-	// Check if the path is a directory or a file
-	info, err := os.Stat(path)
-	if err != nil {
-		return result, err
-	}
-	result.BufDirs = readBufWorkDirs(path)
-
-	// This is a file
-	if !info.IsDir() {
-		if !strings.HasSuffix(info.Name(), ".proto") {
-			return result, errors.New("chosen file is not a proto file")
+	for _, dir := range dirs {
+		// Check if the path is absolute
+		if !filepath.IsAbs(dir) {
+			return result, fmt.Errorf("path must be absolute. given: %s", dir)
 		}
 
-		result.AbsoluteDirPath = filepath.Dir(path)
-		result.RelativeProtoPaths = []string{filepath.Base(path)}
-
-		return result, nil
-	}
-
-	// This is a directory, find all .proto files recursively
-	result.AbsoluteDirPath = path
-	err = filepath.WalkDir(path, func(path string, d fs.DirEntry, err error) error {
+		// Check if the path is a directory or a file
+		info, err := os.Stat(dir)
 		if err != nil {
-			return err
+			return result, err
+		}
+		result.BufDirs = append(result.BufDirs, readBufWorkDirs(dir)...)
+
+		// This is a file
+		if !info.IsDir() {
+			if !strings.HasSuffix(info.Name(), ".proto") {
+				return result, errors.New("chosen file is not a proto file")
+			}
+
+			result.AbsoluteDirsPath = append(result.AbsoluteDirsPath, filepath.Dir(dir))
+			result.RelativeProtoPaths = append(result.RelativeProtoPaths, filepath.Base(dir))
+			continue
 		}
 
-		if !d.IsDir() && strings.HasSuffix(d.Name(), ".proto") {
-			rel, err := filepath.Rel(result.AbsoluteDirPath, path)
+		// This is a directory, find all .proto files recursively
+		result.AbsoluteDirsPath = append(result.AbsoluteDirsPath, dir)
+		if err := filepath.WalkDir(dir, func(path string, d fs.DirEntry, err error) error {
 			if err != nil {
 				return err
 			}
-			result.RelativeProtoPaths = append(result.RelativeProtoPaths, rel)
-		}
-		return nil
-	})
 
-	if err != nil {
-		return result, err
+			if !d.IsDir() && strings.HasSuffix(d.Name(), ".proto") {
+				rel, err := filepath.Rel(dir, path)
+				if err != nil {
+					return err
+				}
+				result.RelativeProtoPaths = append(result.RelativeProtoPaths, rel)
+			}
+			return nil
+		}); err != nil {
+			return result, err
+		}
 	}
 
 	if len(result.RelativeProtoPaths) == 0 {

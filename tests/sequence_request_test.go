@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"context"
 	"kalisto/src/assembly"
 	"kalisto/src/models"
 	server "kalisto/tests/examples/server_seq"
@@ -50,7 +51,7 @@ func (s *SequenceScriptSuite) TestSequenceScript() {
 			wd, err := os.Getwd()
 			s.Require().NoError(err)
 			dir := path.Join(wd, "examples/proto_sequence/")
-			ws, err := api.CreateWorkspace("name", dir)
+			ws, err := api.CreateWorkspace("name", []string{dir})
 			s.Require().NoError(err)
 
 			response, err := api.RunScript(models.ScriptCall{
@@ -61,6 +62,8 @@ func (s *SequenceScriptSuite) TestSequenceScript() {
 			})
 			s.Require().NoError(err)
 			s.Require().JSONEq(response, `{"value": 3, "rpc": "Third"}`)
+
+			app.OnShutdown(context.Background())
 		})
 	}
 }

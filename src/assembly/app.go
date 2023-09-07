@@ -5,12 +5,10 @@ import (
 	"fmt"
 	"kalisto/src/api"
 	"kalisto/src/db"
-	"kalisto/src/environment"
 	"kalisto/src/pkg/runtime"
 	"kalisto/src/proto/client"
 	"kalisto/src/proto/compiler"
 	"kalisto/src/proto/spec"
-	"kalisto/src/workspace"
 
 	"github.com/adrg/xdg"
 )
@@ -20,6 +18,8 @@ type App struct {
 	ctx context.Context
 
 	Api *api.Api
+
+	db *db.DB
 }
 
 // NewApp creates a new App application struct
@@ -30,14 +30,6 @@ func NewApp() (*App, error) {
 	}
 
 	protoRegistry := compiler.NewProtoRegistry()
-	ws, err := workspace.New(store)
-	if err != nil {
-		return nil, fmt.Errorf("failed to init workspace: %w", err)
-	}
-	glovalVars, err := environment.NewGlovalVars(store)
-	if err != nil {
-		return nil, fmt.Errorf("failed to init environments: %w", err)
-	}
 	protoCompiler := compiler.NewFileCompiler()
 	specFactory := spec.NewFactory()
 
@@ -47,9 +39,9 @@ func NewApp() (*App, error) {
 		})
 	}
 
-	a := api.New(protoCompiler, specFactory, ws, glovalVars, newClient, protoRegistry, runtime.New())
+	a := api.New(protoCompiler, specFactory, store, newClient, protoRegistry, runtime.New())
 
-	return &App{Api: a}, nil
+	return &App{Api: a, db: store}, nil
 }
 
 // startup is called when the app starts. The context is saved
@@ -58,4 +50,8 @@ func (a *App) Start(ctx context.Context) {
 	a.ctx = ctx
 
 	api.SetContext(a.Api, ctx)
+}
+
+func (a *App) OnShutdown(ctx context.Context) {
+	a.db.Close()
 }

@@ -7,14 +7,14 @@ import (
 )
 
 type Workspace struct {
-	ID          string       `json:"id"`
-	Name        string       `json:"name"`
-	TargetUrl   string       `json:"targetUrl"`
-	Spec        Spec         `json:"spec"`
-	LastUsage   time.Time    `json:"lastUsage" ts_type:"Date" ts_transform:"new Date(__VALUE__)"`
-	BasePath    string       `json:"basePath"`
-	Script      string       `json:"script"`
-	ScriptFiles []ScriptFile `json:"scriptFiles"`
+	ID          string    `json:"id"`
+	Name        string    `json:"name"`
+	TargetUrl   string    `json:"targetUrl"`
+	Spec        Spec      `json:"spec"`
+	LastUsage   time.Time `json:"lastUsage" ts_type:"Date" ts_transform:"new Date(__VALUE__)"`
+	BasePath    []string  `json:"basePath"`
+	Script      string    `json:"script"`
+	ScriptFiles []File    `json:"scriptFiles"`
 }
 
 type Spec struct {
@@ -81,12 +81,13 @@ func NewCommunicationKind(isStreamClient, isStreamServer bool) CommunicationKind
 }
 
 type Method struct {
-	Name            string            `json:"name"`
-	FullName        string            `json:"fullName"`
-	RequestMessage  Message           `json:"requestMessage"`
-	ResponseMessage Message           `json:"responseMessage"`
-	Kind            CommunicationKind `json:"kind"`
-	RequestExample  string            `json:"requestExample"`
+	Name             string            `json:"name"`
+	FullName         string            `json:"fullName"`
+	RequestMessage   Message           `json:"requestMessage"`
+	ResponseMessage  Message           `json:"responseMessage"`
+	Kind             CommunicationKind `json:"kind"`
+	RequestExample   string            `json:"requestExample"`
+	RequestInstances []File            `json:"requestInstances"`
 }
 
 type Message struct {

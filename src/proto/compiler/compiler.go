@@ -21,12 +21,12 @@ func NewFileCompiler() *FileCompiler {
 	return &FileCompiler{seen: make(map[string]struct{})}
 }
 
-func (c *FileCompiler) Compile(path string, filenames []string, bufDirs []string) (*Registry, error) {
+func (c *FileCompiler) Compile(dirs, filenames, bufDirs []string) (*Registry, error) {
 	if len(filenames) == 0 {
 		return nil, ErrNoFiles
 	}
 
-	paths, filenames, err := c.cutWorkspaceDirs(path, filenames, bufDirs)
+	paths, filenames, err := c.cutWorkspaceDirs(dirs, filenames, bufDirs)
 	if err != nil {
 		return nil, err
 	}
@@ -40,26 +40,28 @@ func (c *FileCompiler) Compile(path string, filenames []string, bufDirs []string
 	return &Registry{Descriptors: descriptors}, nil
 }
 
-func (c *FileCompiler) cutWorkspaceDirs(path string, filenames []string, bufDirs []string) ([]string, []string, error) {
-	filenames, err := protoparse.ResolveFilenames([]string{path}, filenames...)
+func (c *FileCompiler) cutWorkspaceDirs(dirs, filenames, bufDirs []string) ([]string, []string, error) {
+	filenames, err := protoparse.ResolveFilenames(dirs, filenames...)
 	if err != nil {
 		return nil, nil, fmt.Errorf("compiler: failed to resolve files: %w", err)
 	}
 
 	if len(bufDirs) == 0 {
-		return []string{path}, filenames, nil
+		return dirs, filenames, nil
 	}
 	pathSet := make(map[string]struct{})
 
 	for i, name := range filenames {
 		for _, bufDir := range bufDirs {
-			newName, ok := strings.CutPrefix(name, bufDir)
-			if ok {
-				pathSet[filepath.Join(path, bufDir)] = struct{}{}
-				// it cuts directory separator (like "/") OS independently
-				newName = newName[1:]
-				filenames[i] = newName
-				break
+			for _, dir := range dirs {
+				newName, ok := strings.CutPrefix(name, bufDir)
+				if ok {
+					pathSet[filepath.Join(dir, bufDir)] = struct{}{}
+					// it cuts directory separator (like "/") OS independently
+					newName = newName[1:]
+					filenames[i] = newName
+					break
+				}
 			}
 		}
 	}

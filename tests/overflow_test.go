@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"context"
 	"kalisto/src/assembly"
 	"kalisto/src/models"
 	server "kalisto/tests/examples/server_seq"
@@ -98,7 +99,7 @@ func (s *OverflowSuite) TestOverflow() {
 			wd, err := os.Getwd()
 			s.Require().NoError(err)
 			dir := path.Join(wd, "examples/proto/")
-			ws, err := api.CreateWorkspace("name", dir)
+			ws, err := api.CreateWorkspace("name", []string{dir})
 			s.Require().NoError(err)
 
 			_, err = api.SendGrpc(models.Request{
@@ -116,6 +117,8 @@ func (s *OverflowSuite) TestOverflow() {
 			} else {
 				s.NoError(err)
 			}
+
+			app.OnShutdown(context.Background())
 		})
 	}
 }

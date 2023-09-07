@@ -16,13 +16,16 @@ import (
 	"github.com/getsentry/sentry-go"
 )
 
+var version string
+
 //go:embed all:frontend/dist
 var assets embed.FS
 
 func main() {
 	sentryDsn := config.C.SentryDsn
 	if err := sentry.Init(sentry.ClientOptions{
-		Dsn: sentryDsn,
+		Dsn:     sentryDsn,
+		Release: version,
 	}); err != nil {
 		log.Fatalln("failed to initialize sentry client:", err)
 	}
@@ -38,9 +41,10 @@ func main() {
 
 	// Create application with options
 	if err := wails.Run(&options.App{
-		Title:  "kalisto",
-		Width:  1440,
-		Height: 925,
+		OnShutdown: app.OnShutdown,
+		Title:      "kalisto",
+		Width:      1440,
+		Height:     925,
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},

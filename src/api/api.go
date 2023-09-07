@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
-	"kalisto/src/environment"
 	"kalisto/src/filesystem"
 	"kalisto/src/models"
 	"kalisto/src/pkg/runtime"
@@ -14,13 +13,15 @@ import (
 	"kalisto/src/proto/compiler"
 	"kalisto/src/proto/interpreter"
 	"kalisto/src/proto/spec"
-	"kalisto/src/workspace"
 	"reflect"
 	"strings"
 	"sync"
 	"time"
 
+	"kalisto/src/db"
+
 	"github.com/bufbuild/protocompile/reporter"
+	"github.com/google/uuid"
 	"github.com/jhump/protoreflect/dynamic"
 	rpkg "github.com/wailsapp/wails/v2/pkg/runtime"
 	"google.golang.org/grpc/metadata"
@@ -32,8 +33,7 @@ type Api struct {
 
 	compiler      *compiler.FileCompiler
 	specFactory   *spec.Factory
-	workspace     *workspace.Workspace
-	globalVars    *environment.GlovalVars
+	store         *db.DB
 	newClient     func(ctx context.Context, addr string) (*client.Client, error)
 	protoRegistry *compiler.Descritors
 
@@ -43,8 +43,7 @@ type Api struct {
 func New(
 	compiler *compiler.FileCompiler,
 	specFactory *spec.Factory,
-	workspace *workspace.Workspace,
-	globalVars *environment.GlovalVars,
+	store *db.DB,
 	newClient func(ctx context.Context, addr string) (*client.Client, error),
 	protoRegistry *compiler.Descritors,
 	runtime runtime.Runtime,
@@ -52,8 +51,7 @@ func New(
 	return &Api{
 		compiler:      compiler,
 		specFactory:   specFactory,
-		workspace:     workspace,
-		globalVars:    globalVars,
+		store:         store,
 		newClient:     newClient,
 		protoRegistry: protoRegistry,
 		runtime:       runtime,
@@ -80,7 +78,7 @@ func (a *Api) FindProtoFiles() (models.ProtoDir, error) {
 		return models.ProtoDir{}, nil
 	}
 
-	protoFiles, err := filesystem.SearchProtoFiles(path)
+	protoFiles, err := filesystem.SearchProtoFiles([]string{path})
 	if err != nil {
 		if errors.Is(err, models.ErrNoProtoFilesFound) {
 			a.runtime.MessageDialog(a.ctx, rpkg.MessageDialogOptions{
@@ -93,13 +91,13 @@ func (a *Api) FindProtoFiles() (models.ProtoDir, error) {
 	}
 
 	return models.ProtoDir{
-		Folder: path,
-		Files:  protoFiles.RelativeProtoPaths,
+		Dir:   path,
+		Files: protoFiles.RelativeProtoPaths,
 	}, nil
 }
 
-func (a *Api) CreateWorkspace(name, folder string) (models.Workspace, error) {
-	registry, err := a.protoRegistryFromPath(folder)
+func (a *Api) CreateWorkspace(name string, dirs []string) (models.Workspace, error) {
+	registry, err := a.protoRegistryFromPath(dirs)
 	if err != nil {
 		var e reporter.ErrorWithPos
 		if errors.As(err, &e) {
@@ -136,14 +134,15 @@ func (a *Api) CreateWorkspace(name, folder string) (models.Workspace, error) {
 		return models.Workspace{}, fmt.Errorf("no services found")
 	}
 
-	ws, err := a.workspace.Save(models.Workspace{
+	ws := models.Workspace{
+		ID:        uuid.NewString(),
 		Name:      name,
 		Spec:      spc,
-		BasePath:  folder,
+		BasePath:  dirs,
 		TargetUrl: "localhost:9000",
 		LastUsage: time.Now(),
-	})
-	if err != nil {
+	}
+	if err := a.store.SaveWorkspace(ws); err != nil {
 		return ws, fmt.Errorf("api: failed to save workspace: %w", err)
 	}
 
@@ -153,11 +152,15 @@ func (a *Api) CreateWorkspace(name, folder string) (models.Workspace, error) {
 }
 
 func (s *Api) DeleteWorkspace(id string) error {
-	return s.workspace.Delete(id)
+	return s.store.DeleteWorkspace(id)
 }
 
 func (a *Api) FindWorkspaces() ([]models.Workspace, error) {
-	list := a.workspace.List()
+	list, err := a.store.GetWorkspaces()
+	if err != nil {
+		return nil, err
+	}
+
 	for i, w := range list {
 		w, err := a.enrichWorkspace(w, w.LastUsage)
 		if err != nil {
@@ -197,7 +200,7 @@ func (a *Api) FindWorkspaces() ([]models.Workspace, error) {
 }
 
 func (s *Api) GetWorkspace(id string) (models.Workspace, error) {
-	ws, err := s.workspace.Find(id)
+	ws, err := s.store.GetWorkspace(id)
 	if err != nil {
 		return ws, err
 	}
@@ -206,7 +209,7 @@ func (s *Api) GetWorkspace(id string) (models.Workspace, error) {
 }
 
 func (s *Api) UpdateWorkspace(ws models.Workspace) error {
-	return s.workspace.Update(ws)
+	return s.store.SaveWorkspace(ws)
 }
 
 func (s *Api) enrichWorkspace(ws models.Workspace, lastUsage time.Time) (models.Workspace, error) {
@@ -226,7 +229,7 @@ func (s *Api) enrichWorkspace(ws models.Workspace, lastUsage time.Time) (models.
 	newWs.LastUsage = lastUsage
 
 	if !reflect.DeepEqual(ws, newWs) {
-		if err := s.workspace.Update(newWs); err != nil {
+		if err := s.store.SaveWorkspace(newWs); err != nil {
 			return newWs, err
 		}
 	}
@@ -236,32 +239,17 @@ func (s *Api) enrichWorkspace(ws models.Workspace, lastUsage time.Time) (models.
 
 // ENVIRONMENT API
 
-func (s *Api) GetGlobalVars() string {
-	return s.globalVars.Get()
+func (s *Api) GetGlobalVars() (string, error) {
+	return s.store.GlobalVars()
 }
 
 func (s *Api) SaveGlovalVars(vars string) error {
-	if err := s.globalVars.Save(vars); err != nil {
+	if err := s.store.SaveGlobalVars(vars); err != nil {
 		return err
 	}
 	ip := interpreter.NewInterpreter("")
 	if _, err := ip.Raw(vars); err != nil {
 		return err
-	}
-
-	return nil
-}
-
-// SCRIPTING
-
-func (a *Api) SaveScript(WorkspaceID, script string) error {
-	ws, err := a.workspace.Find(WorkspaceID)
-	if err != nil {
-		return err
-	}
-	ws.Script = script
-	if err := a.workspace.Update(ws); err != nil {
-		return nil
 	}
 
 	return nil
@@ -283,7 +271,7 @@ func (a *Api) SendGrpc(request models.Request) (models.Response, error) {
 		return models.Response{}, err
 	}
 
-	ws, err := a.workspace.Find(request.WorkspaceID)
+	ws, err := a.store.GetWorkspace(request.WorkspaceID)
 	if err != nil {
 		return models.Response{}, err
 	}
@@ -296,7 +284,10 @@ func (a *Api) SendGrpc(request models.Request) (models.Response, error) {
 	}
 	defer func() { _ = c.Close() }()
 
-	vars := a.GetGlobalVars()
+	vars, err := a.GetGlobalVars()
+	if err != nil {
+		return models.Response{}, fmt.Errorf("failed to get global vars: %w", err)
+	}
 	ip := interpreter.NewInterpreter(vars)
 	specInputMessage, err := ws.Spec.FindInputMessage(sd.GetFullyQualifiedName(), md.GetName())
 	if err != nil {
@@ -346,6 +337,8 @@ func (a *Api) SendGrpc(request models.Request) (models.Response, error) {
 	}, nil
 }
 
+// SCRIPTING API
+
 func (a *Api) RunScript(request models.ScriptCall) (string, error) {
 	if strings.TrimSpace(request.Body) == "" {
 		return "", nil
@@ -356,7 +349,7 @@ func (a *Api) RunScript(request models.ScriptCall) (string, error) {
 		return "", err
 	}
 
-	ws, err := a.workspace.Find(request.WorkspaceID)
+	ws, err := a.store.GetWorkspace(request.WorkspaceID)
 	if err != nil {
 		return "", err
 	}
@@ -369,7 +362,10 @@ func (a *Api) RunScript(request models.ScriptCall) (string, error) {
 	}
 	defer func() { _ = c.Close() }()
 
-	vars := a.GetGlobalVars()
+	vars, err := a.GetGlobalVars()
+	if err != nil {
+		return "", fmt.Errorf("failed to get global vars: %w", err)
+	}
 	ip := interpreter.NewInterpreter(vars)
 
 	resp, err := ip.RunScript(ctx, request.Body, ws.Spec, reg, c)
@@ -383,13 +379,13 @@ func (a *Api) RunScript(request models.ScriptCall) (string, error) {
 	return string(b), nil
 }
 
-func (s *Api) protoRegistryFromPath(path string) (*compiler.Registry, error) {
-	protoFiles, err := filesystem.SearchProtoFiles(path)
+func (s *Api) protoRegistryFromPath(dirs []string) (*compiler.Registry, error) {
+	protoFiles, err := filesystem.SearchProtoFiles(dirs)
 	if err != nil {
 		return nil, fmt.Errorf("api: failed to search proto files: %w", err)
 	}
 
-	registry, err := s.compiler.Compile(protoFiles.AbsoluteDirPath, protoFiles.RelativeProtoPaths, protoFiles.BufDirs)
+	registry, err := s.compiler.Compile(protoFiles.AbsoluteDirsPath, protoFiles.RelativeProtoPaths, protoFiles.BufDirs)
 	if err != nil {
 		return nil, fmt.Errorf("api: failed to compile proto files: %w", err)
 	}

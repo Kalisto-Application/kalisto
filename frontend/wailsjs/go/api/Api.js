@@ -34,10 +34,6 @@ export function SaveGlovalVars(arg1) {
   return window['go']['api']['Api']['SaveGlovalVars'](arg1);
 }
 
-export function SaveScript(arg1, arg2) {
-  return window['go']['api']['Api']['SaveScript'](arg1, arg2);
-}
-
 export function SendGrpc(arg1) {
   return window['go']['api']['Api']['SendGrpc'](arg1);
 }

@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"context"
 	"kalisto/src/assembly"
 	"kalisto/src/models"
 	"kalisto/tests/examples/server"
@@ -62,7 +63,7 @@ func (s *MirrorRequestSuite) TestMirrorRequest() {
 			wd, err := os.Getwd()
 			s.Require().NoError(err)
 			dir := path.Join(wd, "examples/proto/")
-			ws, err := api.CreateWorkspace("name", dir)
+			ws, err := api.CreateWorkspace("name", []string{dir})
 			s.Require().NoError(err)
 
 			response, err := api.SendGrpc(models.Request{
@@ -85,6 +86,8 @@ func (s *MirrorRequestSuite) TestMirrorRequest() {
 
 			s.EqualValues(response.Body, responseMirror.Body)
 			s.EqualValues(response.MetaData, responseMirror.MetaData)
+
+			app.OnShutdown(context.Background())
 		})
 	}
 }
