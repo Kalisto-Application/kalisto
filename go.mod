@@ -12,7 +12,7 @@ require (
 	github.com/jhump/protoreflect v1.15.1
 	github.com/onsi/gomega v1.27.8
 	github.com/stretchr/testify v1.8.4
-	github.com/wailsapp/wails/v2 v2.5.1
+	github.com/wailsapp/wails/v2 v2.6.0
 	google.golang.org/grpc v1.55.0
 	google.golang.org/protobuf v1.30.0
 	gopkg.in/yaml.v3 v3.0.1
@@ -64,5 +64,3 @@ require (
 	golang.org/x/text v0.11.0 // indirect
 	google.golang.org/genproto v0.0.0-20230306155012-7f2fa6fef1f4 // indirect
 )
-
-replace github.com/wailsapp/wails/v2 => ./subrepos/wails/v2
