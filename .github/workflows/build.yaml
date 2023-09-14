@@ -91,14 +91,23 @@ jobs:
         if: runner.os == 'macOS'
         run: wails build --platform ${{ matrix.build.platform }} -webview2 download -o ${{ matrix.build.name }} -ldflags "-X main.version=${{ github.ref_name }}"
         shell: bash
+        env:
+          SENTRY_TOKEN: ${{ secrets.SENTRY_TOKEN }}
+
       - name: Build App
         if: runner.os == 'Linux'
         run: wails build --platform ${{ matrix.build.platform }} -webview2 download -o ${{ matrix.build.name }} -ldflags "-X main.version=${{ github.ref_name }}"
         shell: bash
+        env:
+          SENTRY_TOKEN: ${{ secrets.SENTRY_TOKEN }}
+
       - name: Build Windows App + Installer
         if: runner.os == 'Windows'
         run: wails build --platform ${{ matrix.build.platform }} -webview2 download -nsis -o ${{ matrix.build.name }} -ldflags "-X main.version=${{ github.ref_name }}"
         shell: bash
+        env:
+          SENTRY_TOKEN: ${{ secrets.SENTRY_TOKEN }}
+
       - name: Add macOS perms
         if: runner.os == 'macOS'
         run: chmod +x build/bin/*/Contents/MacOS/*
