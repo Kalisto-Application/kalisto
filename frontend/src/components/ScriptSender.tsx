@@ -1,10 +1,10 @@
-import React, { useContext, useState, useMemo, useEffect } from "react";
+import React, { useContext, useState, useMemo, useEffect } from 'react';
 
-import { UrlInput } from "../ui/UrlInput";
-import { Context } from "../state";
-import { UpdateWorkspace, RunScript } from "../../wailsjs/go/api/Api";
-import { models } from "../../wailsjs/go/models";
-import { Action, debounce } from "../pkg";
+import { UrlInput } from '../ui/UrlInput';
+import { Context } from '../state';
+import { UpdateWorkspace, RunScript } from '../../wailsjs/go/api/Api';
+import { models } from '../../wailsjs/go/models';
+import { Action, debounce } from '../pkg';
 
 export const ScriptSender: React.FC = () => {
   const ctx = useContext(Context);
@@ -12,17 +12,17 @@ export const ScriptSender: React.FC = () => {
   const activeWorkspace = ctx.state.workspaceList?.find(
     (it) => it.id === ctx.state.activeWorkspaceId,
   );
-  const [url, setUrl] = useState(activeWorkspace?.targetUrl || "");
+  const [url, setUrl] = useState(activeWorkspace?.targetUrl || '');
 
   useEffect(() => {
-    setUrl(activeWorkspace?.targetUrl || "");
+    setUrl(activeWorkspace?.targetUrl || '');
   }, [activeWorkspace]);
 
   const action: Action = (url: string) => {
     UpdateWorkspace(
       new models.Workspace({ ...activeWorkspace, targetUrl: url }),
     ).catch((err) => {
-      console.log("failed to save the workspace url: ", err);
+      console.log('failed to save the workspace url: ', err);
     });
   };
   let debouncedUrlUpdate = useMemo<Action>(() => {
@@ -43,16 +43,16 @@ export const ScriptSender: React.FC = () => {
       addr: url,
       workspaceId: activeWorkspace.id,
       body: ctx.state.scriptText,
-      meta: "",
+      meta: '',
     })
       .then((res) => {
-        ctx.dispatch({ type: "scriptResponse", response: res });
+        ctx.dispatch({ type: 'scriptResponse', response: res });
       })
       .catch((err) => {
-        if (err?.Code == "SYNTAX_ERROR") {
-          ctx.dispatch({ type: "scriptError", value: err.Value });
+        if (err?.Code == 'SYNTAX_ERROR') {
+          ctx.dispatch({ type: 'scriptError', value: err.Value });
         }
-        console.log("failed to get response: ", err);
+        console.log('failed to get response: ', err);
       });
   };
 

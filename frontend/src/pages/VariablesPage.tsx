@@ -1,8 +1,8 @@
-import React, { useContext } from "react";
-import { CodeEditor } from "../components/CodeEditor";
-import { Context } from "../state";
-import { SaveGlovalVars } from "../../wailsjs/go/api/Api";
-import VarsError from "../components/VarsError";
+import React, { useContext } from 'react';
+import { CodeEditor } from '../components/CodeEditor';
+import { Context } from '../state';
+import { SaveGlovalVars } from '../../wailsjs/go/api/Api';
+import VarsError from '../components/VarsError';
 
 type VariablesPageProps = {};
 
@@ -11,13 +11,13 @@ export const VariablesPage: React.FC<VariablesPageProps> = () => {
 
   const saveGlobalVariables = (vars: string) => {
     SaveGlovalVars(vars).catch((err) => {
-      console.log("failed to save global vars: ", err);
-      if (err?.Code === "SYNTAX_ERROR") {
-        console.log("dispatcyhed  ");
-        ctx.dispatch({ type: "varsError", value: err.Value });
+      console.log('failed to save global vars: ', err);
+      if (err?.Code === 'SYNTAX_ERROR') {
+        console.log('dispatcyhed  ');
+        ctx.dispatch({ type: 'varsError', value: err.Value });
         return;
       }
-      console.log("failed to save global vars: ", err);
+      console.log('failed to save global vars: ', err);
     });
   };
 

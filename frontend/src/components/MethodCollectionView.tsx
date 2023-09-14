@@ -1,12 +1,12 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext } from 'react';
 import {
   ControlledTreeEnvironment,
   Tree,
   TreeItemIndex,
   TreeItem,
-} from "react-complex-tree";
-import { models } from "../../wailsjs/go/models";
-import { Context } from "../state";
+} from 'react-complex-tree';
+import { models } from '../../wailsjs/go/models';
+import { Context } from '../state';
 
 const findMethod = (
   s: models.Service[] = [],
@@ -48,9 +48,9 @@ export const MethodCollection: React.FC = () => {
 
   const itemsData: Record<TreeItemIndex, TreeItem<Data>> = {
     root: {
-      index: "root",
+      index: 'root',
       isFolder: true,
-      data: { display: "Root item", isMethod: false },
+      data: { display: 'Root item', isMethod: false },
       children: serviceNames,
     },
   };
@@ -75,7 +75,7 @@ export const MethodCollection: React.FC = () => {
         items={itemsData}
         getItemTitle={(item) => item.data.display}
         viewState={{
-          "1": {
+          '1': {
             expandedItems: expandedItems,
             selectedItems: selectedItem ? [selectedItem] : undefined,
           },
@@ -84,11 +84,11 @@ export const MethodCollection: React.FC = () => {
           if (item.data.isMethod) {
             const method = findMethod(
               services,
-              item.data.parent || "",
+              item.data.parent || '',
               item.index as string,
             );
 
-            ctx.dispatch({ type: "activeMethod", activeMethod: method! });
+            ctx.dispatch({ type: 'activeMethod', activeMethod: method! });
           }
           setExpandedItems([...expandedItems, item.index]);
         }}
@@ -103,10 +103,10 @@ export const MethodCollection: React.FC = () => {
           if (item.data.isMethod) {
             const method = findMethod(
               services,
-              item.data.parent || "",
+              item.data.parent || '',
               item.index as string,
             );
-            ctx.dispatch({ type: "activeMethod", activeMethod: method! });
+            ctx.dispatch({ type: 'activeMethod', activeMethod: method! });
           }
         }}
       >

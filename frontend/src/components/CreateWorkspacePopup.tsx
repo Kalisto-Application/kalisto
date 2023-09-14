@@ -1,13 +1,13 @@
-import React, { useContext, useState } from "react";
-import { FindProtoFiles, CreateWorkspace } from "./../../wailsjs/go/api/Api";
-import { models } from "../../wailsjs/go/models";
-import { Context } from "../state";
-import Button from "../ui/Button";
-import Popup from "../ui/Popup";
-import upload from "../../assets/icons/upload.svg";
-import folder from "../../assets/icons/folder.svg";
-import close from "../../assets/icons/close.svg";
-import file from "../../assets/icons/file.svg";
+import React, { useContext, useState } from 'react';
+import { FindProtoFiles, CreateWorkspace } from './../../wailsjs/go/api/Api';
+import { models } from '../../wailsjs/go/models';
+import { Context } from '../state';
+import Button from '../ui/Button';
+import Popup from '../ui/Popup';
+import upload from '../../assets/icons/upload.svg';
+import folder from '../../assets/icons/folder.svg';
+import close from '../../assets/icons/close.svg';
+import file from '../../assets/icons/file.svg';
 
 interface propsCreateWorkspacePopup {
   onClose: () => void;
@@ -34,7 +34,7 @@ const CreateWorkspaceComponets: React.FC<propsCreateWorkspace> = ({
   onClose,
 }) => {
   const ctx = useContext(Context);
-  const [name, setName] = useState("");
+  const [name, setName] = useState('');
 
   const [data, setData] = useState([] as models.ProtoDir[]);
 
@@ -52,7 +52,7 @@ const CreateWorkspaceComponets: React.FC<propsCreateWorkspace> = ({
       name,
       data.map((it) => it.dir),
     ).then((res) => {
-      ctx.dispatch({ type: "newWorkspace", workspace: res });
+      ctx.dispatch({ type: 'newWorkspace', workspace: res });
       onClose();
     });
   };
@@ -83,7 +83,7 @@ const CreateWorkspaceComponets: React.FC<propsCreateWorkspace> = ({
           className="mr-[10px] border-[1px] border-[#343434]"
         />
         <Button
-          disabled={name === "" || data.length <= 0}
+          disabled={name === '' || data.length <= 0}
           text="Create"
           onClick={() => createNewWorkspace()}
           className="bg-primaryGeneral text-lg font-medium"

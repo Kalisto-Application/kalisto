@@ -1,4 +1,4 @@
-import React, { SyntheticEvent } from "react";
+import React, { SyntheticEvent } from 'react';
 
 interface UrlInputProps {
   value: string;

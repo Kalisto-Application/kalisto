@@ -1,10 +1,10 @@
-import { ReactNode, useEffect, useReducer } from "react";
-import * as Sentry from "@sentry/react";
+import { ReactNode, useEffect, useReducer } from 'react';
+import * as Sentry from '@sentry/react';
 
-import { reducer, Context, newState } from "./state";
+import { reducer, Context, newState } from './state';
 
-import { models } from "../../wailsjs/go/models";
-import { FindWorkspaces, GetGlobalVars } from "../../wailsjs/go/api/Api";
+import { models } from '../../wailsjs/go/models';
+import { FindWorkspaces, GetGlobalVars } from '../../wailsjs/go/api/Api';
 
 type ContextProps = {
   children?: ReactNode;
@@ -18,7 +18,7 @@ export const ContextProvider: React.FC<ContextProps> = ({ children }) => {
     FindWorkspaces()
       .then((res) => {
         if (res.length === 0) {
-          dispatch({ type: "workspaceList", workspaceList: [] });
+          dispatch({ type: 'workspaceList', workspaceList: [] });
           return;
         }
 
@@ -41,23 +41,23 @@ export const ContextProvider: React.FC<ContextProps> = ({ children }) => {
 
         const fristMethod = getFirstMethod();
         if (fristMethod) {
-          dispatch({ type: "activeMethod", activeMethod: fristMethod });
+          dispatch({ type: 'activeMethod', activeMethod: fristMethod });
         }
-        dispatch({ type: "workspaceList", workspaceList: res });
+        dispatch({ type: 'workspaceList', workspaceList: res });
       })
-      .catch((err) => console.log("error on find workspaces: ", err));
+      .catch((err) => console.log('error on find workspaces: ', err));
 
     GetGlobalVars()
       .then((vars) => {
-        dispatch({ type: "changeVariables", text: vars });
+        dispatch({ type: 'changeVariables', text: vars });
       })
-      .catch((err) => console.log("error on get global variables: ", err));
+      .catch((err) => console.log('error on get global variables: ', err));
   }, []);
 
   return (
     <Sentry.ErrorBoundary
       beforeCapture={(scope) => {
-        scope.setExtra("state", state);
+        scope.setExtra('state', state);
       }}
     >
       <Context.Provider value={{ state, dispatch }}>

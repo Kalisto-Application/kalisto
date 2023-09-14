@@ -1,15 +1,15 @@
-import React, { useContext } from "react";
-import { EditorSwitcher } from "../ui/EditorSwitcher";
-import { CodeEditor } from "./CodeEditor";
+import React, { useContext } from 'react';
+import { EditorSwitcher } from '../ui/EditorSwitcher';
+import { CodeEditor } from './CodeEditor';
 
-import { Context } from "../state";
+import { Context } from '../state';
 
 interface RequestEditorProps {}
 
 export const RequestEditor: React.FC<RequestEditorProps> = () => {
   const ctx = useContext(Context);
   const switchRequestEditor = (i: number) =>
-    void [ctx.dispatch({ type: "switchRequestEditor", i: i })];
+    void [ctx.dispatch({ type: 'switchRequestEditor', i: i })];
 
   const editors = [
     <CodeEditor
@@ -28,8 +28,8 @@ export const RequestEditor: React.FC<RequestEditorProps> = () => {
     <div className="bg-textBlockFill w-1/2">
       <EditorSwitcher
         items={[
-          { title: "Request", onClick: switchRequestEditor },
-          { title: "Metadata", onClick: switchRequestEditor },
+          { title: 'Request', onClick: switchRequestEditor },
+          { title: 'Metadata', onClick: switchRequestEditor },
         ]}
         active={ctx.state.activeRequestEditor || 0}
       />

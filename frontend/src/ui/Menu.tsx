@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 
 interface props {
   items: itemProps[];
@@ -34,9 +34,9 @@ export const MenuItem: React.FC<itemProps> = ({ text, icon, onClick }) => {
   };
 
   let className =
-    "flex flex-row w-[259.5px] h-11 items-center gap-[42px] px-4 py-2.5 leading-6";
+    'flex flex-row w-[259.5px] h-11 items-center gap-[42px] px-4 py-2.5 leading-6';
   if (isHovered) {
-    className += " bg-textBlockFill";
+    className += ' bg-textBlockFill';
   }
 
   return (

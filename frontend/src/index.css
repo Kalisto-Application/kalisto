@@ -1,18 +1,18 @@
 /* Fonts (Inter 400/500/600/900, Roboto Mono 400/500) */
-@import url("../assets/fonts/RobotoMono.woff");
+@import url('../assets/fonts/RobotoMono.woff');
 /*
 CSS rules to specify families:
     font-family: 'Inter', sans-serif;
     font-family: 'Roboto Mono', monospace;
 */
 
-@import "react-complex-tree/lib/style-modern.css";
+@import 'react-complex-tree/lib/style-modern.css';
 
 :root {
-  --rct-color-arrow: theme("colors.icon");
-  --rct-color-focustree-item-hover-bg: theme("colors.borderFill");
-  --rct-color-focustree-item-selected-bg: theme("colors.textBlockFill");
-  --rct-color-focustree-item-active-bg: theme("colors.primaryFill");
+  --rct-color-arrow: theme('colors.icon');
+  --rct-color-focustree-item-hover-bg: theme('colors.borderFill');
+  --rct-color-focustree-item-selected-bg: theme('colors.textBlockFill');
+  --rct-color-focustree-item-active-bg: theme('colors.primaryFill');
   --rct-bar-color: none;
   --rct-item-margin: 1px;
   --rct-item-padding: 8px;
@@ -50,7 +50,7 @@ CSS rules to specify families:
 }
 
 .rct-tree-item-li-selected {
-  background-color: theme("colors.textBlockFill");
+  background-color: theme('colors.textBlockFill');
 }
 
 @tailwind base;
@@ -65,7 +65,7 @@ html {
 }
 body {
   height: 100%;
-  background-color: theme("colors.primaryFill");
+  background-color: theme('colors.primaryFill');
   color: white;
 
   font-family: Inter;
@@ -80,5 +80,5 @@ input {
 
 .divide {
   border-bottom-width: 1px;
-  border-color: theme("colors.borderFill");
+  border-color: theme('colors.borderFill');
 }

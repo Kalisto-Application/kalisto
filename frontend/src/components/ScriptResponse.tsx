@@ -1,6 +1,6 @@
-import React, { useContext } from "react";
-import { Editor } from "../ui/Editor";
-import { Context } from "../state";
+import React, { useContext } from 'react';
+import { Editor } from '../ui/Editor';
+import { Context } from '../state';
 
 export const ScriptResponse: React.FC = () => {
   const ctx = useContext(Context);

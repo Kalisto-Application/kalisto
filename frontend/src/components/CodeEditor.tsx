@@ -1,16 +1,16 @@
-import React, { ChangeEvent, useContext, useMemo } from "react";
-import { Context } from "../state";
-import { debounce, Action } from "../pkg";
+import React, { ChangeEvent, useContext, useMemo } from 'react';
+import { Context } from '../state';
+import { debounce, Action } from '../pkg';
 
-import { Editor } from "../ui/Editor";
+import { Editor } from '../ui/Editor';
 
 interface CodeEditorProps {
   text: string;
   type:
-    | "changeRequestText"
-    | "changeMetaText"
-    | "changeVariables"
-    | "changeScriptText";
+    | 'changeRequestText'
+    | 'changeMetaText'
+    | 'changeVariables'
+    | 'changeScriptText';
   action?: Action;
 }
 
@@ -38,7 +38,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
   return (
     <div>
       <Editor
-        key={ctx.state.activeMethod?.fullName || ""}
+        key={ctx.state.activeMethod?.fullName || ''}
         value={text}
         onChange={onChange}
       />

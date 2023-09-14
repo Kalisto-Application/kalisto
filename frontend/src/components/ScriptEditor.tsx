@@ -1,17 +1,17 @@
-import React, { useContext } from "react";
-import { EditorSwitcher } from "../ui/EditorSwitcher";
-import { CodeEditor } from "./CodeEditor";
+import React, { useContext } from 'react';
+import { EditorSwitcher } from '../ui/EditorSwitcher';
+import { CodeEditor } from './CodeEditor';
 
-import { Context } from "../state";
-import { UpdateWorkspace } from "../../wailsjs/go/api/Api";
-import { models } from "../../wailsjs/go/models";
+import { Context } from '../state';
+import { UpdateWorkspace } from '../../wailsjs/go/api/Api';
+import { models } from '../../wailsjs/go/models';
 
 export const ScriptEditor: React.FC = () => {
   const ctx = useContext(Context);
 
   const saveScript = (script: string) => {
     if (!ctx.state.activeWorkspaceId) {
-      console.log("no active workspace");
+      console.log('no active workspace');
       return;
     }
 
@@ -19,7 +19,7 @@ export const ScriptEditor: React.FC = () => {
       (it) => it.id === ctx.state.activeWorkspaceId,
     );
     if (!ws) {
-      console.log("workspace not found");
+      console.log('workspace not found');
       return;
     }
     const updatedWs = new models.Workspace({ ...ws, script: script });
@@ -27,15 +27,15 @@ export const ScriptEditor: React.FC = () => {
 
     UpdateWorkspace(updatedWs)
       .then((_) => {
-        console.log("workspace script saved");
+        console.log('workspace script saved');
       })
       .catch((err) => {
-        console.log("failed to save script: ", err);
-        if (err?.Code === "SYNTAX_ERROR") {
-          ctx.dispatch({ type: "scriptError", value: err.Value });
+        console.log('failed to save script: ', err);
+        if (err?.Code === 'SYNTAX_ERROR') {
+          ctx.dispatch({ type: 'scriptError', value: err.Value });
           return;
         }
-        console.log("failed to save global vars: ", err);
+        console.log('failed to save global vars: ', err);
       });
   };
 
