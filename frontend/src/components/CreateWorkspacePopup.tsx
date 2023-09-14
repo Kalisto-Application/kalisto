@@ -1,13 +1,13 @@
-import React, { useContext, useState } from 'react';
-import { FindProtoFiles, CreateWorkspace } from './../../wailsjs/go/api/Api';
-import { models } from '../../wailsjs/go/models';
-import { Context } from '../state';
-import Button from '../ui/Button';
-import Popup from '../ui/Popup';
-import upload from '../../assets/icons/upload.svg';
-import folder from '../../assets/icons/folder.svg';
-import close from '../../assets/icons/close.svg';
-import file from '../../assets/icons/file.svg';
+import React, { useContext, useState } from "react";
+import { FindProtoFiles, CreateWorkspace } from "./../../wailsjs/go/api/Api";
+import { models } from "../../wailsjs/go/models";
+import { Context } from "../state";
+import Button from "../ui/Button";
+import Popup from "../ui/Popup";
+import upload from "../../assets/icons/upload.svg";
+import folder from "../../assets/icons/folder.svg";
+import close from "../../assets/icons/close.svg";
+import file from "../../assets/icons/file.svg";
 
 interface propsCreateWorkspacePopup {
   onClose: () => void;
@@ -22,7 +22,7 @@ const CreateWorkspacePopup: React.FC<propsCreateWorkspacePopup> = ({
   open,
 }) => {
   return (
-<Popup onClose={onClose} isOpen={open} title="Create Workspace">
+    <Popup onClose={onClose} isOpen={open} title="Create Workspace">
       <CreateWorkspaceComponets onClose={onClose} />
     </Popup>
   );
@@ -34,15 +34,13 @@ const CreateWorkspaceComponets: React.FC<propsCreateWorkspace> = ({
   onClose,
 }) => {
   const ctx = useContext(Context);
-  const [name, setName] = useState('');
+  const [name, setName] = useState("");
 
-  const [data, setData] = useState(
-    [] as models.ProtoDir[]
-  );
+  const [data, setData] = useState([] as models.ProtoDir[]);
 
   const pushDir = (dir: models.ProtoDir) => {
-    setData(prev => prev.concat(dir))
-  }
+    setData((prev) => prev.concat(dir));
+  };
 
   const updateTextValueInp = (e: React.FormEvent<HTMLInputElement>) => {
     let newValue = e.currentTarget.value;
@@ -50,8 +48,11 @@ const CreateWorkspaceComponets: React.FC<propsCreateWorkspace> = ({
   };
 
   const createNewWorkspace = () => {
-    CreateWorkspace(name, data.map(it => it.dir)).then((res) => {
-      ctx.dispatch({ type: 'newWorkspace', workspace: res });
+    CreateWorkspace(
+      name,
+      data.map((it) => it.dir),
+    ).then((res) => {
+      ctx.dispatch({ type: "newWorkspace", workspace: res });
       onClose();
     });
   };
@@ -62,7 +63,9 @@ const CreateWorkspaceComponets: React.FC<propsCreateWorkspace> = ({
         <Upload
           data={data}
           pushDir={pushDir}
-          clearState={idx => setData(prev => prev.filter((_, i) => i !== idx))}
+          clearState={(idx) =>
+            setData((prev) => prev.filter((_, i) => i !== idx))
+          }
         />
         <label className="leading-6">Name</label>
         <input
@@ -80,7 +83,7 @@ const CreateWorkspaceComponets: React.FC<propsCreateWorkspace> = ({
           className="mr-[10px] border-[1px] border-[#343434]"
         />
         <Button
-          disabled={name === '' || data.length <= 0}
+          disabled={name === "" || data.length <= 0}
           text="Create"
           onClick={() => createNewWorkspace()}
           className="bg-primaryGeneral text-lg font-medium"
@@ -114,56 +117,59 @@ const Upload: React.FC<propsUpload> = ({ data, clearState, pushDir }) => {
 
   return (
     <>
-        <button
-          onClick={findFiles}
-          className="mb-6 flex min-h-[179px] w-full flex-col items-center justify-center border-2 border-dashed border-borderFill"
-          disabled={disabledUpload}
-        >
-          <img src={upload} className="mb-6" alt="upload" />
-          <span className="font-sm  font-['Roboto_Mono'] font-bold text-secondaryText">
-            Choose folder to upload
-          </span>
-          <span className="text-xs  text-blind">proto</span>
-        </button>
-        <UploadedDir dirs={data} clear={clearState} />
+      <button
+        onClick={findFiles}
+        className="mb-6 flex min-h-[179px] w-full flex-col items-center justify-center border-2 border-dashed border-borderFill"
+        disabled={disabledUpload}
+      >
+        <img src={upload} className="mb-6" alt="upload" />
+        <span className="font-sm  font-['Roboto_Mono'] font-bold text-secondaryText">
+          Choose folder to upload
+        </span>
+        <span className="text-xs  text-blind">proto</span>
+      </button>
+      <UploadedDir dirs={data} clear={clearState} />
     </>
   );
 };
 
 interface UploadedDirProps {
-  dirs: models.ProtoDir[],
-  clear(i: number): void,
+  dirs: models.ProtoDir[];
+  clear(i: number): void;
 }
 
 const UploadedDir: React.FC<UploadedDirProps> = ({ dirs, clear }) => {
   return (
     <>
-    {dirs.map( (dir, i) => <div className="max mb-6 max-h-52 overflow-auto rounded-md bg-textBlockFill px-5 py-3.5 ">
-      <div key={i} className="flex justify-between [&:not(:last-child)]:mb-1">
-        <div className="flex items-center gap-x-2">
-          <img src={folder} alt="file" />
-          <span className="text-sm text-blueTextPath">{dir.dir}</span>
+      {dirs.map((dir, i) => (
+        <div className="max mb-6 max-h-52 overflow-auto rounded-md bg-textBlockFill px-5 py-3.5 ">
+          <div
+            key={i}
+            className="flex justify-between [&:not(:last-child)]:mb-1"
+          >
+            <div className="flex items-center gap-x-2">
+              <img src={folder} alt="file" />
+              <span className="text-sm text-blueTextPath">{dir.dir}</span>
+            </div>
+            <button onClick={() => clear(i)}>
+              <img src={close} alt="clearState" />
+            </button>
+          </div>
+          <ul>
+            {dir.files.map((f, indx) => {
+              return (
+                <li
+                  key={indx}
+                  className="flex gap-x-2  pl-5 text-sm [&:not(:last-child)]:mb-1"
+                >
+                  <img src={file} alt="file" />
+                  <span>{f}</span>
+                </li>
+              );
+            })}
+          </ul>
         </div>
-        <button
-          onClick={() => clear(i)}
-        >
-          <img src={close} alt="clearState" />
-        </button>
-      </div>
-      <ul>
-        {dir.files.map((f, indx) => {
-          return (
-            <li
-              key={indx}
-              className="flex gap-x-2  pl-5 text-sm [&:not(:last-child)]:mb-1"
-            >
-              <img src={file} alt="file" />
-              <span>{f}</span>
-            </li>
-          );
-        })}
-      </ul>
-    </div>)}
+      ))}
     </>
-  )
-}
+  );
+};

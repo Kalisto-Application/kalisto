@@ -1,5 +1,5 @@
-import React, { useContext } from 'react';
-import { Context } from '../state/state';
+import React, { useContext } from "react";
+import { Context } from "../state/state";
 
 interface props {
   items: item[];
@@ -14,8 +14,8 @@ type item = {
 export const EditorSwitcher: React.FC<props> = ({ items, active }) => {
   const makeClassName = (i: number): string => {
     return active === i
-      ? 'pt-[8px] px-[16px]'
-      : 'pt-[8px] px-[16px] text-secondaryText ';
+      ? "pt-[8px] px-[16px]"
+      : "pt-[8px] px-[16px] text-secondaryText ";
   };
 
   return (

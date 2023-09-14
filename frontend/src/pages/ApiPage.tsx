@@ -9,23 +9,22 @@ import { ApiRequestSender } from "../components/ApiRequestSender";
 import ApiError from "../components/ApiError";
 
 export const ApiPage: React.FC = () => {
-    return (
-      <div className="flex flex-1 w-full">
-        <div className="flex flex-[0_0_220px] justify-items-start flex-col">
-          <WorkspaceList />
-          <SearchBox />
-          <MethodCollection />
-        </div>
-        <div className="flex flex-1 flex-col">
-          <TabList />
-          <ApiRequestSender />          
-          <div className="flex flex-1">
-            <RequestEditor />
-            <ResponseText />
-          </div>
-          <ApiError />
-        </div>
+  return (
+    <div className="flex flex-1 w-full">
+      <div className="flex flex-[0_0_220px] justify-items-start flex-col">
+        <WorkspaceList />
+        <SearchBox />
+        <MethodCollection />
       </div>
-    );
-  };
-  
+      <div className="flex flex-1 flex-col">
+        <TabList />
+        <ApiRequestSender />
+        <div className="flex flex-1">
+          <RequestEditor />
+          <ResponseText />
+        </div>
+        <ApiError />
+      </div>
+    </div>
+  );
+};

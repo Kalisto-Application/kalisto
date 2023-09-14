@@ -3,10 +3,10 @@ name: Wails build
 on:
   push:
     tags:
-      - '*'
+      - "*"
 
 env:
-  NODE_OPTIONS: '--max-old-space-size=6096'
+  NODE_OPTIONS: "--max-old-space-size=6096"
 
 jobs:
   build:
@@ -14,25 +14,25 @@ jobs:
       fail-fast: false
       matrix:
         build:
-          - name: 'kalisto'
-            platform: 'linux/amd64'
-            os: 'ubuntu-latest'
-            bundle-name: 'kalisto-linux.zip'
+          - name: "kalisto"
+            platform: "linux/amd64"
+            os: "ubuntu-latest"
+            bundle-name: "kalisto-linux.zip"
             path: |
               ~/.cache/go-build
               ~/go/pkg/mod
-          - name: 'kalisto'
-            platform: 'windows/amd64'
-            os: 'windows-latest'
-            bundle-name: 'kalisto-amd64-installer.exe'
+          - name: "kalisto"
+            platform: "windows/amd64"
+            os: "windows-latest"
+            bundle-name: "kalisto-amd64-installer.exe"
             path: |
               ~\AppData\Local\go-build
               ~\go\pkg\mod
-          - name: 'kalisto'
-            platform: 'darwin/universal'
-            os: 'macos-latest'
-            bundle-name: 'kalisto.dmg'
-            ext: '.app'
+          - name: "kalisto"
+            platform: "darwin/universal"
+            os: "macos-latest"
+            bundle-name: "kalisto.dmg"
+            ext: ".app"
             path: |
               ~/Library/Caches/go-build
               ~/go/pkg/mod
@@ -72,12 +72,12 @@ jobs:
         uses: actions/setup-go@v4
         with:
           check-latest: true
-          go-version: '1.20'
+          go-version: "1.20"
 
       - name: Setup NodeJS
         uses: actions/setup-node@v3
         with:
-          node-version: '18.16'
+          node-version: "18.16"
 
       - name: Install Wails
         run: cd subrepos/wails/v2/cmd/wails/ && go install && cd ../../../../../
@@ -97,7 +97,7 @@ jobs:
         shell: bash
       - name: Build Windows App + Installer
         if: runner.os == 'Windows'
-        run: wails build --platform ${{ matrix.build.platform }} -webview2 download -nsis -o ${{ matrix.build.name }} -ldflags "-X main.version=${{ github.ref_name }}" 
+        run: wails build --platform ${{ matrix.build.platform }} -webview2 download -nsis -o ${{ matrix.build.name }} -ldflags "-X main.version=${{ github.ref_name }}"
         shell: bash
       - name: Add macOS perms
         if: runner.os == 'macOS'
@@ -112,7 +112,7 @@ jobs:
         if: runner.os == 'Linux'
         uses: thedoctor0/zip-release@0.7.1
         with:
-          type: 'zip'
+          type: "zip"
           directory: build/bin/
           filename: ${{ matrix.build.bundle-name }}
           path: ${{ matrix.build.name }}${{ matrix.build.ext }}
@@ -129,7 +129,7 @@ jobs:
           file_path: build/bin/${{ matrix.build.bundle-name }}
           bucket: release
           upsert: true
-          content_type: 'application/zip'
+          content_type: "application/zip"
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}

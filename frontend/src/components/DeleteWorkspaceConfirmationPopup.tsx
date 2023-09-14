@@ -1,9 +1,9 @@
-import React, { useContext } from 'react';
-import { DeleteWorkspace } from '../../wailsjs/go/api/Api';
+import React, { useContext } from "react";
+import { DeleteWorkspace } from "../../wailsjs/go/api/Api";
 
-import Button from '../ui/Button';
-import Popup from './../ui/Popup';
-import { Context } from '../state';
+import Button from "../ui/Button";
+import Popup from "./../ui/Popup";
+import { Context } from "../state";
 
 interface propsDeletePopup {
   onClose: () => void;
@@ -38,7 +38,7 @@ const DeleteWorkspaceConfirmation: React.FC<propsDelete> = ({
   const deleteRequest = () => {
     DeleteWorkspace(idRequest)
       .then((_) => {
-        ctx.dispatch({ type: 'removeWorkspace', id: idRequest });
+        ctx.dispatch({ type: "removeWorkspace", id: idRequest });
       })
       .catch((err) => {
         console.log(`failed to remove workspace id=${idRequest}: ${err}`);

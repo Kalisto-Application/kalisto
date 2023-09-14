@@ -1,5 +1,5 @@
-import React, { useRef, useState, useEffect } from 'react';
-import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
+import React, { useRef, useState, useEffect } from "react";
+import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
 
 type props = {
   value: string;
@@ -30,8 +30,8 @@ export const Editor: React.FC<props> = ({ value, onChange, readonly }) => {
 
         const ed = monaco.editor.create(monacoEl.current!, {
           value: value,
-          language: 'javascript',
-          theme: 'vs-dark',
+          language: "javascript",
+          theme: "vs-dark",
           minimap: { enabled: false },
           readOnly: readonly,
           scrollBeyondLastLine: false,
@@ -39,9 +39,9 @@ export const Editor: React.FC<props> = ({ value, onChange, readonly }) => {
         setSub(
           ed.getModel()?.onDidChangeContent((e) => {
             if (onChange) {
-              onChange(ed.getModel()?.getValue() || '');
+              onChange(ed.getModel()?.getValue() || "");
             }
-          })
+          }),
         );
 
         return ed;

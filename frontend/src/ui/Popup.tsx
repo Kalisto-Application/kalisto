@@ -1,6 +1,6 @@
-import { Dialog, Transition } from '@headlessui/react';
-import close from '../../assets/icons/close.svg';
-import { Fragment } from 'react';
+import { Dialog, Transition } from "@headlessui/react";
+import close from "../../assets/icons/close.svg";
+import { Fragment } from "react";
 interface propsPopup {
   children?: React.ReactNode;
   isOpen: boolean;

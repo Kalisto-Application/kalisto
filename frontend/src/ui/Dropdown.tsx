@@ -1,6 +1,6 @@
-import React, { Fragment, useState, useRef, ChangeEvent } from 'react';
-import { Menu as M, MenuItem } from './Menu';
-import { Menu } from '@headlessui/react';
+import React, { Fragment, useState, useRef, ChangeEvent } from "react";
+import { Menu as M, MenuItem } from "./Menu";
+import { Menu } from "@headlessui/react";
 
 export type DropdownProps = {
   main: DropdownItemProps;
@@ -23,7 +23,7 @@ interface editable {
 }
 
 const shortifyMainText = (value: string): string => {
-  return value.length > 15 ? value.slice(0, 12) + ' ...' : value;
+  return value.length > 15 ? value.slice(0, 12) + " ..." : value;
 };
 
 export const Dropdown: React.FC<DropdownProps> = ({ main, items }) => {
@@ -102,11 +102,11 @@ const EditableItem: React.FC<EditableItemProps> = ({ value, onDone }) => {
   const [editing, setEditing] = useState(value);
 
   const onKeyDown = (e: React.KeyboardEvent) => {
-    if (e.code == 'Space') {
+    if (e.code == "Space") {
       e.preventDefault();
-      setEditing((prev) => prev + ' ');
+      setEditing((prev) => prev + " ");
     }
-    if (e.code == 'Enter') {
+    if (e.code == "Enter") {
       onDone(editing);
     }
   };

@@ -1,10 +1,10 @@
 interface props {
-    text: string;
-    props?: any;
+  text: string;
+  props?: any;
 }
 
-export const Text: React.FC<props> = ({text, props}) => {
-    return <span {...props}>{text}</span>
-}
+export const Text: React.FC<props> = ({ text, props }) => {
+  return <span {...props}>{text}</span>;
+};
 
 export default Text;
