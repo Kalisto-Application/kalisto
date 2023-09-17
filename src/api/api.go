@@ -14,6 +14,7 @@ import (
 	"kalisto/src/proto/interpreter"
 	"kalisto/src/proto/spec"
 	"reflect"
+	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -110,6 +111,15 @@ func (a *Api) CreateWorkspace(name string, dirs []string) (models.Workspace, err
 					Message: fmt.Sprintf("%s:%d:%d", pos.Filename, pos.Line, pos.Col),
 				})
 			}
+
+			if strings.Contains(e.Error(), "already defined at") {
+				pos := e.GetPosition()
+				a.runtime.MessageDialog(a.ctx, rpkg.MessageDialogOptions{
+					Type:    "error",
+					Title:   "Duplicated type definition found",
+					Message: fmt.Sprintf("%s:%d:%d", pos.Filename, pos.Line, pos.Col),
+				})
+			}
 		}
 		if errors.Is(err, models.ErrNoProtoFilesFound) {
 			a.runtime.MessageDialog(a.ctx, rpkg.MessageDialogOptions{
@@ -140,7 +150,7 @@ func (a *Api) CreateWorkspace(name string, dirs []string) (models.Workspace, err
 		Spec:      spc,
 		BasePath:  dirs,
 		TargetUrl: "localhost:9000",
-		LastUsage: time.Now(),
+		LastUsage: time.Now().UTC().Round(time.Nanosecond),
 	}
 	if err := a.store.SaveWorkspace(ws); err != nil {
 		return ws, fmt.Errorf("api: failed to save workspace: %w", err)
@@ -155,64 +165,84 @@ func (s *Api) DeleteWorkspace(id string) error {
 	return s.store.DeleteWorkspace(id)
 }
 
-func (a *Api) FindWorkspaces() ([]models.Workspace, error) {
-	list, err := a.store.GetWorkspaces()
-	if err != nil {
-		return nil, err
-	}
-
-	for i, w := range list {
-		w, err := a.enrichWorkspace(w, w.LastUsage)
-		if err != nil {
-			var ePos reporter.ErrorWithPos
-			if errors.As(err, &ePos) {
-				var pathE *fs.PathError
-				if errors.As(ePos.Unwrap(), &pathE) {
-					pos := ePos.GetPosition()
-					a.runtime.MessageDialog(a.ctx, rpkg.MessageDialogOptions{
-						Type:    "error",
-						Title:   fmt.Sprintf("Can't resolve import proto file %s", pathE.Path),
-						Message: fmt.Sprintf("%s:%d:%d", pos.Filename, pos.Line, pos.Col),
-					})
-				}
-				continue
-			}
-
-			var pathErr *fs.PathError
-			if errors.As(err, &pathErr) {
-				click, _ := a.runtime.MessageDialog(a.ctx, rpkg.MessageDialogOptions{
-					Type:         rpkg.QuestionDialog,
-					Title:        fmt.Sprintf("Workspace '%s' can't start", w.Name),
-					Message:      fmt.Sprintf("%s: no such file or directory.\nDelete the workspace?", w.BasePath),
-					Buttons:      []string{"Yes", "No"},
-					CancelButton: "No",
-				})
-				if click == "Yes" {
-					a.DeleteWorkspace(w.ID)
-				}
-				continue
-			}
-			return nil, err
-		}
-		list[i] = w
-	}
-	return list, nil
-}
-
-func (s *Api) GetWorkspace(id string) (models.Workspace, error) {
-	ws, err := s.store.GetWorkspace(id)
-	if err != nil {
-		return ws, err
-	}
-
-	return s.enrichWorkspace(ws, time.Now())
-}
-
 func (s *Api) UpdateWorkspace(ws models.Workspace) error {
 	return s.store.SaveWorkspace(ws)
 }
 
-func (s *Api) enrichWorkspace(ws models.Workspace, lastUsage time.Time) (models.Workspace, error) {
+func (a *Api) WorkspaceList(id string) (models.WorkspaceList, error) {
+	var res models.WorkspaceList
+	list, err := a.store.GetWorkspaces()
+	if err != nil {
+		return res, err
+	}
+	if len(list) == 0 {
+		return res, nil
+	}
+	if id == "" {
+		sort.Slice(list, func(i, j int) bool {
+			return list[i].LastUsage.After(list[j].LastUsage)
+		})
+		id = list[0].ID
+	}
+
+	var main models.Workspace
+	for i := range list {
+		if list[i].ID == id {
+			list[i].LastUsage = time.Now().UTC().Round(time.Nanosecond)
+			main = list[i]
+			break
+		}
+	}
+	sort.Slice(list, func(i, j int) bool {
+		return list[i].LastUsage.After(list[j].LastUsage)
+	})
+
+	main, err = a.enrichWorkspace(main)
+	if err != nil {
+		var ePos reporter.ErrorWithPos
+		if errors.As(err, &ePos) {
+			var pathE *fs.PathError
+			if errors.As(ePos.Unwrap(), &pathE) {
+				pos := ePos.GetPosition()
+				a.runtime.MessageDialog(a.ctx, rpkg.MessageDialogOptions{
+					Type:    "error",
+					Title:   fmt.Sprintf("Can't resolve import proto file %s", pathE.Path),
+					Message: fmt.Sprintf("%s:%d:%d", pos.Filename, pos.Line, pos.Col),
+				})
+			}
+		}
+
+		var pathErr *fs.PathError
+		if errors.As(err, &pathErr) {
+			click, _ := a.runtime.MessageDialog(a.ctx, rpkg.MessageDialogOptions{
+				Type:         rpkg.QuestionDialog,
+				Title:        fmt.Sprintf("Workspace '%s' can't start", main.Name),
+				Message:      fmt.Sprintf("%s: no such file or directory.\nDelete the workspace?", main.BasePath),
+				Buttons:      []string{"Yes", "No"},
+				CancelButton: "No",
+			})
+			if click == "Yes" {
+				a.DeleteWorkspace(main.ID)
+			}
+		}
+		return res, err
+
+	}
+
+	shortList := make([]models.WorkspaceShort, len(list))
+	for i := range list {
+		shortList[i] = models.WorkspaceShort{
+			ID:   list[i].ID,
+			Name: list[i].Name,
+		}
+	}
+
+	res.List = shortList
+	res.Main = main
+	return res, nil
+}
+
+func (s *Api) enrichWorkspace(ws models.Workspace) (models.Workspace, error) {
 	registry, err := s.protoRegistryFromPath(ws.BasePath)
 	if err != nil {
 		return ws, err
@@ -226,7 +256,6 @@ func (s *Api) enrichWorkspace(ws models.Workspace, lastUsage time.Time) (models.
 
 	newWs := ws
 	newWs.Spec = spec
-	newWs.LastUsage = lastUsage
 
 	if !reflect.DeepEqual(ws, newWs) {
 		if err := s.store.SaveWorkspace(newWs); err != nil {

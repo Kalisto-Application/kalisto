@@ -33,9 +33,7 @@ type Data = {
 export const MethodCollection: React.FC = () => {
   const ctx = useContext(Context);
 
-  const services = ctx.state.workspaceList?.find(
-    (it) => it.id === ctx.state.activeWorkspaceId,
-  )?.spec.services;
+  const services = ctx.state.activeWorkspace?.spec.services;
   const selectedItem = ctx.state.activeMethod?.fullName;
 
   const serviceNames = services?.map((it) => it.fullName) || [];

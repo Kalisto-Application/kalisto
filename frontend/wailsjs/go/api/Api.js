@@ -14,16 +14,8 @@ export function FindProtoFiles() {
   return window['go']['api']['Api']['FindProtoFiles']();
 }
 
-export function FindWorkspaces() {
-  return window['go']['api']['Api']['FindWorkspaces']();
-}
-
 export function GetGlobalVars() {
   return window['go']['api']['Api']['GetGlobalVars']();
-}
-
-export function GetWorkspace(arg1) {
-  return window['go']['api']['Api']['GetWorkspace'](arg1);
 }
 
 export function RunScript(arg1) {
@@ -40,4 +32,8 @@ export function SendGrpc(arg1) {
 
 export function UpdateWorkspace(arg1) {
   return window['go']['api']['Api']['UpdateWorkspace'](arg1);
+}
+
+export function WorkspaceList(arg1) {
+  return window['go']['api']['Api']['WorkspaceList'](arg1);
 }

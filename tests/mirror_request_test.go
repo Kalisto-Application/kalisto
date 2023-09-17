@@ -10,6 +10,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/adrg/xdg"
 	"github.com/stretchr/testify/suite"
 
 	_ "embed"
@@ -56,7 +57,7 @@ func (s *MirrorRequestSuite) TestMirrorRequest() {
 		// {name: "request4", req: request4},
 	} {
 		s.Run(tt.name, func() {
-			app, err := assembly.NewApp()
+			app, err := assembly.NewApp(xdg.DataHome + "/kalisto.db/test-" + s.T().Name())
 			s.Require().NoError(err)
 			api := app.Api
 

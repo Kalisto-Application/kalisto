@@ -12,6 +12,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/adrg/xdg"
 	"github.com/stretchr/testify/suite"
 
 	_ "embed"
@@ -92,7 +93,7 @@ func (s *OverflowSuite) TestOverflow() {
 		{name: "overflow sint32", req: sint32OverflowRequest, err: "integer overflow"},
 	} {
 		s.Run(tt.name, func() {
-			app, err := assembly.NewApp()
+			app, err := assembly.NewApp(xdg.DataHome + "/kalisto.db/test-" + s.T().Name())
 			s.Require().NoError(err)
 			api := app.Api
 

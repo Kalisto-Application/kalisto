@@ -4,7 +4,7 @@ import * as Sentry from '@sentry/react';
 import { reducer, Context, newState } from './state';
 
 import { models } from '../../wailsjs/go/models';
-import { FindWorkspaces, GetGlobalVars } from '../../wailsjs/go/api/Api';
+import { WorkspaceList, GetGlobalVars } from '../../wailsjs/go/api/Api';
 
 type ContextProps = {
   children?: ReactNode;
@@ -15,26 +15,14 @@ export const ContextProvider: React.FC<ContextProps> = ({ children }) => {
 
   useEffect(() => {
     // load the app
-    FindWorkspaces()
+    WorkspaceList('')
       .then((res) => {
-        if (res.length === 0) {
-          dispatch({ type: 'workspaceList', workspaceList: [] });
-          return;
-        }
-
-        let latest = res.at(0)?.lastUsage || new Date(0);
-        res.forEach((it) => {
-          if (it.lastUsage > latest) {
-            latest = it.lastUsage;
-          }
-        });
+        dispatch({ type: 'workspaceList', workspaceList: res });
 
         const getFirstMethod = (): models.Method | undefined => {
-          for (const ws of res) {
-            for (const service of ws.spec.services) {
-              for (const m of service.methods) {
-                return m;
-              }
+          for (const service of res.main.spec.services) {
+            for (const m of service.methods) {
+              return m;
             }
           }
         };

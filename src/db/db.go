@@ -3,6 +3,7 @@ package db
 import (
 	"bytes"
 	"encoding/gob"
+	"errors"
 	"fmt"
 	"kalisto/src/models"
 	"os"
@@ -47,7 +48,12 @@ func (db *DB) SaveGlobalVars(vars string) error {
 }
 
 func (db *DB) GlobalVars() (string, error) {
-	return read[string](db.db, leyGlobalVars)
+	vars, err := read[string](db.db, leyGlobalVars)
+	if err != nil && !errors.Is(err, badger.ErrKeyNotFound) {
+		return vars, err
+	}
+
+	return vars, nil
 }
 
 func (db *DB) SaveWorkspace(w models.Workspace) error {
@@ -57,7 +63,12 @@ func (db *DB) SaveWorkspace(w models.Workspace) error {
 }
 
 func (db *DB) GetWorkspaces() ([]models.Workspace, error) {
-	return readPrefix[models.Workspace](db.db, keyWorkspace)
+	list, err := readPrefix[models.Workspace](db.db, keyWorkspace)
+	if err != nil {
+		return nil, err
+	}
+
+	return list, nil
 }
 
 func (db *DB) GetWorkspace(id string) (models.Workspace, error) {

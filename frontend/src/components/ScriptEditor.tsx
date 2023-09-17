@@ -1,5 +1,4 @@
 import React, { useContext } from 'react';
-import { EditorSwitcher } from '../ui/EditorSwitcher';
 import { CodeEditor } from './CodeEditor';
 
 import { Context } from '../state';
@@ -10,14 +9,12 @@ export const ScriptEditor: React.FC = () => {
   const ctx = useContext(Context);
 
   const saveScript = (script: string) => {
-    if (!ctx.state.activeWorkspaceId) {
+    if (!ctx.state.activeWorkspace) {
       console.log('no active workspace');
       return;
     }
 
-    const ws = ctx.state.workspaceList?.find(
-      (it) => it.id === ctx.state.activeWorkspaceId,
-    );
+    const ws = ctx.state.activeWorkspace;
     if (!ws) {
       console.log('workspace not found');
       return;

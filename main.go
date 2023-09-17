@@ -9,6 +9,7 @@ import (
 	"kalisto/src/config"
 	"kalisto/src/models"
 
+	"github.com/adrg/xdg"
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
@@ -33,7 +34,7 @@ func main() {
 	defer sentry.Recover()
 
 	// Create an instance of the app structure
-	app, err := assembly.NewApp()
+	app, err := assembly.NewApp(xdg.DataHome)
 	if err != nil {
 		sentry.CaptureException(err)
 		return

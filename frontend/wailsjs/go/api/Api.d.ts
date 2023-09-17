@@ -8,11 +8,7 @@ export function DeleteWorkspace(arg1:string):Promise<void>;
 
 export function FindProtoFiles():Promise<models.ProtoDir>;
 
-export function FindWorkspaces():Promise<Array<models.Workspace>>;
-
 export function GetGlobalVars():Promise<string>;
-
-export function GetWorkspace(arg1:string):Promise<models.Workspace>;
 
 export function RunScript(arg1:models.ScriptCall):Promise<string>;
 
@@ -21,3 +17,5 @@ export function SaveGlovalVars(arg1:string):Promise<void>;
 export function SendGrpc(arg1:models.Request):Promise<models.Response>;
 
 export function UpdateWorkspace(arg1:models.Workspace):Promise<void>;
+
+export function WorkspaceList(arg1:string):Promise<models.WorkspaceList>;

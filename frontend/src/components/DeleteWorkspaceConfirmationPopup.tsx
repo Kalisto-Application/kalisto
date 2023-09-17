@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { DeleteWorkspace } from '../../wailsjs/go/api/Api';
+import { DeleteWorkspace, WorkspaceList } from '../../wailsjs/go/api/Api';
 
 import Button from '../ui/Button';
 import Popup from './../ui/Popup';
@@ -8,22 +8,22 @@ import { Context } from '../state';
 interface propsDeletePopup {
   onClose: () => void;
   isOpen: boolean;
-  idRequest: string;
+  id: string;
 }
 
 interface propsDelete {
   onClose: () => void;
-  idRequest: string;
+  id: string;
 }
 
 const DeleteWorkspaceConfirmationPopup: React.FC<propsDeletePopup> = ({
   onClose,
   isOpen,
-  idRequest,
+  id,
 }) => {
   return (
     <Popup onClose={onClose} isOpen={isOpen} title="Delete Workspace">
-      <DeleteWorkspaceConfirmation onClose={onClose} idRequest={idRequest} />
+      <DeleteWorkspaceConfirmation onClose={onClose} id={id} />
     </Popup>
   );
 };
@@ -31,17 +31,26 @@ export default DeleteWorkspaceConfirmationPopup;
 
 const DeleteWorkspaceConfirmation: React.FC<propsDelete> = ({
   onClose,
-  idRequest,
+  id,
 }) => {
   const ctx = useContext(Context);
 
   const deleteRequest = () => {
-    DeleteWorkspace(idRequest)
+    DeleteWorkspace(id)
       .then((_) => {
-        ctx.dispatch({ type: 'removeWorkspace', id: idRequest });
+        ctx.dispatch({ type: 'removeWorkspace', id: id });
+        if (id === ctx.state.activeWorkspace?.id) {
+          WorkspaceList('')
+            .then((res) => {
+              ctx.dispatch({ type: 'workspaceList', workspaceList: res });
+            })
+            .catch((err) => {
+              console.log(`failed to get workspace list: ${err}`);
+            });
+        }
       })
       .catch((err) => {
-        console.log(`failed to remove workspace id=${idRequest}: ${err}`);
+        console.log(`failed to remove workspace id=${id}: ${err}`);
       });
     onClose();
   };

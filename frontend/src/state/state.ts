@@ -7,10 +7,9 @@ type Action =
   | { type: 'changeRequestText'; text: string }
   | { type: 'changeMetaText'; text: string }
   | { type: 'newWorkspace'; workspace: models.Workspace }
-  | { type: 'activeWorkspace'; id: string }
   | { type: 'removeWorkspace'; id: string }
   | { type: 'renameWorkspace'; id: string; name: string }
-  | { type: 'workspaceList'; workspaceList: models.Workspace[] }
+  | { type: 'workspaceList'; workspaceList: models.WorkspaceList }
   | { type: 'activeMethod'; activeMethod: models.Method }
   | { type: 'apiResponse'; response: models.Response }
   | { type: 'apiError'; value: string }
@@ -25,8 +24,8 @@ export type State = {
   activeResponseEditor: number;
   requestText: string;
   requestMetaText: string;
-  workspaceList?: models.Workspace[];
-  activeWorkspaceId?: string;
+  workspaceList?: models.WorkspaceShort[];
+  activeWorkspace?: models.Workspace;
   activeMethod?: models.Method;
   response?: models.Response;
   apiError: string;
@@ -44,7 +43,7 @@ export const newState = (): State => {
     requestText: '',
     requestMetaText: '',
     workspaceList: undefined,
-    activeWorkspaceId: undefined,
+    activeWorkspace: undefined,
     activeMethod: undefined,
     response: undefined,
     apiError: '',
@@ -57,6 +56,9 @@ export const newState = (): State => {
 };
 
 export const reducer = (state: State, action: Action): State => {
+  console.log('dispatch');
+  console.log(action);
+
   switch (action.type) {
     case 'switchRequestEditor':
       return {
@@ -81,25 +83,20 @@ export const reducer = (state: State, action: Action): State => {
     case 'newWorkspace':
       return {
         ...state,
-        workspaceList: [action.workspace].concat(state.workspaceList || []),
-        activeWorkspaceId: action.workspace.id,
-      };
-    case 'activeWorkspace':
-      return {
-        ...state,
-        activeWorkspaceId: action.id,
-        scriptText:
-          state.workspaceList?.find((it) => it.id === action.id)?.script || '',
+        workspaceList: [action.workspace as models.WorkspaceShort].concat(
+          state.workspaceList || [],
+        ),
+        activeWorkspace: action.workspace,
       };
     case 'removeWorkspace':
       const filtered = state.workspaceList?.filter((it) => it.id != action.id);
       return {
         ...state,
         workspaceList: filtered,
-        activeWorkspaceId:
-          action.id === state.activeWorkspaceId
-            ? filtered?.find(Boolean)?.id
-            : state.activeWorkspaceId,
+        activeWorkspace:
+          action.id === state.activeWorkspace?.id
+            ? undefined
+            : state.activeWorkspace,
       };
     case 'renameWorkspace':
       return {
@@ -112,12 +109,11 @@ export const reducer = (state: State, action: Action): State => {
         }),
       };
     case 'workspaceList':
-      const first = action.workspaceList.find(Boolean);
       return {
         ...state,
-        workspaceList: action.workspaceList,
-        activeWorkspaceId: first?.id,
-        scriptText: first?.script || '',
+        workspaceList: action.workspaceList.list,
+        activeWorkspace: action.workspaceList.main,
+        scriptText: action.workspaceList.main.script || '',
       };
     case 'activeMethod':
       return {

@@ -6,6 +6,16 @@ import (
 	"time"
 )
 
+type WorkspaceList struct {
+	Main Workspace        `json:"main"`
+	List []WorkspaceShort `json:"list"`
+}
+
+type WorkspaceShort struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
 type Workspace struct {
 	ID          string    `json:"id"`
 	Name        string    `json:"name"`

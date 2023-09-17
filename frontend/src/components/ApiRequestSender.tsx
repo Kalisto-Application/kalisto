@@ -9,9 +9,7 @@ import { Action, debounce } from '../pkg';
 export const ApiRequestSender: React.FC = () => {
   const ctx = useContext(Context);
 
-  const activeWorkspace = ctx.state.workspaceList?.find(
-    (it) => it.id === ctx.state.activeWorkspaceId,
-  );
+  const activeWorkspace = ctx.state.activeWorkspace;
   const [url, setUrl] = useState(activeWorkspace?.targetUrl || '');
 
   useEffect(() => {
@@ -27,7 +25,7 @@ export const ApiRequestSender: React.FC = () => {
   };
   let debouncedUrlUpdate: Action = useMemo<Action>(() => {
     return debounce(action, 400);
-  }, [ctx.state.activeWorkspaceId]);
+  }, [activeWorkspace?.id]);
 
   const onSetUrl = (url: string) => {
     setUrl(url);

@@ -7,6 +7,7 @@ import (
 	"path"
 	"testing"
 
+	"github.com/adrg/xdg"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -45,7 +46,7 @@ func (s *ImportSuite) TestImport() {
 		},
 	} {
 		s.Run(tt.name, func() {
-			app, err := assembly.NewApp()
+			app, err := assembly.NewApp(xdg.DataHome + "/kalisto.db/test-" + s.T().Name())
 			s.Require().NoError(err)
 
 			ws, err := app.Api.CreateWorkspace(tt.name, tt.dirs)

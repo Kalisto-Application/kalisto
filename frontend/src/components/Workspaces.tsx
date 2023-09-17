@@ -2,10 +2,8 @@ import React, { useState, useContext, useMemo, useEffect } from 'react';
 import { Context } from '../state';
 
 import {
-  DeleteWorkspace,
   UpdateWorkspace,
-  GetWorkspace,
-  FindWorkspaces,
+  WorkspaceList as GetWorkspaceList,
 } from '../../wailsjs/go/api/Api';
 import { models } from '../../wailsjs/go/models';
 
@@ -16,7 +14,6 @@ import dropdownIcon from '../../assets/icons/dropdown.svg';
 import editIcon from '../../assets/icons/edit.svg';
 import deleteIcon from '../../assets/icons/delete.svg';
 import plusIcon from '../../assets/icons/plus.svg';
-import { defaultStackLineParsers } from '@sentry/react';
 import CreateWorkspacePopup from './CreateWorkspacePopup';
 import DeleteWorkspaceConfirmationPopup from './DeleteWorkspaceConfirmationPopup';
 
@@ -27,9 +24,7 @@ export const WorkspaceList: React.FC = () => {
   const [isOpenDeletePopup, setIsOpenDeletePopup] = useState('');
 
   const items = ctx.state.workspaceList;
-  const activeWorkspace = items?.find(
-    (it) => it.id === ctx.state.activeWorkspaceId,
-  );
+  const activeWorkspace = ctx.state.activeWorkspace;
 
   useEffect(() => {
     if (items?.length === 0) {
@@ -54,12 +49,9 @@ export const WorkspaceList: React.FC = () => {
   };
 
   const setActiveWorkspace = (id: string) => {
-    GetWorkspace(id)
-      .then((_) => {
-        FindWorkspaces().then((list) => {
-          ctx.dispatch({ type: 'activeWorkspace', id: id });
-          ctx.dispatch({ type: 'workspaceList', workspaceList: list });
-        });
+    GetWorkspaceList(id)
+      .then((res) => {
+        ctx.dispatch({ type: 'workspaceList', workspaceList: res });
       })
       .catch((err) =>
         console.log(`failed to get active workspace, id==${id}: ${err}`),
@@ -127,7 +119,7 @@ export const WorkspaceList: React.FC = () => {
         onClose={() => setIsOpenCreateWorkspace(false)}
       />
       <DeleteWorkspaceConfirmationPopup
-        idRequest={isOpenDeletePopup}
+        id={isOpenDeletePopup}
         isOpen={isOpenDeletePopup !== ''}
         onClose={() => setIsOpenDeletePopup('')}
       />
