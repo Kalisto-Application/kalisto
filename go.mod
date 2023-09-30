@@ -10,15 +10,19 @@ require (
 	github.com/getsentry/sentry-go v0.22.0
 	github.com/google/uuid v1.3.0
 	github.com/jhump/protoreflect v1.15.1
+	github.com/minio/selfupdate v0.6.0
 	github.com/onsi/gomega v1.27.8
 	github.com/stretchr/testify v1.8.4
 	github.com/wailsapp/wails/v2 v2.6.0
+	golang.org/x/mod v0.12.0
 	google.golang.org/grpc v1.55.0
 	google.golang.org/protobuf v1.30.0
+	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
+	aead.dev/minisign v0.2.0 // indirect
 	github.com/bep/debounce v1.2.1 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect

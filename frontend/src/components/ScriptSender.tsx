@@ -18,7 +18,7 @@ export const ScriptSender: React.FC = () => {
 
   const action: Action = (url: string) => {
     UpdateWorkspace(
-      new models.Workspace({ ...activeWorkspace, targetUrl: url }),
+      new models.Workspace({ ...activeWorkspace, targetUrl: url })
     ).catch((err) => {
       console.log('failed to save the workspace url: ', err);
     });

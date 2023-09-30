@@ -18,6 +18,10 @@ export function GetGlobalVars() {
   return window['go']['api']['Api']['GetGlobalVars']();
 }
 
+export function RenameWorkspace(arg1, arg2) {
+  return window['go']['api']['Api']['RenameWorkspace'](arg1, arg2);
+}
+
 export function RunScript(arg1) {
   return window['go']['api']['Api']['RunScript'](arg1);
 }

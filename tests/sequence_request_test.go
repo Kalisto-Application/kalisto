@@ -4,7 +4,9 @@ import (
 	"context"
 	"kalisto/src/assembly"
 	"kalisto/src/models"
-	server "kalisto/tests/examples/server_seq"
+	"kalisto/src/proto/interpreter"
+	"kalisto/tests/examples/server"
+	"kalisto/tests/examples/server_seq"
 	"os"
 	"path"
 	"testing"
@@ -19,6 +21,9 @@ import (
 //go:embed testdata/script.js
 var script []byte
 
+//go:embed testdata/scriptMirror.js
+var scriptMirror []byte
+
 type SequenceScriptSuite struct {
 	suite.Suite
 
@@ -26,47 +31,80 @@ type SequenceScriptSuite struct {
 }
 
 func (s *SequenceScriptSuite) SetupSuite() {
-	close, _, err := server.Run(":9000")
-	s.Require().NoError(err)
-	s.close = close
-	time.Sleep(time.Millisecond * 200)
 }
 
-func (s *SequenceScriptSuite) TearDownSuite() {
-	s.close()
-}
-
-func (s *SequenceScriptSuite) TestSequenceScript() {
+func (s *SequenceScriptSuite) TestScriptSequence() {
 	meta := `{"content-type": 'application/grpc', authorization: 'super token'}`
-	for _, tt := range []struct {
-		name string
-		req  []byte
-	}{
-		{name: "sequence script", req: script},
-	} {
-		s.Run(tt.name, func() {
-			app, err := assembly.NewApp(xdg.DataHome + "/kalisto.db/test-" + s.T().Name())
-			s.Require().NoError(err)
-			api := app.Api
+	close, closed, err := server_seq.Run(":9000")
+	s.Require().NoError(err)
+	time.Sleep(time.Millisecond * 200)
 
-			wd, err := os.Getwd()
-			s.Require().NoError(err)
-			dir := path.Join(wd, "examples/proto_sequence/")
-			ws, err := api.CreateWorkspace("name", []string{dir})
-			s.Require().NoError(err)
+	app, err := assembly.NewApp(xdg.DataHome + "/kalisto.db/test-" + s.T().Name())
+	s.Require().NoError(err)
+	api := app.Api
 
-			response, err := api.RunScript(models.ScriptCall{
-				Addr:        "localhost:9000",
-				WorkspaceID: ws.ID,
-				Body:        string(tt.req),
-				Meta:        meta,
-			})
-			s.Require().NoError(err)
-			s.Require().JSONEq(response, `{"value": 3, "rpc": "Third"}`)
+	wd, err := os.Getwd()
+	s.Require().NoError(err)
+	dir := path.Join(wd, "examples/proto_sequence/")
+	ws, err := api.CreateWorkspace("name", []string{dir})
+	s.Require().NoError(err)
 
-			app.OnShutdown(context.Background())
-		})
+	response, err := api.RunScript(models.ScriptCall{
+		Addr:        "localhost:9000",
+		WorkspaceID: ws.ID,
+		Body:        string(script),
+		Meta:        meta,
+	})
+	s.Require().NoError(err)
+
+	AssertJsObjectsAreEqual(s.T(), `{"value": 3, "rpc": "Third"}`, response)
+
+	close()
+	app.OnShutdown(context.Background())
+	<-closed
+}
+
+func (s *SequenceScriptSuite) TestMirrorScripting() {
+	meta := `{"content-type": 'application/grpc', authorization: 'super token'}`
+	close, closed, err := server.Run(":9000")
+	s.Require().NoError(err)
+	time.Sleep(time.Millisecond * 200)
+
+	app, err := assembly.NewApp(xdg.DataHome + "/kalisto.db/test-" + s.T().Name())
+	s.Require().NoError(err)
+	api := app.Api
+
+	wd, err := os.Getwd()
+	s.Require().NoError(err)
+	dir := path.Join(wd, "examples/proto")
+	ws, err := api.CreateWorkspace("name", []string{dir})
+	s.Require().NoError(err)
+
+	response, err := api.RunScript(models.ScriptCall{
+		Addr:        "localhost:9000",
+		WorkspaceID: ws.ID,
+		Body:        string(scriptMirror),
+		Meta:        meta,
+	})
+	s.Require().NoError(err)
+
+	ip := interpreter.NewInterpreter("")
+	ex1, err := ip.ExportValue(string(request1), "")
+	s.Require().NoError(err)
+	ex2, err := ip.ExportValue(response, "")
+	s.Require().NoError(err)
+
+	ex1["time"] = ex1["time"].(time.Time).UTC().Format(time.RFC3339)
+	for k, v := range ex2 {
+		if v == nil {
+			delete(ex2, k)
+		}
 	}
+	s.EqualValues(ex1, ex2)
+
+	close()
+	app.OnShutdown(context.Background())
+	<-closed
 }
 
 func TestSequenceScript(t *testing.T) {

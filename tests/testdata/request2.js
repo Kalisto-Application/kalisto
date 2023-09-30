@@ -60,8 +60,6 @@
     dur: '365d',
     // 2022-04-04T00:00:00.000Z or 1649030400000 in ms
     time: Date.UTC(2022, 3, 4, 0, 0, 0, 0),
-    // unused field
-    time2: Date.now(),
     l1: {
       f1: {
         f1: {

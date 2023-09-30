@@ -169,6 +169,16 @@ func (s *Api) UpdateWorkspace(ws models.Workspace) error {
 	return s.store.SaveWorkspace(ws)
 }
 
+func (s *Api) RenameWorkspace(id, name string) error {
+	ws, err := s.store.GetWorkspace(id)
+	if err != nil {
+		return fmt.Errorf("failed to get a ws %s: %w", id, err)
+	}
+
+	ws.Name = name
+	return s.store.SaveWorkspace(ws)
+}
+
 func (a *Api) WorkspaceList(id string) (models.WorkspaceList, error) {
 	var res models.WorkspaceList
 	list, err := a.store.GetWorkspaces()
@@ -355,6 +365,7 @@ func (a *Api) SendGrpc(request models.Request) (models.Response, error) {
 			return models.Response{}, fmt.Errorf("api: failed to present response as js object: %w", err)
 		}
 	}
+
 	metaJson, err := json.Marshal(responseMeta)
 	if err != nil {
 		return models.Response{}, err
@@ -397,15 +408,11 @@ func (a *Api) RunScript(request models.ScriptCall) (string, error) {
 	}
 	ip := interpreter.NewInterpreter(vars)
 
-	resp, err := ip.RunScript(ctx, request.Body, ws.Spec, reg, c)
+	resp, err := ip.RunScript(ctx, request.Body, request.Meta, ws.Spec, reg, c, a.specFactory)
 	if err != nil {
 		return "", fmt.Errorf("api: failed to create request: %w", err)
 	}
-	b, err := resp.MarshalJSONIndent()
-	if err != nil {
-		return "", fmt.Errorf("api: failed to marshal response: %w", err)
-	}
-	return string(b), nil
+	return resp, nil
 }
 
 func (s *Api) protoRegistryFromPath(dirs []string) (*compiler.Registry, error) {

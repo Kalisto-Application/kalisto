@@ -50,7 +50,7 @@ const CreateWorkspaceComponets: React.FC<propsCreateWorkspace> = ({
   const createNewWorkspace = () => {
     CreateWorkspace(
       name,
-      data.map((it) => it.dir),
+      data.map((it) => it.dir)
     ).then((res) => {
       ctx.dispatch({ type: 'newWorkspace', workspace: res });
       onClose();
@@ -142,11 +142,11 @@ const UploadedDir: React.FC<UploadedDirProps> = ({ dirs, clear }) => {
   return (
     <>
       {dirs.map((dir, i) => (
-        <div className="max mb-6 max-h-52 overflow-auto rounded-md bg-textBlockFill px-5 py-3.5 ">
-          <div
-            key={i}
-            className="flex justify-between [&:not(:last-child)]:mb-1"
-          >
+        <div
+          key={i}
+          className="max mb-6 max-h-52 overflow-auto rounded-md bg-textBlockFill px-5 py-3.5 "
+        >
+          <div className="flex justify-between [&:not(:last-child)]:mb-1">
             <div className="flex items-center gap-x-2">
               <img src={folder} alt="file" />
               <span className="text-sm text-blueTextPath">{dir.dir}</span>

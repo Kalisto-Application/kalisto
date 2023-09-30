@@ -99,8 +99,16 @@ export const reducer = (state: State, action: Action): State => {
             : state.activeWorkspace,
       };
     case 'renameWorkspace':
+      let ws = state.activeWorkspace
+      if (state.activeWorkspace && state.activeWorkspace?.id === action.id) {
+        ws = new models.Workspace({
+          ...ws,
+          name: action.name,
+        })
+      }
       return {
         ...state,
+        activeWorkspace: ws,
         workspaceList: state.workspaceList?.map((it) => {
           if (it.id === action.id) {
             it.name = action.name;

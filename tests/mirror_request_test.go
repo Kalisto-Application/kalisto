@@ -54,7 +54,7 @@ func (s *MirrorRequestSuite) TestMirrorRequest() {
 		{name: "request1", req: request1},
 		{name: "request2", req: request2},
 		{name: "request3", req: request3},
-		// {name: "request4", req: request4},
+		{name: "request4", req: request4},
 	} {
 		s.Run(tt.name, func() {
 			app, err := assembly.NewApp(xdg.DataHome + "/kalisto.db/test-" + s.T().Name())
@@ -85,7 +85,7 @@ func (s *MirrorRequestSuite) TestMirrorRequest() {
 			})
 			s.Require().NoError(err)
 
-			s.EqualValues(response.Body, responseMirror.Body)
+			AssertJsObjectsAreEqual(s.T(), response.Body, responseMirror.Body)
 			s.EqualValues(response.MetaData, responseMirror.MetaData)
 
 			app.OnShutdown(context.Background())

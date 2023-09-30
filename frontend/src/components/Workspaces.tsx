@@ -2,7 +2,7 @@ import React, { useState, useContext, useMemo, useEffect } from 'react';
 import { Context } from '../state';
 
 import {
-  UpdateWorkspace,
+  RenameWorkspace,
   WorkspaceList as GetWorkspaceList,
 } from '../../wailsjs/go/api/Api';
 import { models } from '../../wailsjs/go/models';
@@ -33,17 +33,14 @@ export const WorkspaceList: React.FC = () => {
   }, [items]);
 
   const renameWorkspace = (id: string, name: string) => {
-    const ws = items?.find((it) => it.id === id);
-    if (!ws) return;
-    const renamed = new models.Workspace({ ...ws, name });
-    UpdateWorkspace(renamed)
+    RenameWorkspace(id, name)
       .then((_) => {
         setRenameI(-1);
         ctx.dispatch({ type: 'renameWorkspace', id: id, name: name });
       })
       .catch((err) => {
         console.log(
-          `failed to rename workspace id=${id}, new name=${name}: ${err}`,
+          `failed to rename workspace id=${id}, new name=${name}: ${err}`
         );
       });
   };
@@ -54,7 +51,7 @@ export const WorkspaceList: React.FC = () => {
         ctx.dispatch({ type: 'workspaceList', workspaceList: res });
       })
       .catch((err) =>
-        console.log(`failed to get active workspace, id==${id}: ${err}`),
+        console.log(`failed to get active workspace, id==${id}: ${err}`)
       );
   };
 

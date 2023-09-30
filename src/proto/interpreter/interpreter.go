@@ -7,6 +7,7 @@ import (
 	"kalisto/src/models"
 	"kalisto/src/proto/client"
 	"kalisto/src/proto/compiler"
+	"kalisto/src/proto/spec"
 	"math"
 	"strconv"
 	"strings"
@@ -29,7 +30,7 @@ func NewInterpreter(vars string) *Interpreter {
 }
 
 func (ip *Interpreter) CreateMessageFromScript(script string, desc *desc.MessageDescriptor, spec models.Spec, message models.Message) (*dynamic.Message, error) {
-	m, err := ip.exportValue(script, "body.js")
+	m, err := ip.ExportValue(script, "body.js")
 	if err != nil {
 		return nil, err
 	}
@@ -38,7 +39,7 @@ func (ip *Interpreter) CreateMessageFromScript(script string, desc *desc.Message
 }
 
 func (ip *Interpreter) CreateMetadata(script string) (metadata.MD, error) {
-	m, err := ip.exportValue(script, "header.js")
+	m, err := ip.ExportValue(script, "header.js")
 	if err != nil {
 		return nil, err
 	}
@@ -47,55 +48,65 @@ func (ip *Interpreter) CreateMetadata(script string) (metadata.MD, error) {
 }
 
 func (ip *Interpreter) Raw(script string) (map[string]interface{}, error) {
-	return ip.exportValue(script, "script.js")
+	return ip.ExportValue(script, "script.js")
 }
 
-type requestFunc func(obj interface{}) (interface{}, error)
+type requestFunc func(obj interface{}) (map[string]interface{}, error)
 type apiError string
 
 func (a apiError) Error() string {
 	return string(a)
 }
 
-func (ip *Interpreter) RunScript(ctx context.Context, script string, spec models.Spec, reg *compiler.Registry, client *client.Client) (*dynamic.Message, error) {
+func (ip *Interpreter) RunScript(ctx context.Context, script, meta string, spec models.Spec, reg *compiler.Registry, client *client.Client, factory *spec.Factory) (string, error) {
 	vm := goja.New()
 	if ip.vars != "" {
 		globalScript := fmt.Sprintf("g = %s;", ip.vars)
 		if _, err := vm.RunScript("global.js", globalScript); err != nil {
-			return nil, ip.mapErr(vm, err)
+			return "", ip.mapErr(vm, err)
 		}
 	}
+
+	md, err := ip.CreateMetadata(meta)
+	if err != nil {
+		return "", err
+	}
+	ctx = metadata.NewOutgoingContext(ctx, md)
+	var latestCalledMethod models.Method
 
 	for _, service := range spec.Services {
 		jsService := vm.NewObject()
 		for _, method := range service.Methods {
 			sd, md, err := reg.FindMethod(models.MethodName(method.FullName))
 			if err != nil {
-				return nil, err
+				return "", err
 			}
-			jsService.Set(method.Name, newJsFunc(ctx, vm, sd, md, spec, method, client))
+			jsService.Set(method.Name, newJsFunc(ctx, vm, sd, md, spec, method, client, factory, &latestCalledMethod))
 		}
 
 		if err := vm.Set(service.Name, jsService); err != nil {
-			return nil, err
+			return "", err
 		}
 	}
 
 	value, err := vm.RunString(script)
 	if err != nil {
-		return nil, ip.mapErr(vm, err)
+		return "", ip.mapErr(vm, err)
 	}
 	exported := value.Export()
-	response, ok := exported.(*dynamic.Message)
+	response, ok := exported.(map[string]interface{})
 	if !ok {
-		return nil, fmt.Errorf("expected grpc message as a result")
+		return "", fmt.Errorf("expected map as a result")
 	}
-	return response, nil
+	responseText, err := factory.MapAsJs(latestCalledMethod.ResponseMessage, response)
+	if err != nil {
+		return "", fmt.Errorf("api: failed to marshal response to js: %w", err)
+	}
+	return responseText, nil
 }
 
-func newJsFunc(ctx context.Context, vm *goja.Runtime, sd *desc.ServiceDescriptor, md *desc.MethodDescriptor, spec models.Spec, method models.Method, client *client.Client) requestFunc {
-	return func(obj interface{}) (interface{}, error) {
-		ctx = context.Background()
+func newJsFunc(ctx context.Context, vm *goja.Runtime, sd *desc.ServiceDescriptor, md *desc.MethodDescriptor, spec models.Spec, method models.Method, client *client.Client, factory *spec.Factory, latestCalled *models.Method) requestFunc {
+	return func(obj interface{}) (map[string]interface{}, error) {
 		var msg *dynamic.Message
 		var err error
 		switch obj := obj.(type) {
@@ -120,11 +131,12 @@ func newJsFunc(ctx context.Context, vm *goja.Runtime, sd *desc.ServiceDescriptor
 			return nil, apiError(apiErr)
 		}
 
-		return resp, nil
+		*latestCalled = method
+		return factory.MessageAsMap(method.ResponseMessage, resp)
 	}
 }
 
-func (ip *Interpreter) exportValue(script, name string) (map[string]interface{}, error) {
+func (ip *Interpreter) ExportValue(script, name string) (map[string]interface{}, error) {
 	for {
 		if !strings.HasPrefix(script, "\n") {
 			break
@@ -264,34 +276,60 @@ func castValue(desc *desc.MessageDescriptor, spec models.Spec, f models.Field, v
 	}
 
 	if f.MapKey != nil {
-		val, ok := v.(map[string]interface{})
-		if !ok {
-			return nil, fmt.Errorf("failed to cast map value, expected object")
+		switch val := v.(type) {
+		case map[string]interface{}:
+			mDesc := desc.FindFieldByName(f.Name).GetMessageType()
+			ret := make([]*dynamic.Message, 0, len(val))
+			for k, v := range val {
+				msg := dynamic.NewMessage(mDesc)
+				key, err := castValue(mDesc, spec, *f.MapKey, k, f.Name)
+				if err != nil {
+					return nil, err
+				}
+
+				value, err := castValue(mDesc, spec, *f.MapValue, v, f.Name)
+				if err != nil {
+					return nil, err
+				}
+
+				if err := msg.TrySetFieldByName("key", key); err != nil {
+					return nil, err
+				}
+				if err := msg.TrySetFieldByName("value", value); err != nil {
+					return nil, err
+				}
+				ret = append(ret, msg)
+			}
+
+			return ret, nil
+		case map[interface{}]interface{}:
+			mDesc := desc.FindFieldByName(f.Name).GetMessageType()
+			ret := make([]*dynamic.Message, 0, len(val))
+			for k, v := range val {
+				msg := dynamic.NewMessage(mDesc)
+				key, err := castValue(mDesc, spec, *f.MapKey, k, f.Name)
+				if err != nil {
+					return nil, err
+				}
+
+				value, err := castValue(mDesc, spec, *f.MapValue, v, f.Name)
+				if err != nil {
+					return nil, err
+				}
+
+				if err := msg.TrySetFieldByName("key", key); err != nil {
+					return nil, err
+				}
+				if err := msg.TrySetFieldByName("value", value); err != nil {
+					return nil, err
+				}
+				ret = append(ret, msg)
+			}
+
+			return ret, nil
+		default:
+			return nil, fmt.Errorf("unknown map type: %v", v)
 		}
-		mDesc := desc.FindFieldByName(f.Name).GetMessageType()
-		ret := make([]*dynamic.Message, 0, len(val))
-		for k, v := range val {
-			msg := dynamic.NewMessage(mDesc)
-			key, err := castValue(mDesc, spec, *f.MapKey, k, f.Name)
-			if err != nil {
-				return nil, err
-			}
-
-			value, err := castValue(mDesc, spec, *f.MapValue, v, f.Name)
-			if err != nil {
-				return nil, err
-			}
-
-			if err := msg.TrySetFieldByName("key", key); err != nil {
-				return nil, err
-			}
-			if err := msg.TrySetFieldByName("value", value); err != nil {
-				return nil, err
-			}
-			ret = append(ret, msg)
-		}
-
-		return ret, nil
 	}
 
 	switch f.Type {
@@ -310,6 +348,12 @@ func castValue(desc *desc.MessageDescriptor, spec models.Spec, f models.Field, v
 				return nil, models.ErrorSyntax(fmt.Sprintf("%s: integer overflow", nameField))
 			}
 			return int32(intV), nil
+		}
+		if intV, ok := v.(int32); ok {
+			if intV < math.MinInt32 || intV > math.MaxInt32 {
+				return nil, models.ErrorSyntax(fmt.Sprintf("%s: integer overflow", nameField))
+			}
+			return intV, nil
 		}
 		if floatV, ok := v.(float64); ok {
 			if floatV < math.MinInt32 || floatV > math.MaxInt32 {
@@ -351,6 +395,15 @@ func castValue(desc *desc.MessageDescriptor, spec models.Spec, f models.Field, v
 				return nil, models.ErrorSyntax(fmt.Sprintf("%s: integer overflow", nameField))
 			}
 			val = uint32(intV)
+		}
+		if intV, ok := v.(int32); ok {
+			if intV < 0 {
+				return nil, models.ErrorSyntax(fmt.Sprintf("%s: integer overflow", nameField))
+			}
+			val = uint32(intV)
+		}
+		if intV, ok := v.(uint32); ok {
+			val = intV
 		}
 		if floatV, ok := v.(float64); ok {
 			if floatV < 0 || floatV > math.MaxUint32 {
@@ -425,13 +478,30 @@ func castValue(desc *desc.MessageDescriptor, spec models.Spec, f models.Field, v
 	case models.DataTypeString:
 		return v, nil
 	case models.DataTypeBytes:
-		strV, ok := v.(string)
-		if !ok {
-			return nil, fmt.Errorf("value must be string")
+		switch strV := v.(type) {
+		case string:
+			return []byte(strV), nil
+		case []byte:
+			return strV, nil
+		default:
+			return nil, fmt.Errorf("bytes value must be string or bytes")
 		}
-		return []byte(strV), nil
 	case models.DataTypeEnum:
 		switch v := v.(type) {
+		case int32:
+			fieldDesc := desc.FindFieldByName(f.Name)
+			if fieldDesc == nil {
+				return nil, fmt.Errorf("descriptor field=%s not found", f.Name)
+			}
+			enumValue := fieldDesc.GetEnumType().FindValueByNumber(v)
+			if enumValue == nil {
+				fieldKey := f.Name
+				if parentMapField != "" {
+					fieldKey = parentMapField
+				}
+				return nil, models.ErrorSyntax(fmt.Sprintf("%s: %d:  enum value is out of range", fieldKey, v))
+			}
+			return enumValue.GetNumber(), nil
 		case int64:
 			fieldDesc := desc.FindFieldByName(f.Name)
 			if fieldDesc == nil {

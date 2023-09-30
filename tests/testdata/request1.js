@@ -22,7 +22,7 @@
     intToBooks: {14: {
       id: "book-id",
     }},
-    etoe: {true: 3},
+    btoe: {true: 3},
     strings: ["str1", "str2"],
     enums: [4],
     uints: [111],
@@ -55,8 +55,6 @@
     dur: 31536000000000000,
     // 2022-04-04T00:00:00.000Z or 1649030400000 in ms
     time: new Date(Date.UTC(2022, 3, 4, 0, 0, 0, 0)),
-    // unused field
-    time2: Date.now(),
     l1: {
       f1: {
         f1: {

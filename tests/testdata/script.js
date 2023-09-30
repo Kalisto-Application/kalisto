@@ -1,8 +1,14 @@
 firstRes = SequenceService.First({
-    value: 0,
-    rpc: '',
-})
+  value: 0,
+  rpc: '',
+});
 
-secondRes = SequenceService.Second(firstRes)
+secondRes = SequenceService.Second({
+  value: firstRes.value,
+  rpc: firstRes.rpc,
+});
 
-thirdRes = SequenceService.Third(secondRes)
+thirdRes = SequenceService.Third({
+  value: secondRes.value,
+  rpc: secondRes.rpc,
+});

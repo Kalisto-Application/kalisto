@@ -2,15 +2,20 @@ package main
 
 import (
 	"embed"
-	"log"
+	"fmt"
+	"runtime"
 	"time"
 
 	"kalisto/src/assembly"
 	"kalisto/src/config"
 	"kalisto/src/models"
+	"kalisto/src/pkg/log"
+	"kalisto/src/pkg/update"
+	stdlog "log"
 
 	"github.com/adrg/xdg"
 	"github.com/wailsapp/wails/v2"
+	"github.com/wailsapp/wails/v2/pkg/menu"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 
@@ -18,20 +23,47 @@ import (
 )
 
 var version string
+var token string
+var platform string
 
 //go:embed all:frontend/dist
 var assets embed.FS
 
 func main() {
+	l := log.New()
 	sentryDsn := config.C.SentryDsn
 	if err := sentry.Init(sentry.ClientOptions{
 		Dsn:     sentryDsn,
 		Release: version,
 	}); err != nil {
-		log.Fatalln("failed to initialize sentry client:", err)
+		stdlog.Fatalln("failed to initialize sentry client:", err)
 	}
 	defer sentry.Flush(time.Second * 3)
 	defer sentry.Recover()
+	l.Debug("sentry initialized")
+
+	AppMenu := menu.NewMenu()
+	if runtime.GOOS == "darwin" {
+		AppMenu.Append(menu.EditMenu())
+	}
+	HelpMenu := AppMenu.AddSubmenu("Help")
+	HelpMenu.AddText(fmt.Sprintf("Version %s", version), nil, func(_ *menu.CallbackData) {})
+	l.Debug("menu built")
+
+	updater := update.NewUpdater(version, platform, token)
+	updated, err := updater.Run()
+	if err != nil {
+		l.Error(err.Error())
+		sentry.CaptureException(err)
+	}
+	if updated {
+		l.Info("app restart after update")
+		if err := updater.Restart(); err != nil {
+			l.Error(err.Error())
+			sentry.CaptureException(err)
+		}
+	}
+	l.Debug("updater ran")
 
 	// Create an instance of the app structure
 	app, err := assembly.NewApp(xdg.DataHome)
@@ -57,6 +89,11 @@ func main() {
 		ErrorFormatter: models.NewErrorFormatter(func(err error) {
 			sentry.CaptureException(err)
 		}),
+		Menu:   AppMenu,
+		Logger: l,
+		Debug: options.Debug{
+			OpenInspectorOnStartup: version == "",
+		},
 	}); err != nil {
 		sentry.CaptureException(err)
 	}
