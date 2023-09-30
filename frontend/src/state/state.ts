@@ -17,7 +17,8 @@ type Action =
   | { type: 'varsError'; value: string }
   | { type: 'changeScriptText'; text: string }
   | { type: 'scriptResponse'; response: string }
-  | { type: 'scriptError'; value: string };
+  | { type: 'scriptError'; value: string }
+  | { type: 'updateWorkspace'; workspace: models.Workspace };
 
 export type State = {
   activeRequestEditor: number;
@@ -168,6 +169,11 @@ export const reducer = (state: State, action: Action): State => {
         ...state,
         scriptError: action.value,
       };
+    case 'updateWorkspace':
+      return {
+      ...state,
+        activeWorkspace: action.workspace
+        };
     default:
       return state;
   }

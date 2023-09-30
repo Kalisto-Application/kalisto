@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 
 interface props {
   items: itemProps[];
+  className?: string;
 }
 
 export const Menu: React.FC<props> = ({ items }) => {
   return (
-    <div className="flex justify-center items-center px-0 py-1 flex-col content-normal rounded-md border-[1px] border-borderFill absolute z-10 bg-primaryFill cursor-pointer">
+    <div className="absolute z-10 flex cursor-pointer flex-col content-normal items-center justify-center rounded-md border-[1px] border-borderFill bg-primaryFill px-0 py-1">
       {items.map((it, i) => {
         return <MenuItem key={i} {...it} />;
       })}

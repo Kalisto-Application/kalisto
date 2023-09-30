@@ -34,6 +34,7 @@ Install mockery: `go install github.com/vektra/mockery/v2@v2.29.0`
 - `npm i && npm run build`
 - `cd ../`
 - `wails dev`
+  `rm -rf frontend/dist && wails dev`
 - [optional] open in a browser: http://localhost:34115
 
 ## Troubleshooting

@@ -1,0 +1,1000 @@
+[33mcommit 53cef88cce9ed6ae584586962d1b4ac103366635[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Sun Sep 17 17:03:21 2023 +0200
+
+    Fix list reading
+
+[33mcommit a345406805c472c01f72a5835b6c31f768244a5f[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Thu Sep 14 19:33:15 2023 +0200
+
+    Move prettier
+
+[33mcommit 7153d5a6513289c3538338cb68535e64f8480cc4[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Thu Sep 14 19:04:31 2023 +0200
+
+    Set prettier config
+
+[33mcommit d5fb0871665111170b140ffd860545babd2f4d46[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Thu Sep 14 19:02:08 2023 +0200
+
+    Update wails to 2.6.0
+
+[33mcommit 447575201ef64ec40a31065e86bd34d93a94a929[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Thu Sep 14 18:59:19 2023 +0200
+
+    Apply prettier
+
+[33mcommit 24a1737aa94670027b43d9b85a35c1b3ba797ea7[m
+Merge: bd60b13 366e47f
+Author: Denis <666trall666@gmail.com>
+Date:   Thu Sep 7 13:33:04 2023 +0300
+
+    Merge pull request #8 from Kalisto-Application/fix_html
+    
+    Fix html
+
+[33mcommit 366e47fe7a5ce23b6e74119434ad2ff13362b99a[m[33m ([m[1;31morigin/fix_html[m[33m, [m[1;32mfix_html[m[33m)[m
+Merge: 7d8d3e1 bd60b13
+Author: DenisGrishin <666trall666@gmail.com>
+Date:   Thu Sep 7 13:32:46 2023 +0300
+
+    Merge branch 'main' into fix_html
+
+[33mcommit bd60b134879aff06fe9c0c6a1e83382eeafe4cbc[m[33m ([m[1;33mtag: v0.2.4[m[33m)[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Sat Sep 2 16:38:31 2023 +0200
+
+    Fix db workspace getter
+
+[33mcommit b56745ac5da803101c9d725b22708294a5abdb5a[m[33m ([m[1;33mtag: v0.2.2[m[33m)[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Sat Sep 2 14:53:39 2023 +0200
+
+    Add current version to a build
+
+[33mcommit 48b8b149454483638bc97e167bdd0ab0c1c9f18a[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Sat Sep 2 14:49:49 2023 +0200
+
+    Replace diskv store to badger
+
+[33mcommit 55be3488bed494d1e2dca0a8bccc6a6289ef7f97[m
+Merge: 2a51795 eff820c
+Author: Denis Dvornikov <candyboobers@gmail.com>
+Date:   Fri Sep 1 21:51:33 2023 +0200
+
+    Merge pull request #7 from Kalisto-Application/multi-import
+    
+    Multi import
+
+[33mcommit 7d8d3e164d962b98c261019cfc9709a9875fb48d[m
+Author: DenisGrishin <666trall666@gmail.com>
+Date:   Fri Sep 1 21:04:02 2023 +0300
+
+    поправил местами верстку
+
+[33mcommit eff820c269a719aa019910cf102b03fad2f7ab5a[m[33m ([m[1;31morigin/multi-import[m[33m)[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Fri Sep 1 16:25:32 2023 +0200
+
+    Make possible to upload multiple files
+
+[33mcommit c13a257d6abb009e3ebcb12cb4e471dd1cea6a02[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Thu Aug 31 21:40:27 2023 +0200
+
+    Make possible to add multiple files
+
+[33mcommit ebf13d506d03ea765ae13ccfd39c8cb7da233fbe[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Thu Aug 31 19:27:41 2023 +0200
+
+    Update yarn lock
+
+[33mcommit 2a517952da099da8fe7d9499d5c3172d52f78475[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Thu Aug 31 19:27:41 2023 +0200
+
+    Update yarn lock
+
+[33mcommit 1d775b3eef121db5d239d82f560e5c22f0e4a0d7[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Thu Aug 31 19:25:59 2023 +0200
+
+    Remove unused api
+
+[33mcommit c682aada18fd7055b924642e26571b98cb3e5f14[m
+Merge: 4a05f05 d866715
+Author: Denis Dvornikov <candyboobers@gmail.com>
+Date:   Thu Aug 31 19:18:58 2023 +0200
+
+    Merge pull request #6 from Kalisto-Application/fix_edit_and_cursor
+    
+    Fix editing
+
+[33mcommit d866715b7448c7b214b3c5491da6c569545c1b62[m[33m ([m[1;31morigin/fix_edit_and_cursor[m[33m, [m[1;32mfix_edit_and_cursor[m[33m)[m
+Author: DenisGrishin <666trall666@gmail.com>
+Date:   Thu Aug 31 20:07:52 2023 +0300
+
+    Fix editing
+
+[33mcommit 4a05f05b3b359a92589e5151c8dc22af94b19e9c[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Thu Aug 31 18:24:58 2023 +0200
+
+    Describe script files model
+
+[33mcommit 14d41d2e44547d3d83d34c6e86460f42bef99e07[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Wed Aug 30 16:42:01 2023 +0200
+
+    Update model to store scripting files
+
+[33mcommit 4559903909a42defc887dabd4e987cd7e4d04451[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Wed Aug 30 12:01:23 2023 +0200
+
+    Marshal proto messages to dynamic in order to present as a generic object
+
+[33mcommit 7a51dedf90e6fd762f8dfc90a97f3fdd7d8de815[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Tue Aug 29 18:43:34 2023 +0200
+
+    Try fixing  sentry
+
+[33mcommit 9f8e429ad84ca2493783f846a9a1cf54b61c8fd2[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Tue Aug 29 17:13:15 2023 +0200
+
+    Set new icons, add DisplayName to service model, test overflows
+
+[33mcommit f89133007115e164cab0976e85e3efa0385b7c30[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Mon Aug 28 17:16:56 2023 +0200
+
+    Set app icon
+
+[33mcommit bbe5e341d4eeb30b4ace09494dd1caac954e2439[m[33m ([m[1;33mtag: v0.0.26-beta[m[33m)[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Sun Aug 27 15:07:19 2023 +0200
+
+    Draw an error on wrong enum value in maps
+
+[33mcommit 48899b6b43aae20c83870cf84d3d0d06a3960f18[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Sun Aug 27 14:29:47 2023 +0200
+
+    Validate enum ranges, remove outdated workspaces, unquote oneofs
+
+[33mcommit 1ba25de88595354fd7e0fda5bc8fcf4b6c09e011[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Sat Aug 26 16:05:05 2023 +0200
+
+    Test scripting flow
+
+[33mcommit c7ef0c31e11cba985b762ee5e5bca58da70e0a11[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Sat Aug 26 13:59:39 2023 +0200
+
+    Test mirror api
+
+[33mcommit 358c1bb326962f502bb25ea407a5f1f32dd05435[m
+Merge: 3e9cb53 88cd468
+Author: Denis Dvornikov <candyboobers@gmail.com>
+Date:   Fri Aug 25 17:21:25 2023 +0200
+
+    Merge pull request #4 from Kalisto-Application/create_popup
+    
+    Create popup
+
+[33mcommit 88cd468e6b6fed6499dc88e2ceaf9bef02494ae9[m[33m ([m[1;31morigin/create_popup[m[33m)[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Fri Aug 25 17:21:11 2023 +0200
+
+    Move color to variable
+
+[33mcommit daf0f85a3048f7802c39a918161e1f2ace1b0034[m
+Author: Denis Dvornikov <candyboobers@gmail.com>
+Date:   Fri Aug 25 16:39:40 2023 +0200
+
+    Update frontend/src/components/CreateWorkspacePopup.tsx
+
+[33mcommit 240a10dfdcd362305790974237824141e7521790[m
+Author: Denis Dvornikov <candyboobers@gmail.com>
+Date:   Fri Aug 25 16:39:28 2023 +0200
+
+    Update frontend/src/components/CreateWorkspacePopup.tsx
+
+[33mcommit 1762c3dd6a8f82e9f34b483fa225d9f4a075e644[m
+Author: Denis Dvornikov <candyboobers@gmail.com>
+Date:   Fri Aug 25 16:39:21 2023 +0200
+
+    Update frontend/src/components/CreateWorkspacePopup.tsx
+
+[33mcommit 077a29a8fb89bc6527dc3c9fcd7240343cde7871[m
+Author: Denis Dvornikov <candyboobers@gmail.com>
+Date:   Fri Aug 25 16:39:10 2023 +0200
+
+    Update frontend/src/components/CreateWorkspacePopup.tsx
+
+[33mcommit 9e8dfbe295e4ed1cb2e507e98b01357c5ab7076e[m
+Author: Denis Dvornikov <candyboobers@gmail.com>
+Date:   Fri Aug 25 16:37:47 2023 +0200
+
+    Update frontend/src/components/CreateWorkspacePopup.tsx
+
+[33mcommit e27dd037ed6c12ae577b43ec94e3bd6890ec52f9[m[33m ([m[1;32mcreate_popup[m[33m)[m
+Author: unknown <666trall666@gmail.com>
+Date:   Fri Aug 25 16:54:13 2023 +0300
+
+    add popup delete
+
+[33mcommit bba5ef443c7f1559ec9fb16ddb6877a74ca24d59[m
+Author: unknown <666trall666@gmail.com>
+Date:   Fri Aug 25 11:12:10 2023 +0300
+
+    add disabled, add upload
+
+[33mcommit 5be25475a96fd30049e6f6d7be6c109faf04e30d[m
+Author: unknown <666trall666@gmail.com>
+Date:   Thu Aug 24 18:14:47 2023 +0300
+
+    create popup
+
+[33mcommit 3e9cb53f55c6079f42710eacab741dc93506aa2b[m[33m ([m[1;33mtag: v0.0.25-beta[m[33m, [m[1;33mtag: v0.0.24-beta[m[33m)[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Thu Aug 24 14:01:22 2023 +0200
+
+    Clean build pkg
+
+[33mcommit 1f7efcb4759d77fa80fb82a05bcc950a150166bb[m[33m ([m[1;33mtag: v0.0.23-beta[m[33m)[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Thu Aug 24 13:27:00 2023 +0200
+
+    Set sentry dsn
+
+[33mcommit 388c88b6317c9fd367b47e6f287bb97419a8cd31[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Thu Aug 24 12:39:56 2023 +0200
+
+    return builds
+
+[33mcommit 42841cceaa95578560e73d030cdb34d64894498a[m[33m ([m[1;33mtag: v0.0.22-beta[m[33m)[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Thu Aug 24 12:38:52 2023 +0200
+
+    Packa only mac .app
+
+[33mcommit 35d43f71e956656caf47c9b6f777ef3e715ee190[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Thu Aug 24 12:13:29 2023 +0200
+
+    Set app icon
+
+[33mcommit 03abd12648f2b56b5f73f655437c4cc12616b20c[m[33m ([m[1;33mtag: v0.0.21-beta[m[33m)[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Thu Aug 24 11:42:01 2023 +0200
+
+    Fix sentry dsn check in build
+
+[33mcommit 07c5177cd79999bdc9242de4dd9dfdba5b397e76[m[33m ([m[1;33mtag: v0.0.20-beta[m[33m)[m
+Merge: 7afd709 55e8341
+Author: Denis Dvornikov <candyboobers@gmail.com>
+Date:   Thu Aug 24 11:35:03 2023 +0200
+
+    Merge pull request #3 from Kalisto-Application/build-sentry
+    
+    Move secrets closer to usage
+
+[33mcommit 55e83419553d021905a8f9442536bd88bbc8056e[m[33m ([m[1;31morigin/build-sentry[m[33m)[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Thu Aug 24 11:33:10 2023 +0200
+
+    Move secrets closer to usage
+
+[33mcommit 7afd709ecab70f2db884ba8fd73dd044e913c055[m[33m ([m[1;33mtag: v0.0.19-beta[m[33m)[m
+Merge: 6a270e2 0cf0b98
+Author: Denis Dvornikov <candyboobers@gmail.com>
+Date:   Wed Aug 23 21:51:32 2023 +0200
+
+    Merge pull request #2 from Kalisto-Application/active-icons
+    
+    Add active icons
+
+[33mcommit 0cf0b98633ccb864c8fa741bfc0ee68ace898895[m[33m ([m[1;31morigin/active-icons[m[33m)[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Wed Aug 23 21:48:51 2023 +0200
+
+    Add active icons
+
+[33mcommit 6a270e2ee4abe86f0bf3218a1f12b6aab23d2741[m[33m ([m[1;33mtag: v0.0.18-beta[m[33m)[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Tue Aug 22 22:17:42 2023 +0200
+
+    Try deliveering mac build
+
+[33mcommit 1be1345cc89643de675d496a752d7e5e3813b091[m
+Merge: a9c635c 52c1f82
+Author: Denis Dvornikov <candyboobers@gmail.com>
+Date:   Tue Aug 22 20:19:09 2023 +0200
+
+    Merge pull request #1 from Kalisto-Application/develop
+    
+    Develop
+
+[33mcommit 52c1f826bb7c53eeb5c4385992b0446df40ec6db[m[33m ([m[1;31morigin/develop[m[33m)[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Tue Aug 22 20:18:10 2023 +0200
+
+    Add nodejs memory fail workaround
+
+[33mcommit a6ceb4caf84a6ee3490451450f83e9399cd950a5[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Tue Aug 22 20:16:28 2023 +0200
+
+    Implement new workspace creiation flow
+
+[33mcommit d4cd0dd46b7f439bb06c71b62d55060cdd0732db[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Sat Aug 19 22:43:08 2023 +0200
+
+    Introduce yarn
+
+[33mcommit d1003d56c83673032b1db311eeb2ba79cc66a68d[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Sat Aug 19 22:42:37 2023 +0200
+
+    Add launching instruction
+
+[33mcommit a9c635c5c0297dfae24ca12cf7060827b9b5220b[m[33m ([m[1;33mtag: v0.0.12-beta[m[33m, [m[1;32mfix_eit[m[33m, [m[1;32mfix_edit[m[33m)[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Sat Aug 19 13:33:03 2023 +0200
+
+    Add icons, handle no protofiles error
+
+[33mcommit 5f617421bca70fe7910970cdf6f234e38e797c98[m[33m ([m[1;33mtag: v0.0.11-beta[m[33m)[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Sat Aug 19 12:09:30 2023 +0200
+
+    Fix upload path
+
+[33mcommit d853240a8801cd4b190409114d0c864a6ff2632e[m[33m ([m[1;33mtag: v0.0.10-beta[m[33m)[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Sat Aug 19 12:00:24 2023 +0200
+
+    Try caching node
+
+[33mcommit 1073914e096328cba78e06cab54edf6521e31b45[m[33m ([m[1;33mtag: v0.0.9-beta[m[33m)[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Sat Aug 19 11:14:33 2023 +0200
+
+    Archive app bundle
+
+[33mcommit 3381960d20e1d191c983b0dd40ebf7736904fbed[m[33m ([m[1;33mtag: v0.0.8-beta[m[33m)[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Fri Aug 18 15:24:50 2023 +0200
+
+    again
+
+[33mcommit 50509a5d673f64d74862e08add8005fb6c932459[m[33m ([m[1;33mtag: v0.0.7-beta[m[33m)[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Fri Aug 18 15:02:02 2023 +0200
+
+    Try uploading
+
+[33mcommit ab51232e944d04f0c41695dcbc7778f12f9e6d78[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Fri Aug 18 14:14:38 2023 +0200
+
+    Save script file
+
+[33mcommit 6f795cb7e8706a19ecc58d6ca670ab7a539cbe0e[m[33m ([m[1;33mtag: v0.0.5-beta[m[33m)[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Thu Aug 17 00:19:34 2023 +0200
+
+    Disable failfast on action
+
+[33mcommit 9958b6dfb3d475d71333184c4766ea6663a053ce[m[33m ([m[1;33mtag: v0.0.4-beta[m[33m)[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Thu Aug 17 00:11:25 2023 +0200
+
+    Add windows and mac builds
+
+[33mcommit b4d1323a16261e487c9222c502eb1e1a23d08ede[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Wed Aug 16 21:06:26 2023 +0200
+
+    Add github secret to action
+
+[33mcommit 33f4a1c6220365d22f121d2109c5459287f025ad[m[33m ([m[1;33mtag: v0.0.3-beta[m[33m)[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Wed Aug 16 20:54:25 2023 +0200
+
+    Increase node js memory runtime in actions
+
+[33mcommit 4286f43410d7e2a860ebb93eb840c78d8fbbf98b[m[33m ([m[1;33mtag: v0.0.2-beta[m[33m)[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Wed Aug 16 20:28:05 2023 +0200
+
+    Add linux build action
+
+[33mcommit 563d61ad5390a083b9bfc18724e643a4b281744a[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Thu Aug 10 18:13:36 2023 +0200
+
+    Handle empty proto files
+
+[33mcommit 34bddf83735f1b90438f001b4cc84c8a1b346677[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Thu Aug 10 17:52:48 2023 +0200
+
+    Handle buf.work.yaml directories
+
+[33mcommit 9c49e31ec864d729b5e9c3dac3eadfa14bb4708b[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Thu Aug 10 17:51:55 2023 +0200
+
+    Add mac signing job
+
+[33mcommit 971917f382576e05a64b7043e53c9b0d94dce8f0[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Tue Aug 8 00:01:13 2023 +0200
+
+    Handle server unavailable error
+
+[33mcommit 55ea3dee1555e508802a1fd2ad17e92551c6dc05[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Mon Aug 7 23:24:42 2023 +0200
+
+    Draw a response message as a JS object
+
+[33mcommit 1bf5c1077b8b09e08072185b38c11f59bf556c38[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Sun Aug 6 15:39:57 2023 +0200
+
+    Implement scripting
+
+[33mcommit 35b41ec1f1f6ac22bb2c1e41e3c5f300c77e92c4[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Sat Aug 5 16:45:47 2023 +0200
+
+    Validate input js request
+
+[33mcommit 27e51b4284aecb6eaeac4828f66a3efffa461e98[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Sat Aug 5 15:33:39 2023 +0200
+
+    Draw metadata values
+
+[33mcommit d58c6b3e9af2e2d624565042400e4e1e51b9e6c5[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Sat Aug 5 14:53:28 2023 +0200
+
+    Add mutexes to in-memory data
+
+[33mcommit 1c29ef24ce9d9016bf559d1eab61cd99e40a1a48[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Fri Aug 4 11:03:22 2023 +0200
+
+    Fix dropdown items
+
+[33mcommit 10a319d3f1e3a20c4c241961f20b7c5440dee813[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Thu Aug 3 23:19:43 2023 +0200
+
+    Draw a methods tree
+
+[33mcommit 8f3d03fee76dcacff3d8248efe982870d1c9b2da[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Thu Aug 3 16:20:06 2023 +0200
+
+    Draw dropdown
+
+[33mcommit 4e92fddd0738c8b8c3927fbcac21ed872c47243d[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Thu Aug 3 00:36:05 2023 +0200
+
+    WIP: Replace a dropdown
+
+[33mcommit f0b617ac13c759b06bb92c62cbd7dfa233d101b5[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Tue Aug 1 23:27:04 2023 +0200
+
+    Draw a variables page
+
+[33mcommit f35e42d57bc7948708b66929ff8cb06e5c7c8dcb[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Tue Aug 1 11:54:54 2023 +0200
+
+    Draw request input
+
+[33mcommit b8f445e632e04edc90c844bb90e2a02f166b0865[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Tue Aug 1 11:25:50 2023 +0200
+
+    Inject monaco editor
+
+[33mcommit 8421fa69c670aece72d5915c89b290ca9c821edd[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Mon Jul 31 22:08:48 2023 +0200
+
+    Style url input
+
+[33mcommit 9fa571ae26c06c5b225034984eda4cdee0ca8558[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Sun Jul 30 14:34:52 2023 +0200
+
+    Remove links usage, save target url
+
+[33mcommit a7a655c50c5b3bd6d38a75ba54525c5c6124cdaa[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Sat Jul 29 14:46:04 2023 +0200
+
+    Implement workspace renaming
+
+[33mcommit 7c28589853172afc2b5897d6c65283b32631c9a2[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Sat Jul 29 12:45:49 2023 +0200
+
+    Inject sentry
+
+[33mcommit 732430516ca70f4aadf759061455a3a30cedbb4d[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Thu Jul 27 21:23:09 2023 +0200
+
+    Fix empty item list handling
+
+[33mcommit 02abeab602b2ca7d94e484db70be186d7524cc99[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Wed Jul 26 00:25:19 2023 +0200
+
+    Implement global variables
+
+[33mcommit ac9108468ed6617b88bb2890ee66e8d96ac1f504[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Mon Jul 24 23:53:27 2023 +0200
+
+    Implement variables input text
+
+[33mcommit b8de65a4f92bc1b2ee95027859682c94653a19c0[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Mon Jul 24 10:13:50 2023 +0200
+
+    Replace state to context
+
+[33mcommit 4a49844802e67285f9f029b8cd3fd1aac6337135[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Sun Jul 23 21:37:19 2023 +0200
+
+    Fix oneof multiline comment
+
+[33mcommit 73a2df2ce613a603ba23a09556ec13c8a8930554[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Sun Jul 23 15:14:10 2023 +0200
+
+    Make build, introduce xdg file store
+
+[33mcommit e79c6fbff1f3cb0f4ad2533bf7f82e6211533f58[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Thu Jul 20 10:15:42 2023 +0200
+
+    Handle enums as string
+
+[33mcommit 848e42403653b01926db22ff2857b92166f59a2c[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Wed Jul 19 22:27:52 2023 +0200
+
+    Support duration and time
+
+[33mcommit c47ff3ab8a719b24f2047991f28dfe87b4f276f6[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Tue Jul 18 23:45:50 2023 +0200
+
+    Support built-in types
+
+[33mcommit 12cd4a4cb82b79b91f3dced23f3943b332564fa7[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Mon Jul 17 23:34:30 2023 +0200
+
+    Support oneof types
+
+[33mcommit 9ef6d96e5bfb6245d2e58269372834059c2bea85[m
+Author: Denis Dvornikov <candyboobers@gmail.com>
+Date:   Tue Jul 11 15:00:41 2023 +0000
+
+    Make oneof in spec
+
+[33mcommit e6af4582fd58046629f820aac5e609469959dd43[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Sat Jul 8 15:27:40 2023 +0200
+
+    WIP: one of fields
+
+[33mcommit 594704aa4cb47a7afb9ed189015902ad89e6b441[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Tue Jul 4 23:17:23 2023 +0200
+
+    Support int to objet maps
+
+[33mcommit 050075080c1fa08862b31b21a393712933272df7[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Tue Jul 4 22:59:47 2023 +0200
+
+    Support maps
+
+[33mcommit d57cb29e33a044ea0a880906f5aab69a1820eaee[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Tue Jul 4 11:40:54 2023 +0200
+
+    Cast message types to dynamic
+
+[33mcommit 21ae74cfbaf947d30513cb5d867ab425d0368b5d[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Thu Jun 29 22:56:45 2023 +0200
+
+    Add default body
+
+[33mcommit dc1c585d3b7c0fec4e00f23e756add09c428aa00[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Thu Jun 29 22:41:16 2023 +0200
+
+    Selectedc methods
+
+[33mcommit d86ca663cbf1d5ae621976c0108b1342a0b986c4[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Thu Jun 29 20:17:26 2023 +0200
+
+    Select method
+
+[33mcommit b9a4fbbc93ccfe779d5a663c08e55558d16ffa0a[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Thu Jun 29 00:26:25 2023 +0200
+
+    pushka
+
+[33mcommit 184285eb63ad1754658ab631ad5c645a4e4ee3db[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Wed Jun 28 22:06:33 2023 +0200
+
+    Some changes
+
+[33mcommit 7aa436a473db186ab89b1489bf02dd8c2a075192[m
+Merge: a405563 db6c09d
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Thu Jun 22 18:10:19 2023 +0200
+
+    Merge recursive parsing
+
+[33mcommit db6c09de28974db8e4090084ffd915ef8c496e72[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Thu Jun 22 18:08:54 2023 +0200
+
+    Support recursive proto parsing
+
+[33mcommit a405563dbb72a8915b8ff009d09f1abdacba02a7[m
+Merge: 5c42e79 9d80ad8
+Author: Andrei Petrovich <babadro@gmail.com>
+Date:   Thu Jun 22 06:07:23 2023 +0000
+
+    Merge branch 'implement-SendGrpc-endpoint' into 'main'
+    
+    implement SendGrpc endpoint
+    
+    See merge request kalisto-application/kalisto-app!19
+
+[33mcommit 9d80ad81db1b9c5a634d3d4c87130dbd3d364d6d[m
+Author: Andrei Petrovich <babadro@gmail.com>
+Date:   Thu Jun 22 06:07:23 2023 +0000
+
+    implement SendGrpc endpoint
+
+[33mcommit 5c42e791b489626265c935147b2b322d099a2bad[m
+Merge: 699c060 41aae78
+Author: Victor <v.kostyuk@hellohabit.net>
+Date:   Mon Jun 19 22:23:25 2023 +0000
+
+    Merge branch 'input-url' into 'main'
+    
+    Input url
+    
+    See merge request kalisto-application/kalisto-app!17
+
+[33mcommit 41aae78fcb6b01ad0c9cf0784740dd379c9ca3c9[m
+Author: Denny <candyboobers@gmail.com>
+Date:   Mon Jun 19 22:23:25 2023 +0000
+
+    Input url
+
+[33mcommit 699c0606272ae81ccf77686345de30006afe3598[m
+Merge: 7d79798 26b8090
+Author: Denny <candyboobers@gmail.com>
+Date:   Sat Jun 17 14:43:46 2023 +0000
+
+    Merge branch 'fix-db-files' into 'main'
+    
+    Fix db files
+    
+    See merge request kalisto-application/kalisto-app!16
+
+[33mcommit 26b8090d1e955033f80e17037f071a288dabec75[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Sat Jun 17 16:43:28 2023 +0200
+
+    Fix db files
+
+[33mcommit 7d7979816cb3c52924a8c692bc42bf1fdc532a9e[m
+Merge: 6cb4b97 275fa97
+Author: Denny <candyboobers@gmail.com>
+Date:   Sat Jun 17 11:34:56 2023 +0000
+
+    Merge branch 'manage-environments' into 'main'
+    
+    Implement environments api
+    
+    See merge request kalisto-application/kalisto-app!15
+
+[33mcommit 275fa9779ec95ae34e9fe0d9734156fb401baaba[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Sat Jun 17 13:34:33 2023 +0200
+
+    Implement environments api
+
+[33mcommit 6cb4b972dd2c61633327cbdd230aae6c7c25a3ec[m
+Merge: 87fe6c7 f4e00b4
+Author: Denny <candyboobers@gmail.com>
+Date:   Fri Jun 16 15:36:06 2023 +0000
+
+    Merge branch 'workspace-on-parse' into 'main'
+    
+    Add rename and delete workspace api
+    
+    See merge request kalisto-application/kalisto-app!14
+
+[33mcommit f4e00b4ba7fae6499717bca177cb59fbf3f3b2db[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Fri Jun 16 17:35:23 2023 +0200
+
+    Add rename and delete workspace api
+
+[33mcommit 87fe6c7d3d1a2fd975717ebb2bf31751e5e60e8c[m
+Merge: 7e9019e 43d9949
+Author: Denny <candyboobers@gmail.com>
+Date:   Thu Jun 15 22:03:11 2023 +0000
+
+    Merge branch 'workspace-on-parse' into 'main'
+    
+    save workspace on proto parse
+    
+    See merge request kalisto-application/kalisto-app!13
+
+[33mcommit 43d994929239b1a1e29d1929a0d0a2a0d87c0bdb[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Fri Jun 16 00:01:37 2023 +0200
+
+    save workspace on proto parse
+
+[33mcommit 7e9019ea4cb6b753c58a414aed8171f03f28b8f3[m
+Merge: b11183d b637646
+Author: Denny <candyboobers@gmail.com>
+Date:   Thu Jun 15 20:11:42 2023 +0000
+
+    Merge branch 'implement-SpecFromProto' into 'main'
+    
+    Implement spec from proto
+    
+    See merge request kalisto-application/kalisto-app!10
+
+[33mcommit b637646e3b8fde29ce2cd623345359261a7d280c[m
+Author: Andrei Petrovich <babadro@gmail.com>
+Date:   Thu Jun 15 20:11:42 2023 +0000
+
+    Implement spec from proto
+
+[33mcommit b11183da1410c77dbf1bcc3c43c10ac95d8a075b[m
+Merge: faa7dfa 19a5f30
+Author: Denny <candyboobers@gmail.com>
+Date:   Thu Jun 15 18:23:45 2023 +0000
+
+    Merge branch 'workspace-config' into 'main'
+    
+    Add envs management
+    
+    See merge request kalisto-application/kalisto-app!12
+
+[33mcommit 19a5f30224d12128032e8c18289fa275d83e0d04[m
+Author: Denny <candyboobers@gmail.com>
+Date:   Thu Jun 15 18:23:45 2023 +0000
+
+    Add envs management
+
+[33mcommit faa7dfacdc376700270ddcf85e1bbc4468e12cec[m
+Merge: 7c74d3c f89f055
+Author: Denny <candyboobers@gmail.com>
+Date:   Tue Jun 13 17:08:25 2023 +0000
+
+    Merge branch 'migrate-to-protoreflect' into 'main'
+    
+    Move to protodesc
+    
+    See merge request kalisto-application/kalisto-app!11
+
+[33mcommit f89f055a872247e4236b221d88c56eddef9434f3[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Tue Jun 13 19:08:04 2023 +0200
+
+    Move to protodesc
+
+[33mcommit 7c74d3cb9310f98790429f4ffdfb4711dbb96d4e[m
+Merge: cdaf83e 6f67e71
+Author: Denny <candyboobers@gmail.com>
+Date:   Tue Jun 13 08:06:15 2023 +0000
+
+    Merge branch 'find-proto-files' into 'main'
+    
+    find proto files
+    
+    See merge request kalisto-application/kalisto-app!9
+
+[33mcommit 6f67e710fd3a0498d207be73c26d7ccb08f715fc[m
+Author: Andrei Petrovich <babadro@gmail.com>
+Date:   Tue Jun 13 08:06:15 2023 +0000
+
+    find proto files
+
+[33mcommit cdaf83e0d2ec371079c40027340b76d7a0f0ff1f[m
+Merge: 544ba53 4e753a7
+Author: Denny <candyboobers@gmail.com>
+Date:   Sun Jun 11 17:56:40 2023 +0000
+
+    Merge branch 'default-message-values' into 'main'
+    
+    Add default values to request message
+    
+    See merge request kalisto-application/kalisto-app!8
+
+[33mcommit 4e753a7a95acdb3f12e19b60ad8fb026fae46bac[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Sun Jun 11 19:56:00 2023 +0200
+
+    Add default values to request message
+
+[33mcommit 544ba53bf99f3530864fbb3e620fecad91d1b8aa[m
+Merge: 8e57bd7 97fb241
+Author: Denny <candyboobers@gmail.com>
+Date:   Sun Jun 11 17:01:52 2023 +0000
+
+    Merge branch 'frontend/basic-layout' into 'main'
+    
+    [FE] Basic layout
+    
+    See merge request kalisto-application/kalisto-app!7
+
+[33mcommit 97fb241783f709b8d2050f457742844c6b51246b[m
+Author: Victor <v.kostyuk@hellohabit.net>
+Date:   Sun Jun 11 17:01:51 2023 +0000
+
+    [FE] Basic layout
+
+[33mcommit 8e57bd704f8e7946773ba7e8d41871c7ffa27730[m
+Merge: f688274 5a79759
+Author: Denny <candyboobers@gmail.com>
+Date:   Sun Jun 11 16:41:54 2023 +0000
+
+    Merge branch 'api-controller' into 'main'
+    
+    Add api controller with a few stubs
+    
+    See merge request kalisto-application/kalisto-app!6
+
+[33mcommit 5a7975945fda8e2d1c21b074c76006a0a1199da1[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Sun Jun 11 18:38:35 2023 +0200
+
+    Add api controller with a few stubs
+
+[33mcommit f68827477be3c0905136b395344e8dcacffac97f[m
+Merge: 5fd3d06 6adcae7
+Author: Denny <candyboobers@gmail.com>
+Date:   Sun Jun 11 13:51:42 2023 +0000
+
+    Merge branch 'remove-internal' into 'main'
+    
+    Remove internal folder, add task file
+    
+    See merge request kalisto-application/kalisto-app!5
+
+[33mcommit 6adcae78275079d08d832e68f5b54baaee24857b[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Sun Jun 11 15:50:27 2023 +0200
+
+    Remove internal folder, add task file
+
+[33mcommit 5fd3d06747534b98e82320aa168fe65b50ae75a9[m
+Merge: 484b0c8 79ca009
+Author: Denny <candyboobers@gmail.com>
+Date:   Fri Jun 9 22:27:30 2023 +0000
+
+    Merge branch 'grpc-client' into 'main'
+    
+    Add grpc client
+    
+    See merge request kalisto-application/kalisto-app!4
+
+[33mcommit 79ca009cc61a37caf51ecfd22fc6bba449bbfa64[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Sat Jun 10 00:26:52 2023 +0200
+
+    Add grpc client
+
+[33mcommit 484b0c87f9b5d3f52b65e2727b980c74fa59e990[m
+Merge: 0a4634d 7ee2446
+Author: Denny <candyboobers@gmail.com>
+Date:   Fri Jun 9 21:10:30 2023 +0000
+
+    Merge branch 'proto-spec-generation' into 'main'
+    
+    Implement spec factory draft
+    
+    See merge request kalisto-application/kalisto-app!3
+
+[33mcommit 7ee2446fc0b5d583716e118d1528edad762c5df3[m
+Author: Denny <candyboobers@gmail.com>
+Date:   Fri Jun 9 21:10:30 2023 +0000
+
+    Implement spec factory draft
+
+[33mcommit 0a4634ddaca46dd4d78fa1d429543930dbd0522c[m
+Merge: 6dcf548 e401005
+Author: Denny <candyboobers@gmail.com>
+Date:   Thu Jun 8 17:03:27 2023 +0000
+
+    Merge branch 'proto-compiler' into 'main'
+    
+    Implement proto compiler
+    
+    See merge request kalisto-application/kalisto-app!2
+
+[33mcommit e401005162acffdefa6f54d1e310d6fd07615a5f[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Thu Jun 8 10:55:04 2023 +0200
+
+    Implement proto compiler
+
+[33mcommit 6dcf5485a28cccaf4cf46585f1d988e91836632f[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Tue Jun 6 23:08:35 2023 +0200
+
+    Add a client example
+
+[33mcommit a1692f35994467306c4e27284ca06c817d4847c1[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Tue Jun 6 22:41:19 2023 +0200
+
+    Add proto server example
+
+[33mcommit ef23863db952171e24db13cdb79581fb3f88c0d9[m
+Merge: a81e4b8 51c5b12
+Author: Denny <candyboobers@gmail.com>
+Date:   Tue Jun 6 19:47:28 2023 +0000
+
+    Merge branch 'add-ide-to-gitignore' into 'main'
+    
+    add ide files to gitignore
+    
+    See merge request kalisto-application/kalisto-app!1
+
+[33mcommit 51c5b121a5272319b7a32948c85e732bfedcb1aa[m
+Author: AndreiPetrovich <babadro@gmail.com>
+Date:   Tue Jun 6 06:58:47 2023 +0200
+
+    add ide files to gitignore
+
+[33mcommit a81e4b85a77d3517096f0c7b482d072057a8433c[m
+Author: Denis <denis@Deniss-Mac-mini.fritz.box>
+Date:   Mon Jun 5 21:21:00 2023 +0200
+
+    Yeah real shit

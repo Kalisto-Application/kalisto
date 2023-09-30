@@ -114,10 +114,10 @@ const EditableItem: React.FC<EditableItemProps> = ({ value, onDone }) => {
   return (
     <div
       onClick={(e) => e.preventDefault()}
-      className="flex h-11 w-[259.5px] leading-6"
+      className=" h-11 w-[259.5px] bg-textBlockFill leading-6"
     >
       <input
-        className=" h-full w-full flex-1 bg-textBlockFill text-secondaryText"
+        className="    h-full w-full bg-textBlockFill text-secondaryText"
         value={editing}
         onChange={(e) => setEditing(e.target.value)}
         autoFocus={true}
@@ -128,6 +128,9 @@ const EditableItem: React.FC<EditableItemProps> = ({ value, onDone }) => {
           }
         }}
       />
+      <div className=" bg-primaryFill pl-1 pt-1 text-xs">
+        Нажми Entre для переименования
+      </div>
     </div>
   );
 };
