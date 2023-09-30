@@ -23,7 +23,11 @@ import (
 )
 
 var version string
+<<<<<<< HEAD
 var ghApiToken string
+=======
+var token string
+>>>>>>> 66e7f4a (Test scripting)
 var platform string
 
 //go:embed all:frontend/dist
