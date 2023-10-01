@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react';
 import { Context } from '../state';
 import { models } from '../../wailsjs/go/models';
 import DeletePopup from './DeletePopup';
-import ScriptList from '../ui/ScriptList';
+import FileList from '../ui/FileList';
 import { UpdateWorkspace } from '../../wailsjs/go/api/Api';
 import editIcon from '../../assets/icons/edit.svg';
 import deleteIcon from '../../assets/icons/delete.svg';
@@ -69,7 +69,7 @@ const ScriptCollectionView: React.FC = () => {
     <>
       {ctx.state.activeWorkspace ? (
         <>
-          <ScriptList
+          <FileList
             addScript={(value: string) => addScript(value)}
             activeWorkspace={ctx.state.activeWorkspace}
             setActiveScript={(id: string) => setActiveScript(id)}

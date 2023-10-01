@@ -6,7 +6,7 @@ import plusIcon from '../../assets/icons/plus.svg';
 
 import subMenuIcon from '../../assets/icons/subMenu.svg';
 
-type scriptListProps = {
+type fileListtProps = {
   addScript: (value: string) => void;
   activeWorkspace?: models.Workspace;
   setActiveScript: (id: string) => void;
@@ -17,7 +17,7 @@ interface itemProps {
   icon?: string;
   onClick?: (e: React.MouseEvent) => void;
 }
-const ScriptList: React.FC<scriptListProps> = ({
+const FileList: React.FC<fileListtProps> = ({
   addScript,
   activeWorkspace,
   items,
@@ -38,7 +38,7 @@ const ScriptList: React.FC<scriptListProps> = ({
     </>
   );
 };
-export default ScriptList;
+export default FileList;
 
 type ScriptNewProps = {
   addScript: (value: string) => void;
