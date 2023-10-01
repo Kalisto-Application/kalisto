@@ -77,9 +77,6 @@ body {
 ul li {
   list-style: none;
 }
-input {
-  padding-left: 16px;
-}
 
 .divide {
   border-bottom-width: 1px;

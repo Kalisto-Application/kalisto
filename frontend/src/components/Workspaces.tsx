@@ -4,18 +4,19 @@ import { Context } from '../state';
 import {
   RenameWorkspace,
   WorkspaceList as GetWorkspaceList,
+  DeleteWorkspace,
 } from '../../wailsjs/go/api/Api';
 import { models } from '../../wailsjs/go/models';
 
 import Dropdown, { DropdownItemProps } from './../ui/Dropdown';
+import CreateWorkspacePopup from './CreateWorkspacePopup';
+import DeletePopup from './DeletePopup';
 
 import folderIcon from '../../assets/icons/folder.svg';
 import dropdownIcon from '../../assets/icons/dropdown.svg';
 import editIcon from '../../assets/icons/edit.svg';
 import deleteIcon from '../../assets/icons/delete.svg';
 import plusIcon from '../../assets/icons/plus.svg';
-import CreateWorkspacePopup from './CreateWorkspacePopup';
-import DeleteWorkspaceConfirmationPopup from './DeleteWorkspaceConfirmationPopup';
 
 export const WorkspaceList: React.FC = () => {
   const ctx = useContext(Context);
@@ -109,16 +110,39 @@ export const WorkspaceList: React.FC = () => {
   ]);
 
   const main = menuItems.shift();
+
+  const deleteRequest = (id: string) => {
+    DeleteWorkspace(id)
+      .then((_) => {
+        ctx.dispatch({ type: 'removeWorkspace', id: id });
+        if (id === ctx.state.activeWorkspace?.id) {
+          GetWorkspaceList('')
+            .then((res) => {
+              ctx.dispatch({ type: 'workspaceList', workspaceList: res });
+            })
+            .catch((err) => {
+              console.log(`failed to get workspace list: ${err}`);
+            });
+        }
+      })
+      .catch((err) => {
+        console.log(`failed to remove workspace id=${id}: ${err}`);
+      });
+    setIsOpenDeletePopup('');
+  };
+
   return (
     <>
       <CreateWorkspacePopup
         open={isOpenCreateWorkspace}
         onClose={() => setIsOpenCreateWorkspace(false)}
       />
-      <DeleteWorkspaceConfirmationPopup
+      <DeletePopup
         id={isOpenDeletePopup}
         isOpen={isOpenDeletePopup !== ''}
         onClose={() => setIsOpenDeletePopup('')}
+        deleteScript={() => deleteRequest(isOpenDeletePopup)}
+        title="Delete workspase?"
       />
       <Dropdown main={main!} items={menuItems} />
     </>

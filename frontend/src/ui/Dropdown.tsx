@@ -1,6 +1,6 @@
 import React, { Fragment, useState, useRef, ChangeEvent } from 'react';
 import { Menu as M, MenuItem } from './Menu';
-import { Menu } from '@headlessui/react';
+import { Menu, Transition } from '@headlessui/react';
 
 export type DropdownProps = {
   main: DropdownItemProps;
@@ -37,11 +37,21 @@ export const Dropdown: React.FC<DropdownProps> = ({ main, items }) => {
         {main.tip && <div className="ml-auto">{main.tip}</div>}
       </Menu.Button>
       <div className="relative mt-2 flex">
-        <Menu.Items className="absolute z-10 flex cursor-pointer flex-col content-normal items-center justify-center rounded-md border-[1px] border-borderFill bg-primaryFill px-0 py-1">
-          {items.map((it, i) => (
-            <DropdownItem key={i} {...it} />
-          ))}
-        </Menu.Items>
+        <Transition
+          as={Fragment}
+          enter="transition ease-out duration-300"
+          enterFrom="transform opacity-0 scale-95"
+          enterTo="transform opacity-100 scale-100"
+          leave="transition ease-in duration-75"
+          leaveFrom="transform opacity-100 scale-100"
+          leaveTo="transform opacity-0 scale-95"
+        >
+          <Menu.Items className="absolute z-10 flex cursor-pointer flex-col content-normal items-center justify-center rounded-md border-[1px] border-borderFill bg-primaryFill px-0 py-1">
+            {items.map((it, i) => (
+              <DropdownItem key={i} {...it} />
+            ))}
+          </Menu.Items>
+        </Transition>
       </div>
     </Menu>
   );
@@ -65,13 +75,13 @@ const DropdownItem: React.FC<DropdownItemProps> = ({
         let el = (
           <div
             onClick={onClick}
-            className="ui-active:text-white relative flex h-11 w-[259.5px] flex-row items-center gap-[42px] px-4 py-2.5 leading-6 ui-active:bg-textBlockFill"
+            className="ui-active:text-white relative flex h-11 w-[259.5px]  gap-x-11 px-4 py-2.5  ui-active:bg-textBlockFill"
           >
             {icon && <img src={icon} />}
             <a>{text}</a>
             {tip}
             {render.active && (
-              <div className="absolute left-[200px] top-0 z-20">
+              <div className="absolute  left-[200px] top-0 z-20 w-1/2">
                 {menu && (
                   <M
                     items={menu.map((menu) => ({

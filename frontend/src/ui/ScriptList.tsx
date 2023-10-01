@@ -1,50 +1,53 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { models } from '../../wailsjs/go/models';
-import iconPlus from '../../assets/icons/plus.svg';
-import editIcon from '../../assets/icons/edit.svg';
-import deleteIcon from '../../assets/icons/delete.svg';
+import { Menu } from './Menu';
+import { useOnClickOutside } from '../hooks/useOnClickOutside';
+import plusIcon from '../../assets/icons/plus.svg';
+
+import subMenuIcon from '../../assets/icons/subMenu.svg';
 
 type scriptListProps = {
-  setValidateWorkspace: (value: boolean) => void;
   addScript: (value: string) => void;
   activeWorkspace?: models.Workspace;
-  deleteScript: (id: string) => void;
+  setActiveScript: (id: string) => void;
+  items: itemProps[];
 };
-
+interface itemProps {
+  text: string;
+  icon?: string;
+  onClick?: (e: React.MouseEvent) => void;
+}
 const ScriptList: React.FC<scriptListProps> = ({
   addScript,
   activeWorkspace,
-  setValidateWorkspace,
-  deleteScript,
+  items,
+  setActiveScript: deleteScript,
 }) => {
   return (
     <>
       <ScriptNewCreate
         addScript={addScript}
         activeWorkspace={activeWorkspace}
-        setValidateWorkspace={(value) => setValidateWorkspace(value)}
       />
 
-      <ul className="pl-10">
-        <ItemList
-          deleteScript={deleteScript}
-          activeWorkspace={activeWorkspace}
-        />
-      </ul>
+      <ItemList
+        deleteScript={(id) => deleteScript(id)}
+        activeWorkspace={activeWorkspace}
+        items={items}
+      />
     </>
   );
 };
 export default ScriptList;
 
 type ScriptNewProps = {
-  setValidateWorkspace: (value: boolean) => void;
   addScript: (value: string) => void;
   activeWorkspace?: models.Workspace;
 };
 
 const ScriptNewCreate: React.FC<ScriptNewProps> = ({
   addScript,
-  setValidateWorkspace,
+
   activeWorkspace,
 }) => {
   const [value, setValue] = useState('');
@@ -71,85 +74,101 @@ const ScriptNewCreate: React.FC<ScriptNewProps> = ({
   };
 
   const onClick = () => {
-    if (!activeWorkspace) {
-      setValidateWorkspace(true);
-      return;
-    }
     setIsMode(false);
   };
   return (
-    <>
+    <div className="mb-3 flex flex-col items-center ">
       {isMode ? (
-        <button className="flex items-center gap-x-2 pl-3" onClick={onClick}>
-          <img src={iconPlus} alt="" /> <span>New Script</span>
+        <button
+          className="flex items-center gap-x-2  rounded-md border-[1px] border-borderFill bg-primaryFill px-3 py-1 transition duration-500 ease-in-out hover:bg-textBlockFill"
+          onClick={onClick}
+        >
+          <img src={plusIcon} alt="" />
+          <span className="text-lg">Add Script</span>
         </button>
       ) : (
-        <div className=" text-center">
-          <input
-            className="border-1 mb-1 w-10/12 border-borderFill bg-textBlockFill"
-            type="text"
-            autoFocus
-            onChange={(e) => updateValue(e)}
-            onBlur={() => {
-              setIsMode(true), setValueValidate(false);
-            }}
-            onKeyDown={onKeyDown}
-          />
-          <div className=" text-xs">Нажми Entre для создания</div>
-        </div>
+        <>
+          <div className="px-5">
+            <input
+              placeholder="Name script"
+              className="border-1 mb-1 w-full border-[1px] border-borderFill  bg-textBlockFill px-3 placeholder:text-[14px] placeholder:text-secondaryText"
+              type="text"
+              autoFocus
+              onChange={(e) => updateValue(e)}
+              onKeyDown={onKeyDown}
+            />
+          </div>
+          <div className="text-xs">Push Enter to rename </div>
+        </>
       )}
       {valueValidate ? (
-        <span className="pl-3 text-center text-[13px] text-red">
+        <span className="text-[13px] text-red">
           A script name must not be empty
         </span>
       ) : null}
-    </>
+    </div>
   );
 };
 
 interface ItemListProps {
   activeWorkspace?: models.Workspace;
   deleteScript: (id: string) => void;
+  items: itemProps[];
 }
 
 const ItemList: React.FC<ItemListProps> = ({
   activeWorkspace,
   deleteScript,
+  items,
 }) => {
-  const items = [
-    {
-      // icon: editIcon,
-      text: 'Edit',
-      onClick: (e: React.MouseEvent) => {
-        e.preventDefault();
-      },
-    },
+  const [isMode, setIsMode] = useState(false);
+  const [idSubMenu, setIdSubMenu] = useState('');
 
-    {
-      // icon: deleteIcon,
-      text: 'Delete',
-      onClick: (e: React.SyntheticEvent) => {
-        e.preventDefault();
-      },
-    },
-  ];
+  const subMenuRef = useRef(null);
+
+  useOnClickOutside(subMenuRef, () => setIsMode(false));
+
+  const active = 'text-red';
 
   return (
-    <>
+    <ul className="text-center">
       {activeWorkspace?.scriptFiles ? (
         activeWorkspace?.scriptFiles
           .map((it, indx) => (
             <li
               key={indx}
-              className="text-ms hover: flex  cursor-pointer justify-between pr-3"
+              className=" text-ms relative  flex cursor-pointer justify-between px-3"
+              onClick={() => {
+                setIdSubMenu(it.id);
+                deleteScript(it.id);
+              }}
             >
-              <button>{it.name}</button>
+              <button className={`${idSubMenu === it.id ? active : null}`}>
+                {it.name}
+              </button>
+              {/* button submenu  */}
+              <button
+                onClick={(e) => {
+                  setIsMode(true);
+                }}
+              >
+                <img src={subMenuIcon} alt="" />
+              </button>
+              {/* Sub menu */}
+              {isMode && idSubMenu === it.id ? (
+                <div
+                  ref={subMenuRef}
+                  className="absolute right-2 top-5 w-[70%]"
+                >
+                  <Menu items={items} />
+                </div>
+              ) : null}
             </li>
           ))
           .reverse()
       ) : (
-        <h2>Список пуст</h2>
+        <h2>No scripts found</h2>
       )}
-    </>
+    </ul>
   );
 };
