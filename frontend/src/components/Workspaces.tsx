@@ -128,7 +128,6 @@ export const WorkspaceList: React.FC = () => {
       .catch((err) => {
         console.log(`failed to remove workspace id=${id}: ${err}`);
       });
-    setIsOpenDeletePopup('');
   };
 
   return (

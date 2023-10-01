@@ -51,7 +51,6 @@ export namespace models {
 	    content: string;
 	    headers: string;
 	    id: string;
-	    createdAt: Date;
 	
 	    static createFrom(source: any = {}) {
 	        return new File(source);
@@ -63,7 +62,6 @@ export namespace models {
 	        this.content = source["content"];
 	        this.headers = source["headers"];
 	        this.id = source["id"];
-	        this.createdAt = new Date(source["createdAt"]);
 	    }
 	}
 	export class Message {

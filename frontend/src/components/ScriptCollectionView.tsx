@@ -12,7 +12,11 @@ const ScriptCollectionView: React.FC = () => {
   const [activeScript, setActiveScript] = useState('');
   const [isOpenDeletePopup, setIsOpenDeletePopup] = useState('');
 
-  const addScript = (value: string) => {
+  let textScript = ctx.state.scriptText;
+
+  console.log('textScript', textScript);
+
+  const addFile = (value: string) => {
     let workspace = new models.Workspace({
       ...ctx.state.activeWorkspace,
       scriptFiles: [
@@ -34,7 +38,7 @@ const ScriptCollectionView: React.FC = () => {
       })
     );
   };
-  const deleteScript = (id: string) => {
+  const deleteFile = (id: string) => {
     let workspace = new models.Workspace({
       ...ctx.state.activeWorkspace,
       scriptFiles: ctx.state.activeWorkspace?.scriptFiles.filter(
@@ -70,7 +74,7 @@ const ScriptCollectionView: React.FC = () => {
       {ctx.state.activeWorkspace ? (
         <>
           <FileList
-            addScript={(value: string) => addScript(value)}
+            addFile={(value: string) => addFile(value)}
             activeWorkspace={ctx.state.activeWorkspace}
             setActiveScript={(id: string) => setActiveScript(id)}
             items={items}
@@ -79,7 +83,7 @@ const ScriptCollectionView: React.FC = () => {
             id={isOpenDeletePopup}
             isOpen={isOpenDeletePopup !== ''}
             onClose={() => setIsOpenDeletePopup('')}
-            deleteScript={() => deleteScript(activeScript)}
+            deleteScript={() => deleteFile(activeScript)}
             title="Delete script?"
           />
         </>

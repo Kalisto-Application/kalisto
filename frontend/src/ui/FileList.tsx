@@ -7,7 +7,7 @@ import plusIcon from '../../assets/icons/plus.svg';
 import subMenuIcon from '../../assets/icons/subMenu.svg';
 
 type fileListtProps = {
-  addScript: (value: string) => void;
+  addFile: (value: string) => void;
   activeWorkspace?: models.Workspace;
   setActiveScript: (id: string) => void;
   items: itemProps[];
@@ -18,20 +18,17 @@ interface itemProps {
   onClick?: (e: React.MouseEvent) => void;
 }
 const FileList: React.FC<fileListtProps> = ({
-  addScript,
+  addFile,
   activeWorkspace,
   items,
   setActiveScript: deleteScript,
 }) => {
   return (
     <>
-      <ScriptNewCreate
-        addScript={addScript}
-        activeWorkspace={activeWorkspace}
-      />
+      <ScriptNewCreate addFile={addFile} />
 
       <ItemList
-        deleteScript={(id) => deleteScript(id)}
+        deleteFile={(id) => deleteScript(id)}
         activeWorkspace={activeWorkspace}
         items={items}
       />
@@ -41,15 +38,10 @@ const FileList: React.FC<fileListtProps> = ({
 export default FileList;
 
 type ScriptNewProps = {
-  addScript: (value: string) => void;
-  activeWorkspace?: models.Workspace;
+  addFile: (value: string) => void;
 };
 
-const ScriptNewCreate: React.FC<ScriptNewProps> = ({
-  addScript,
-
-  activeWorkspace,
-}) => {
+const ScriptNewCreate: React.FC<ScriptNewProps> = ({ addFile: addScript }) => {
   const [value, setValue] = useState('');
   const [isMode, setIsMode] = useState(true);
   const [valueValidate, setValueValidate] = useState(false);
@@ -112,13 +104,13 @@ const ScriptNewCreate: React.FC<ScriptNewProps> = ({
 
 interface ItemListProps {
   activeWorkspace?: models.Workspace;
-  deleteScript: (id: string) => void;
+  deleteFile: (id: string) => void;
   items: itemProps[];
 }
 
 const ItemList: React.FC<ItemListProps> = ({
   activeWorkspace,
-  deleteScript,
+  deleteFile: deleteScript,
   items,
 }) => {
   const [isMode, setIsMode] = useState(false);
