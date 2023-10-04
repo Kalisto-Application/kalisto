@@ -1,4 +1,4 @@
-name: Wails build
+name: Kalisto app build
 
 on:
   push:
@@ -47,6 +47,7 @@ jobs:
       - name: Set envs
         run: echo "VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
 
+      # --- CACHING ---
       # - name: Get npm cache directory
       #   id: npm-cache-dir
       #   shell: bash
@@ -68,6 +69,7 @@ jobs:
       #     restore-keys: |
       #       ${{ runner.os }}-go-
 
+        # --- DEPENDENCIES ---
       - name: Setup GoLang
         uses: actions/setup-go@v4
         with:
@@ -87,27 +89,29 @@ jobs:
         run: sudo apt-get update && sudo apt-get install libgtk-3-0 libwebkit2gtk-4.0-dev gcc-aarch64-linux-gnu
         shell: bash
 
+        # --- BUILD ---
       - name: Build App
         if: runner.os == 'macOS'
-        run: wails build --platform ${{ matrix.build.platform }} -webview2 download -o ${{ matrix.build.name }} -ldflags "-X main.version=${{ github.ref_name }}"
+        run: wails build --platform ${{ matrix.build.platform }} -webview2 download -o ${{ matrix.build.name }} -ldflags "-X 'main.version=${{ github.ref_name }}' -X 'main.platform=mac' -X 'main.ghApiToken=${{ secrets.GH_API_KEY }}'"
         shell: bash
         env:
           SENTRY_TOKEN: ${{ secrets.SENTRY_TOKEN }}
 
       - name: Build App
         if: runner.os == 'Linux'
-        run: wails build --platform ${{ matrix.build.platform }} -webview2 download -o ${{ matrix.build.name }} -ldflags "-X main.version=${{ github.ref_name }}"
+        run: wails build --platform ${{ matrix.build.platform }} -webview2 download -o ${{ matrix.build.name }} -ldflags "-X 'main.version=${{ github.ref_name }}' -X 'main.platform=linux' -X 'main.ghApiToken=${{ secrets.GH_API_KEY }}'"
         shell: bash
         env:
           SENTRY_TOKEN: ${{ secrets.SENTRY_TOKEN }}
 
       - name: Build Windows App + Installer
         if: runner.os == 'Windows'
-        run: wails build --platform ${{ matrix.build.platform }} -webview2 download -nsis -o ${{ matrix.build.name }} -ldflags "-X main.version=${{ github.ref_name }}"
+        run: wails build --platform ${{ matrix.build.platform }} -webview2 download -nsis -o ${{ matrix.build.name }} -ldflags "-X 'main.version=${{ github.ref_name }}' -X 'main.platform=win' -X 'main.ghApiToken=${{ secrets.GH_API_KEY }}'"
         shell: bash
         env:
           SENTRY_TOKEN: ${{ secrets.SENTRY_TOKEN }}
 
+        # --- PRE UPLOADING ---
       - name: Add macOS perms
         if: runner.os == 'macOS'
         run: chmod +x build/bin/*/Contents/MacOS/*
@@ -116,6 +120,12 @@ jobs:
         if: runner.os  == 'Linux'
         run: chmod +x build/bin/*
         shell: bash
+
+      - name: Make disk image
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          hdiutil create -volname "Kalisto" -srcfolder build/bin/kalisto.app -ov -format UDBZ build/bin/kalisto.dmg
 
       - name: Archive app bundle
         if: runner.os == 'Linux'
@@ -126,16 +136,75 @@ jobs:
           filename: ${{ matrix.build.bundle-name }}
           path: ${{ matrix.build.name }}${{ matrix.build.ext }}
 
-      - name: Make disk image
-        if: runner.os == 'macOS'
-        shell: bash
-        run: |
-          hdiutil create -volname "Kalisto" -srcfolder build/bin/kalisto.app -ov -format UDBZ build/bin/kalisto.dmg
+        # --- ZIPPING ---
+      - name: Zip a bin linux
+        if: runner.os == 'Linux'
+        uses: thedoctor0/zip-release@0.7.1
+        with:
+          type: 'zip'
+          directory: build/bin/
+          filename: kalisto-bin-linux-${{ github.ref_name }}.zip
+          path: kalisto
 
+      - name: Zip a bin mac
+        if: runner.os == 'macOS'
+        uses: thedoctor0/zip-release@0.7.1
+        with:
+          type: 'zip'
+          directory: build/bin/
+          filename: kalisto-bin-mac-${{ github.ref_name }}.zip
+          path: kalisto.app/Contents/MacOS/kalisto
+
+      - name: Zip a bin windows
+        if: runner.os == 'Windows'
+        uses: thedoctor0/zip-release@0.7.1
+        with:
+          type: 'zip'
+          directory: build/bin/
+          filename: kalisto-bin-win-${{ github.ref_name }}.zip
+          path: kalisto
+
+        # --- UPLOADING ---
       - name: Upload release
         uses: status-base/upload-file-to-supabase-storage@v1.0.2
         with:
           file_path: build/bin/${{ matrix.build.bundle-name }}
+          bucket: release
+          upsert: true
+          content_type: 'application/zip'
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+
+      - name: Upload zip linux release
+        uses: status-base/upload-file-to-supabase-storage@v1.0.2
+        if: runner.os == 'Linux'
+        with:
+          file_path: build/bin/kalisto-bin-linux-${{ github.ref_name }}.zip
+          bucket: release
+          upsert: true
+          content_type: 'application/zip'
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+
+      - name: Upload zip mac release
+        uses: status-base/upload-file-to-supabase-storage@v1.0.2
+        if: runner.os == 'macOS'
+        with:
+          file_path: build/bin/kalisto-bin-mac-${{ github.ref_name }}.zip
+          bucket: release
+          upsert: true
+          content_type: 'application/zip'
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+
+      - name: Upload zip windows release
+        uses: status-base/upload-file-to-supabase-storage@v1.0.2
+        if: runner.os == 'Windows'
+        with:
+          file_path: build/bin/kalisto-bin-win-${{ github.ref_name }}.zip
           bucket: release
           upsert: true
           content_type: 'application/zip'

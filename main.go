@@ -23,7 +23,7 @@ import (
 )
 
 var version string
-var token string
+var ghApiToken string
 var platform string
 
 //go:embed all:frontend/dist
@@ -50,7 +50,7 @@ func main() {
 	HelpMenu.AddText(fmt.Sprintf("Version %s", version), nil, func(_ *menu.CallbackData) {})
 	l.Debug("menu built")
 
-	updater := update.NewUpdater(version, platform, token)
+	updater := update.NewUpdater(version, platform, ghApiToken)
 	updated, err := updater.Run()
 	if err != nil {
 		l.Error(err.Error())
