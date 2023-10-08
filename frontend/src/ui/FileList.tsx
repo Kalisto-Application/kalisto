@@ -21,14 +21,14 @@ const FileList: React.FC<fileListtProps> = ({
   addFile,
   activeWorkspace,
   items,
-  setActiveScript: deleteScript,
+  setActiveScript,
 }) => {
   return (
     <>
       <ScriptNewCreate addFile={addFile} />
 
       <ItemList
-        deleteFile={(id) => deleteScript(id)}
+        setActiveScript={(id) => setActiveScript(id)}
         activeWorkspace={activeWorkspace}
         items={items}
       />
@@ -41,7 +41,7 @@ type ScriptNewProps = {
   addFile: (value: string) => void;
 };
 
-const ScriptNewCreate: React.FC<ScriptNewProps> = ({ addFile: addScript }) => {
+const ScriptNewCreate: React.FC<ScriptNewProps> = ({ addFile }) => {
   const [value, setValue] = useState('');
   const [isMode, setIsMode] = useState(true);
   const [valueValidate, setValueValidate] = useState(false);
@@ -59,7 +59,7 @@ const ScriptNewCreate: React.FC<ScriptNewProps> = ({ addFile: addScript }) => {
     }
 
     if (e.code == 'Enter') {
-      addScript(value);
+      addFile(value);
       setIsMode(true);
       setValue('');
     }
@@ -104,13 +104,13 @@ const ScriptNewCreate: React.FC<ScriptNewProps> = ({ addFile: addScript }) => {
 
 interface ItemListProps {
   activeWorkspace?: models.Workspace;
-  deleteFile: (id: string) => void;
+  setActiveScript: (id: string) => void;
   items: itemProps[];
 }
 
 const ItemList: React.FC<ItemListProps> = ({
   activeWorkspace,
-  deleteFile: deleteScript,
+  setActiveScript,
   items,
 }) => {
   const [isMode, setIsMode] = useState(false);
@@ -125,39 +125,34 @@ const ItemList: React.FC<ItemListProps> = ({
   return (
     <ul className="text-center">
       {activeWorkspace?.scriptFiles ? (
-        activeWorkspace?.scriptFiles
-          .map((it, indx) => (
-            <li
-              key={indx}
-              className=" text-ms relative  flex cursor-pointer justify-between px-3"
-              onClick={() => {
-                setIdSubMenu(it.id);
-                deleteScript(it.id);
+        activeWorkspace?.scriptFiles.map((it, indx) => (
+          <li
+            key={indx}
+            className=" text-ms relative  flex cursor-pointer justify-between px-3"
+            onClick={() => {
+              setIdSubMenu(it.id);
+              setActiveScript(it.id);
+            }}
+          >
+            <button className={`${idSubMenu === it.id ? active : ''}`}>
+              {it.name}
+            </button>
+            {/* button submenu  */}
+            <button
+              onClick={(e) => {
+                setIsMode(true);
               }}
             >
-              <button className={`${idSubMenu === it.id ? active : null}`}>
-                {it.name}
-              </button>
-              {/* button submenu  */}
-              <button
-                onClick={(e) => {
-                  setIsMode(true);
-                }}
-              >
-                <img src={subMenuIcon} alt="" />
-              </button>
-              {/* Sub menu */}
-              {isMode && idSubMenu === it.id ? (
-                <div
-                  ref={subMenuRef}
-                  className="absolute right-2 top-5 w-[70%]"
-                >
-                  <Menu items={items} />
-                </div>
-              ) : null}
-            </li>
-          ))
-          .reverse()
+              <img src={subMenuIcon} alt="" />
+            </button>
+            {/* Sub menu */}
+            {isMode && idSubMenu === it.id ? (
+              <div ref={subMenuRef} className="absolute right-2 top-5 w-[70%]">
+                <Menu items={items} />
+              </div>
+            ) : null}
+          </li>
+        ))
       ) : (
         <h2>No scripts found</h2>
       )}

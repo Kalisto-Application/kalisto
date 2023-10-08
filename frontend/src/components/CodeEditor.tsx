@@ -1,4 +1,10 @@
-import React, { ChangeEvent, useContext, useMemo } from 'react';
+import React, {
+  ChangeEvent,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { Context } from '../state';
 import { debounce, Action } from '../pkg';
 
@@ -12,14 +18,24 @@ interface CodeEditorProps {
     | 'changeVariables'
     | 'changeScriptText';
   action?: Action;
+  showComponent?: boolean;
+  idFile?: string;
 }
 
 export const CodeEditor: React.FC<CodeEditorProps> = ({
   text,
   type,
   action,
+  showComponent,
+  idFile,
 }) => {
   const ctx = useContext(Context);
+
+  useEffect(() => {
+    return () => {
+      console.log('Компонент удален', idFile);
+    };
+  }, [idFile]);
 
   let debouncedAction: Action | undefined;
   if (action) {
@@ -37,11 +53,13 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
 
   return (
     <div>
-      <Editor
-        key={ctx.state.activeMethod?.fullName || ''}
-        value={text}
-        onChange={onChange}
-      />
+      {showComponent && (
+        <Editor
+          key={ctx.state.activeMethod?.fullName || ''}
+          value={text}
+          onChange={onChange}
+        />
+      )}
     </div>
   );
 };

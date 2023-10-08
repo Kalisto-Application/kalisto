@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Context } from '../state';
 import { models } from '../../wailsjs/go/models';
 import DeletePopup from './DeletePopup';
@@ -9,15 +9,15 @@ import deleteIcon from '../../assets/icons/delete.svg';
 
 const ScriptCollectionView: React.FC = () => {
   const ctx = useContext(Context);
-  const [activeScript, setActiveScript] = useState('');
   const [isOpenDeletePopup, setIsOpenDeletePopup] = useState('');
+  const activeScript = ctx.state.scriptIdFile;
 
-  let textScript = ctx.state.scriptText;
-
-  console.log('textScript', textScript);
+  const setActiveScript = (id: string) => {
+    ctx.dispatch({ type: 'setActiveScriptId', id });
+  };
 
   const addFile = (value: string) => {
-    let workspace = new models.Workspace({
+    let updatedWs = new models.Workspace({
       ...ctx.state.activeWorkspace,
       scriptFiles: [
         ...(ctx.state.activeWorkspace?.scriptFiles || []),
@@ -31,28 +31,33 @@ const ScriptCollectionView: React.FC = () => {
       ],
     });
 
-    UpdateWorkspace(workspace).then((res) =>
+    UpdateWorkspace(updatedWs).then((res) => {
+      debugger;
       ctx.dispatch({
         type: 'updateWorkspace',
-        workspace: workspace,
-      })
-    );
+        workspace: updatedWs,
+      });
+    });
   };
+
   const deleteFile = (id: string) => {
-    let workspace = new models.Workspace({
+    let updatedWs = new models.Workspace({
       ...ctx.state.activeWorkspace,
       scriptFiles: ctx.state.activeWorkspace?.scriptFiles.filter(
         (s) => s.id !== activeScript
       ),
     });
-    UpdateWorkspace(workspace).then((res) => {
+    UpdateWorkspace(updatedWs).then((res) => {
+      console.log('delte', updatedWs);
+
       ctx.dispatch({
         type: 'updateWorkspace',
-        workspace: workspace,
+        workspace: updatedWs,
       });
     });
   };
 
+  // sub menu items
   const items = [
     {
       icon: editIcon,
@@ -76,7 +81,7 @@ const ScriptCollectionView: React.FC = () => {
           <FileList
             addFile={(value: string) => addFile(value)}
             activeWorkspace={ctx.state.activeWorkspace}
-            setActiveScript={(id: string) => setActiveScript(id)}
+            setActiveScript={setActiveScript}
             items={items}
           />
           <DeletePopup

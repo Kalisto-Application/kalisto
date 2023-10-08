@@ -1,6 +1,7 @@
 import { Dispatch, createContext } from 'react';
 import { models } from '../../wailsjs/go/models';
 
+
 type Action =
   | { type: 'switchRequestEditor'; i: number }
   | { type: 'switchResponseEditor'; i: number }
@@ -18,7 +19,9 @@ type Action =
   | { type: 'changeScriptText'; text: string }
   | { type: 'scriptResponse'; response: string }
   | { type: 'scriptError'; value: string }
-  | { type: 'updateWorkspace'; workspace: models.Workspace };
+  | { type: 'updateWorkspace'; workspace: models.Workspace }
+  // test
+  | {type:'setActiveScriptId';id:string};
 
 export type State = {
   activeRequestEditor: number;
@@ -35,6 +38,8 @@ export type State = {
   scriptText: string;
   scriptResponse: string;
   scriptError: string;
+  // test
+  scriptIdFile:string
 };
 
 export const newState = (): State => {
@@ -53,6 +58,7 @@ export const newState = (): State => {
     scriptText: '',
     scriptResponse: '',
     scriptError: '',
+    scriptIdFile:'',
   };
 };
 
@@ -170,10 +176,17 @@ export const reducer = (state: State, action: Action): State => {
         scriptError: action.value,
       };
     case 'updateWorkspace':
+    
       return {
       ...state,
         activeWorkspace: action.workspace
         };
+        case 'setActiveScriptId':
+          
+          return {
+          ...state,
+            scriptIdFile: action.id
+            };
     default:
       return state;
   }
