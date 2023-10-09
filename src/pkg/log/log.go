@@ -14,9 +14,9 @@ type Logger struct {
 }
 
 func New() *Logger {
-	os.MkdirAll(path.Join(xdg.DataHome, "kalisto.logs"), os.ModePerm)
+	os.MkdirAll(path.Join(xdg.DataHome, "kalisto/logs"), os.ModePerm)
 	l := log.New(&lumberjack.Logger{
-		Filename:   path.Join(xdg.DataHome, "kalisto.logs/logs.txt"),
+		Filename:   path.Join(xdg.DataHome, "kalisto/logs/logs.txt"),
 		MaxSize:    5, // megabytes
 		MaxBackups: 2,
 		MaxAge:     280, //days

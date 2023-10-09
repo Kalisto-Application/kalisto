@@ -25,7 +25,7 @@ type DB struct {
 	db *badger.DB
 }
 
-const dbFolderName = "kalisto.db"
+const dbFolderName = "kalisto/db"
 
 func New(wd string) (*DB, error) {
 	dbDir := path.Join(wd, dbFolderName)
