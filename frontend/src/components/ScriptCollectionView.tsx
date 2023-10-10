@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Context } from '../state';
 import { models } from '../../wailsjs/go/models';
 import DeletePopup from './DeletePopup';
@@ -32,7 +32,6 @@ const ScriptCollectionView: React.FC = () => {
     });
 
     UpdateWorkspace(updatedWs).then((res) => {
-      debugger;
       ctx.dispatch({
         type: 'updateWorkspace',
         workspace: updatedWs,
@@ -43,13 +42,11 @@ const ScriptCollectionView: React.FC = () => {
   const deleteFile = (id: string) => {
     let updatedWs = new models.Workspace({
       ...ctx.state.activeWorkspace,
-      scriptFiles: ctx.state.activeWorkspace?.scriptFiles.filter(
+      scriptFiles: ctx.state.activeWorkspace?.scriptFiles?.filter(
         (s) => s.id !== activeScript
       ),
     });
     UpdateWorkspace(updatedWs).then((res) => {
-      console.log('delte', updatedWs);
-
       ctx.dispatch({
         type: 'updateWorkspace',
         workspace: updatedWs,

@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { models } from '../../wailsjs/go/models';
 import { Menu } from './Menu';
-import { useOnClickOutside } from '../hooks/useOnClickOutside';
+import { useOnClickOutside } from 'usehooks-ts';
 import plusIcon from '../../assets/icons/plus.svg';
 
 import subMenuIcon from '../../assets/icons/subMenu.svg';

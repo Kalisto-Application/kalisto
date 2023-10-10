@@ -1,7 +1,6 @@
 import { Dispatch, createContext } from 'react';
 import { models } from '../../wailsjs/go/models';
 
-
 type Action =
   | { type: 'switchRequestEditor'; i: number }
   | { type: 'switchResponseEditor'; i: number }
@@ -21,7 +20,8 @@ type Action =
   | { type: 'scriptError'; value: string }
   | { type: 'updateWorkspace'; workspace: models.Workspace }
   // test
-  | {type:'setActiveScriptId';id:string};
+  | { type: 'setActiveScriptId'; id: string }
+  | { type: 'updateScriptFile'; content: string };
 
 export type State = {
   activeRequestEditor: number;
@@ -39,7 +39,7 @@ export type State = {
   scriptResponse: string;
   scriptError: string;
   // test
-  scriptIdFile:string
+  scriptIdFile: string;
 };
 
 export const newState = (): State => {
@@ -58,7 +58,7 @@ export const newState = (): State => {
     scriptText: '',
     scriptResponse: '',
     scriptError: '',
-    scriptIdFile:'',
+    scriptIdFile: '',
   };
 };
 
@@ -91,7 +91,7 @@ export const reducer = (state: State, action: Action): State => {
       return {
         ...state,
         workspaceList: [action.workspace as models.WorkspaceShort].concat(
-          state.workspaceList || [],
+          state.workspaceList || []
         ),
         activeWorkspace: action.workspace,
       };
@@ -165,6 +165,18 @@ export const reducer = (state: State, action: Action): State => {
         ...state,
         scriptText: action.text,
       };
+    case 'updateScriptFile':
+      return {
+        ...state,
+        activeWorkspace: new models.Workspace({
+          ...state.activeWorkspace,
+          scriptFiles: state.activeWorkspace?.scriptFiles.map((it) => {
+            if (it.id !== state.scriptIdFile) return;
+            it.content = action.content;
+            return it;
+          }),
+        }),
+      };
     case 'scriptResponse':
       return {
         ...state,
@@ -176,17 +188,15 @@ export const reducer = (state: State, action: Action): State => {
         scriptError: action.value,
       };
     case 'updateWorkspace':
-    
       return {
-      ...state,
-        activeWorkspace: action.workspace
-        };
-        case 'setActiveScriptId':
-          
-          return {
-          ...state,
-            scriptIdFile: action.id
-            };
+        ...state,
+        activeWorkspace: action.workspace,
+      };
+    case 'setActiveScriptId':
+      return {
+        ...state,
+        scriptIdFile: action.id,
+      };
     default:
       return state;
   }
