@@ -47,10 +47,11 @@ export namespace models {
 		}
 	}
 	export class File {
+	    id: string;
 	    name: string;
 	    content: string;
 	    headers: string;
-	    id: string;
+	    createdAt: Date;
 	
 	    static createFrom(source: any = {}) {
 	        return new File(source);
@@ -58,10 +59,11 @@ export namespace models {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.id = source["id"];
 	        this.name = source["name"];
 	        this.content = source["content"];
 	        this.headers = source["headers"];
-	        this.id = source["id"];
+	        this.createdAt = new Date(source["createdAt"]);
 	    }
 	}
 	export class Message {
