@@ -6,16 +6,20 @@ import FileList from '../ui/FileList';
 import { UpdateWorkspace } from '../../wailsjs/go/api/Api';
 import editIcon from '../../assets/icons/edit.svg';
 import deleteIcon from '../../assets/icons/delete.svg';
+import copyIcon from '../../assets/icons/copy.svg';
 
 const ScriptCollectionView: React.FC = () => {
   const ctx = useContext(Context);
   const [isOpenDeletePopup, setIsOpenDeletePopup] = useState('');
+  const [isOpenEditInput, setIsOpenEditInput] = useState(false);
+
   const activeScript = ctx.state.scriptIdFile;
 
   const setActiveScript = (id: string) => {
     ctx.dispatch({ type: 'setActiveScriptId', id });
   };
 
+  // Add
   const addFile = (value: string) => {
     let updatedWs = new models.Workspace({
       ...ctx.state.activeWorkspace,
@@ -39,11 +43,12 @@ const ScriptCollectionView: React.FC = () => {
     });
   };
 
+  // Delete
   const deleteFile = (id: string) => {
     let updatedWs = new models.Workspace({
       ...ctx.state.activeWorkspace,
       scriptFiles: ctx.state.activeWorkspace?.scriptFiles?.filter(
-        (s) => s.id !== activeScript
+        (file) => file.id !== activeScript
       ),
     });
     UpdateWorkspace(updatedWs).then((res) => {
@@ -54,14 +59,73 @@ const ScriptCollectionView: React.FC = () => {
     });
   };
 
+  // Edit
+  const edeitFile = (rename: string) => {
+    let updatedWs = new models.Workspace({
+      ...ctx.state.activeWorkspace,
+      scriptFiles: ctx.state.activeWorkspace?.scriptFiles?.map((file) => {
+        if (file.id === activeScript) {
+          file.name = rename;
+        }
+        return file;
+      }),
+    });
+
+    UpdateWorkspace(updatedWs).then((res) => {
+      ctx.dispatch({
+        type: 'updateWorkspace',
+        workspace: updatedWs,
+      });
+    });
+  };
+
+  // Copy
+
+  const [indxCopyFile, setIndxCopyFile] = useState(0);
+  const [copyFile, setCopyFile] = useState({
+    name: '',
+    content: '',
+    id: '',
+    headers: '',
+  });
+  const CopyFile = () => {
+    // Find index active file
+    ctx.state.activeWorkspace?.scriptFiles?.forEach((file, indx) => {
+      if (file.id === activeScript) {
+        setIndxCopyFile(indx);
+        setCopyFile({
+          ...file,
+          name: `${file.name} copy`,
+          id: `${file.id} copy`,
+        });
+      }
+    });
+
+    ctx.state.activeWorkspace?.scriptFiles?.splice(indxCopyFile, 0, copyFile);
+
+    let updatedWs = new models.Workspace({
+      ...ctx.state.activeWorkspace,
+    });
+  };
+  console.log('copyFile', ctx.state.activeWorkspace?.scriptFiles);
+
   // sub menu items
   const items = [
     {
       icon: editIcon,
       text: 'Edit',
-      onClick: () => {},
+      onClick: () => {
+        setIsOpenEditInput(true);
+      },
     },
 
+    {
+      icon: copyIcon,
+      text: 'Copy',
+      onClick: () => {
+        CopyFile();
+      },
+    },
     {
       icon: deleteIcon,
       text: 'Delete',
@@ -80,6 +144,9 @@ const ScriptCollectionView: React.FC = () => {
             activeWorkspace={ctx.state.activeWorkspace}
             setActiveScript={setActiveScript}
             items={items}
+            isOpenEditInput={isOpenEditInput}
+            onCloseInput={() => setIsOpenEditInput(false)}
+            edeitFile={(value) => edeitFile(value)}
           />
           <DeletePopup
             id={isOpenDeletePopup}

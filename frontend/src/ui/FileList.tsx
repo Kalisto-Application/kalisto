@@ -11,6 +11,9 @@ type fileListtProps = {
   activeWorkspace?: models.Workspace;
   setActiveScript: (id: string) => void;
   items: itemProps[];
+  isOpenEditInput: boolean;
+  onCloseInput: () => void;
+  edeitFile: (value: string) => void;
 };
 interface itemProps {
   text: string;
@@ -22,6 +25,9 @@ const FileList: React.FC<fileListtProps> = ({
   activeWorkspace,
   items,
   setActiveScript,
+  isOpenEditInput,
+  onCloseInput,
+  edeitFile: updateValueRename,
 }) => {
   return (
     <>
@@ -31,6 +37,9 @@ const FileList: React.FC<fileListtProps> = ({
         setActiveScript={(id) => setActiveScript(id)}
         activeWorkspace={activeWorkspace}
         items={items}
+        isOpenEditInput={isOpenEditInput}
+        onCloseInput={onCloseInput}
+        updateValueEditInput={updateValueRename}
       />
     </>
   );
@@ -102,19 +111,26 @@ const ScriptNewCreate: React.FC<ScriptNewProps> = ({ addFile }) => {
   );
 };
 
-interface ItemListProps {
+type ItemListProps = {
   activeWorkspace?: models.Workspace;
   setActiveScript: (id: string) => void;
   items: itemProps[];
-}
+  isOpenEditInput: boolean;
+  onCloseInput: () => void;
+  updateValueEditInput: (value: string) => void;
+};
 
 const ItemList: React.FC<ItemListProps> = ({
   activeWorkspace,
   setActiveScript,
   items,
+  isOpenEditInput,
+  onCloseInput,
+  updateValueEditInput: edeitFile,
 }) => {
   const [isMode, setIsMode] = useState(false);
   const [idSubMenu, setIdSubMenu] = useState('');
+  const [valueEdit, setValueEdit] = useState('');
 
   const subMenuRef = useRef(null);
 
@@ -122,6 +138,17 @@ const ItemList: React.FC<ItemListProps> = ({
 
   const active = 'text-red';
 
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    if (e.code == 'Enter' && valueEdit !== '') {
+      edeitFile(valueEdit);
+      onCloseInput();
+      setValueEdit('');
+    }
+  };
+
+  const updateValueEdit = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setValueEdit(e.target.value);
+  };
   return (
     <ul className="text-center">
       {activeWorkspace?.scriptFiles ? (
@@ -134,9 +161,25 @@ const ItemList: React.FC<ItemListProps> = ({
               setActiveScript(it.id);
             }}
           >
-            <button className={`${idSubMenu === it.id ? active : ''}`}>
-              {it.name}
-            </button>
+            {isOpenEditInput && idSubMenu === it.id ? (
+              <input
+                className="border-1 mb-  w-[75%] border-[1px]  border-borderFill bg-textBlockFill px-3 placeholder:text-[14px] placeholder:text-secondaryText"
+                type="text"
+                onFocus={(e) => {
+                  e.target.select();
+                  setIsMode(false);
+                }}
+                autoFocus
+                value={valueEdit || it.name}
+                onChange={updateValueEdit}
+                onBlur={onCloseInput}
+                onKeyDown={onKeyDown}
+              />
+            ) : (
+              <button className={`${idSubMenu === it.id ? active : ''}`}>
+                {it.name}
+              </button>
+            )}
             {/* button submenu  */}
             <button
               onClick={(e) => {
@@ -148,7 +191,7 @@ const ItemList: React.FC<ItemListProps> = ({
             {/* Sub menu */}
             {isMode && idSubMenu === it.id ? (
               <div ref={subMenuRef} className="absolute right-2 top-5 w-[70%]">
-                <Menu items={items} />
+                <Menu items={items} closeSubMenu={() => setIsMode(false)} />
               </div>
             ) : null}
           </li>
