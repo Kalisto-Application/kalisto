@@ -105,13 +105,15 @@ func (s *ApiSuite) TestScriptFiles() {
 	ws, err := app.Api.CreateWorkspace("1", dirs)
 	s.Require().NoError(err)
 
-	newFile, err := app.Api.CreateScriptFile(ws.ID, "f1")
+	newFile, err := app.Api.CreateScriptFile(ws.ID, "f1", "")
 	s.Require().NoError(err)
 	s.Equal(newFile.Name, "f1")
+	s.Equal(newFile.Content, "")
 
-	newFile2, err := app.Api.CreateScriptFile(ws.ID, "f2")
+	newFile2, err := app.Api.CreateScriptFile(ws.ID, "f2", "content")
 	s.Require().NoError(err)
 	s.Equal(newFile2.Name, "f2")
+	s.Equal(newFile2.Content, "content")
 
 	err = app.Api.RenameScriptFile(ws.ID, newFile.Id, "f11")
 	s.Require().NoError(err)

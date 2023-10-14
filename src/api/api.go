@@ -431,11 +431,12 @@ func (s *Api) protoRegistryFromPath(dirs []string) (*compiler.Registry, error) {
 
 // SCRIPTING FILES API
 
-func (s *Api) CreateScriptFile(workspaceID, name string) (models.File, error) {
+func (s *Api) CreateScriptFile(workspaceID, name, content string) (models.File, error) {
 	file := models.File{
 		Id:        uuid.NewString(),
 		Name:      name,
 		CreatedAt: time.Now().UTC().Round(time.Nanosecond),
+		Content:   content,
 	}
 
 	ws, err := s.store.GetWorkspace(workspaceID)
