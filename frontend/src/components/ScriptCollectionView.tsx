@@ -81,33 +81,7 @@ const ScriptCollectionView: React.FC = () => {
 
   // Copy
 
-  const [indxCopyFile, setIndxCopyFile] = useState(0);
-  const [copyFile, setCopyFile] = useState({
-    name: '',
-    content: '',
-    id: '',
-    headers: '',
-  });
-  const CopyFile = () => {
-    // Find index active file
-    ctx.state.activeWorkspace?.scriptFiles?.forEach((file, indx) => {
-      if (file.id === activeScript) {
-        setIndxCopyFile(indx);
-        setCopyFile({
-          ...file,
-          name: `${file.name} copy`,
-          id: `${file.id} copy`,
-        });
-      }
-    });
-
-    ctx.state.activeWorkspace?.scriptFiles?.splice(indxCopyFile, 0, copyFile);
-
-    let updatedWs = new models.Workspace({
-      ...ctx.state.activeWorkspace,
-    });
-  };
-  console.log('copyFile', ctx.state.activeWorkspace?.scriptFiles);
+  const CopyFile = () => {};
 
   // sub menu items
   const items = [
