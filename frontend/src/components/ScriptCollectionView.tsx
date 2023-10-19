@@ -112,7 +112,7 @@ const ScriptCollectionView: React.FC = () => {
       },
     },
   ];
-  debugger;
+
   return (
     <>
       {ctx.state.activeWorkspace?.id ? (
