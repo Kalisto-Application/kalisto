@@ -1,6 +1,7 @@
 import { Dispatch, createContext } from 'react';
 import { models } from '../../wailsjs/go/models';
 
+
 type Action =
   | { type: 'switchRequestEditor'; i: number }
   | { type: 'switchResponseEditor'; i: number }
@@ -21,7 +22,10 @@ type Action =
   | { type: 'updateWorkspace'; workspace: models.Workspace }
   // test
   | { type: 'setActiveScriptId'; id: string }
-  | { type: 'updateScriptFile'; content: string };
+  | { type: 'updateScriptFile'; content: string }
+  | {type:'addScriptFile',scriptFile:{content: string,name:string,id:string,headers:string,createdAt:any}}
+  | {type:'deleteScriptFile',listFiles:models.File[]}
+  | { type:'renameScriptFile',idFile: string, value:string };
 
 export type State = {
   activeRequestEditor: number;
@@ -65,6 +69,8 @@ export const newState = (): State => {
 export const reducer = (state: State, action: Action): State => {
   console.log('dispatch');
   console.log(action);
+
+const copyState = state
 
   switch (action.type) {
     case 'switchRequestEditor':
@@ -197,6 +203,36 @@ export const reducer = (state: State, action: Action): State => {
         ...state,
         scriptIdFile: action.id,
       };
+      case 'addScriptFile':
+        return {
+          ...state,
+          activeWorkspace: new models.Workspace({
+            ...state.activeWorkspace,
+            scriptFiles: [...state.activeWorkspace?.scriptFiles || [], action.scriptFile]
+          })
+        }
+      case 'deleteScriptFile':
+        return {
+          ...state,
+          activeWorkspace: new models.Workspace({
+            ...state.activeWorkspace,
+            scriptFiles: [ ...action.listFiles]
+          })
+        }
+        case 'renameScriptFile':
+          return {
+            ...state,
+            activeWorkspace: new models.Workspace({
+              ...state.activeWorkspace,
+              scriptFiles: state.activeWorkspace?.scriptFiles.map((file)=>{
+                if(file.id === action.idFile){
+                  file.name = action.value
+                return file
+                }
+                return file
+              })
+            })
+          }
     default:
       return state;
   }

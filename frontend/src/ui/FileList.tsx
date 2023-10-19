@@ -13,7 +13,10 @@ type fileListtProps = {
   items: itemProps[];
   isOpenEditInput: boolean;
   onCloseInput: () => void;
-  edeitFile: (value: string) => void;
+  editFile: (value: string) => void;
+  isModeSubMenu: boolean;
+  closeSubMenu: () => void;
+  openSubMenu: () => void;
 };
 interface itemProps {
   text: string;
@@ -27,7 +30,10 @@ const FileList: React.FC<fileListtProps> = ({
   setActiveScript,
   isOpenEditInput,
   onCloseInput,
-  edeitFile: updateValueRename,
+  editFile,
+  isModeSubMenu,
+  closeSubMenu,
+  openSubMenu,
 }) => {
   return (
     <>
@@ -39,7 +45,10 @@ const FileList: React.FC<fileListtProps> = ({
         items={items}
         isOpenEditInput={isOpenEditInput}
         onCloseInput={onCloseInput}
-        updateValueEditInput={updateValueRename}
+        editFile={editFile}
+        isModeSubMenu={isModeSubMenu}
+        closeSubMenu={closeSubMenu}
+        openSubMenu={openSubMenu}
       />
     </>
   );
@@ -117,7 +126,10 @@ type ItemListProps = {
   items: itemProps[];
   isOpenEditInput: boolean;
   onCloseInput: () => void;
-  updateValueEditInput: (value: string) => void;
+  editFile: (value: string) => void;
+  isModeSubMenu: boolean;
+  closeSubMenu: () => void;
+  openSubMenu: () => void;
 };
 
 const ItemList: React.FC<ItemListProps> = ({
@@ -126,21 +138,23 @@ const ItemList: React.FC<ItemListProps> = ({
   items,
   isOpenEditInput,
   onCloseInput,
-  updateValueEditInput: edeitFile,
+  editFile,
+  isModeSubMenu,
+  closeSubMenu,
+  openSubMenu,
 }) => {
-  const [isMode, setIsMode] = useState(false);
   const [idSubMenu, setIdSubMenu] = useState('');
   const [valueEdit, setValueEdit] = useState('');
 
   const subMenuRef = useRef(null);
 
-  useOnClickOutside(subMenuRef, () => setIsMode(false));
+  useOnClickOutside(subMenuRef, () => closeSubMenu());
 
   const active = 'text-red';
 
   const onKeyDown = (e: React.KeyboardEvent) => {
     if (e.code == 'Enter' && valueEdit !== '') {
-      edeitFile(valueEdit);
+      editFile(valueEdit);
       onCloseInput();
       setValueEdit('');
     }
@@ -163,11 +177,10 @@ const ItemList: React.FC<ItemListProps> = ({
           >
             {isOpenEditInput && idSubMenu === it.id ? (
               <input
-                className="border-1 mb-  w-[75%] border-[1px]  border-borderFill bg-textBlockFill px-3 placeholder:text-[14px] placeholder:text-secondaryText"
+                className="border-1   w-[75%] border-[1px]  border-borderFill bg-textBlockFill px-3 placeholder:text-[14px] placeholder:text-secondaryText"
                 type="text"
                 onFocus={(e) => {
                   e.target.select();
-                  setIsMode(false);
                 }}
                 autoFocus
                 value={valueEdit || it.name}
@@ -181,17 +194,13 @@ const ItemList: React.FC<ItemListProps> = ({
               </button>
             )}
             {/* button submenu  */}
-            <button
-              onClick={(e) => {
-                setIsMode(true);
-              }}
-            >
+            <button onClick={openSubMenu}>
               <img src={subMenuIcon} alt="" />
             </button>
             {/* Sub menu */}
-            {isMode && idSubMenu === it.id ? (
+            {isModeSubMenu && idSubMenu === it.id ? (
               <div ref={subMenuRef} className="absolute right-2 top-5 w-[70%]">
-                <Menu items={items} closeSubMenu={() => setIsMode(false)} />
+                <Menu items={items} />
               </div>
             ) : null}
           </li>
