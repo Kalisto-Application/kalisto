@@ -112,10 +112,10 @@ const ScriptCollectionView: React.FC = () => {
       },
     },
   ];
-
+  debugger;
   return (
     <>
-      {ctx.state.activeWorkspace ? (
+      {ctx.state.activeWorkspace?.id ? (
         <>
           <FileList
             addFile={(value: string) => addFile(value)}
