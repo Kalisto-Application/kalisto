@@ -23,7 +23,7 @@ type Action =
   // test
   | { type: 'setActiveScriptId'; id: string }
   | { type: 'updateScriptFile'; content: string }
-  | {type:'addScriptFile',scriptFile:{content: string,name:string,id:string,headers:string,createdAt:any}}
+  | {type:'addScriptFile',scriptFile:models.File[]}
   | {type:'deleteScriptFile',listFiles:models.File[]}
   | { type:'renameScriptFile',idFile: string, value:string };
 
@@ -199,6 +199,7 @@ const copyState = state
         activeWorkspace: action.workspace,
       };
     case 'setActiveScriptId':
+      
       return {
         ...state,
         scriptIdFile: action.id,
