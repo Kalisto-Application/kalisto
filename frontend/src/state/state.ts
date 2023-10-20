@@ -1,7 +1,6 @@
 import { Dispatch, createContext } from 'react';
 import { models } from '../../wailsjs/go/models';
 
-
 type Action =
   | { type: 'switchRequestEditor'; i: number }
   | { type: 'switchResponseEditor'; i: number }
@@ -20,12 +19,11 @@ type Action =
   | { type: 'scriptResponse'; response: string }
   | { type: 'scriptError'; value: string }
   | { type: 'updateWorkspace'; workspace: models.Workspace }
-  // test
   | { type: 'setActiveScriptId'; id: string }
   | { type: 'updateScriptFile'; content: string }
-  | {type:'addScriptFile',scriptFile:models.File[]}
-  | {type:'deleteScriptFile',listFiles:models.File[]}
-  | { type:'renameScriptFile',idFile: string, value:string };
+  | { type: 'addScriptFile'; scriptFile: models.File }
+  | { type: 'deleteScriptFile'; listFiles: models.File[] }
+  | { type: 'renameScriptFile'; idFile: string; value: string };
 
 export type State = {
   activeRequestEditor: number;
@@ -70,8 +68,6 @@ export const reducer = (state: State, action: Action): State => {
   console.log('dispatch');
   console.log(action);
 
-const copyState = state
-
   switch (action.type) {
     case 'switchRequestEditor':
       return {
@@ -112,12 +108,12 @@ const copyState = state
             : state.activeWorkspace,
       };
     case 'renameWorkspace':
-      let ws = state.activeWorkspace
+      let ws = state.activeWorkspace;
       if (state.activeWorkspace && state.activeWorkspace?.id === action.id) {
         ws = new models.Workspace({
           ...ws,
           name: action.name,
-        })
+        });
       }
       return {
         ...state,
@@ -199,41 +195,43 @@ const copyState = state
         activeWorkspace: action.workspace,
       };
     case 'setActiveScriptId':
-      
       return {
         ...state,
         scriptIdFile: action.id,
       };
-      case 'addScriptFile':
-        return {
-          ...state,
-          activeWorkspace: new models.Workspace({
-            ...state.activeWorkspace,
-            scriptFiles: [...state.activeWorkspace?.scriptFiles || [], action.scriptFile]
-          })
-        }
-      case 'deleteScriptFile':
-        return {
-          ...state,
-          activeWorkspace: new models.Workspace({
-            ...state.activeWorkspace,
-            scriptFiles: [ ...action.listFiles]
-          })
-        }
-        case 'renameScriptFile':
-          return {
-            ...state,
-            activeWorkspace: new models.Workspace({
-              ...state.activeWorkspace,
-              scriptFiles: state.activeWorkspace?.scriptFiles.map((file)=>{
-                if(file.id === action.idFile){
-                  file.name = action.value
-                return file
-                }
-                return file
-              })
-            })
-          }
+    case 'addScriptFile':
+      return {
+        ...state,
+        activeWorkspace: new models.Workspace({
+          ...state.activeWorkspace,
+          scriptFiles: [
+            ...(state.activeWorkspace?.scriptFiles || []),
+            action.scriptFile,
+          ],
+        }),
+      };
+    case 'deleteScriptFile':
+      return {
+        ...state,
+        activeWorkspace: new models.Workspace({
+          ...state.activeWorkspace,
+          scriptFiles: [...action.listFiles],
+        }),
+      };
+    case 'renameScriptFile':
+      return {
+        ...state,
+        activeWorkspace: new models.Workspace({
+          ...state.activeWorkspace,
+          scriptFiles: state.activeWorkspace?.scriptFiles.map((file) => {
+            if (file.id === action.idFile) {
+              file.name = action.value;
+              return file;
+            }
+            return file;
+          }),
+        }),
+      };
     default:
       return state;
   }

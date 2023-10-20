@@ -14,9 +14,9 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
   fileId,
   onChange,
 }) => {
-  let handleOnChange = () => {
+  const handleOnChange = useMemo(() => {
     return debounce(onChange, 400);
-  };
+  }, [fileId]);
 
   return <Editor key={fileId} value={text} onChange={handleOnChange} />;
 };

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 import { CodeEditor } from '../ui/Editor';
 
 import { Context } from '../state';
@@ -12,11 +12,11 @@ export const ScriptEditor: React.FC = () => {
   const activeFile = ws?.scriptFiles?.find((it) => it.id == fileId);
 
   const saveScript = (content: string) => {
-    UpdateScriptFileContent(
-      ctx.state.activeWorkspace?.id || '',
-      fileId,
-      content
-    ).then((res) => {
+    if (!ws?.id || !activeFile?.id) {
+      return;
+    }
+
+    UpdateScriptFileContent(ws?.id, fileId, content).then(() => {
       ctx.dispatch({
         type: 'updateScriptFile',
         content: content,

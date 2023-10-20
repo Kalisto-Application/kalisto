@@ -1,4 +1,4 @@
-import React, { useState, useContext, useMemo, useEffect } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { Context } from '../state';
 
 import {
@@ -6,7 +6,6 @@ import {
   WorkspaceList as GetWorkspaceList,
   DeleteWorkspace,
 } from '../../wailsjs/go/api/Api';
-import { models } from '../../wailsjs/go/models';
 
 import Dropdown, { DropdownItemProps } from './../ui/Dropdown';
 import CreateWorkspacePopup from './CreateWorkspacePopup';
