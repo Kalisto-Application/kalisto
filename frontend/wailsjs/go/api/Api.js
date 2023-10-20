@@ -6,6 +6,10 @@ export function CreateScriptFile(arg1, arg2, arg3) {
   return window['go']['api']['Api']['CreateScriptFile'](arg1, arg2, arg3);
 }
 
+export function Context() {
+  return window['go']['api']['Api']['Context']();
+}
+
 export function CreateWorkspace(arg1, arg2) {
   return window['go']['api']['Api']['CreateWorkspace'](arg1, arg2);
 }
@@ -38,6 +42,10 @@ export function RunScript(arg1) {
   return window['go']['api']['Api']['RunScript'](arg1);
 }
 
+export function Runtime() {
+  return window['go']['api']['Api']['Runtime']();
+}
+
 export function SaveGlovalVars(arg1) {
   return window['go']['api']['Api']['SaveGlovalVars'](arg1);
 }
@@ -47,7 +55,11 @@ export function SendGrpc(arg1) {
 }
 
 export function UpdateScriptFileContent(arg1, arg2, arg3) {
-  return window['go']['api']['Api']['UpdateScriptFileContent'](arg1, arg2, arg3);
+  return window['go']['api']['Api']['UpdateScriptFileContent'](
+    arg1,
+    arg2,
+    arg3
+  );
 }
 
 export function UpdateWorkspace(arg1) {

@@ -8,7 +8,6 @@ package service
 
 import (
 	context "context"
-
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -24,7 +23,9 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type BookStoreClient interface {
-	GetBook(ctx context.Context, in *GetBookRequest, opts ...grpc.CallOption) (*GetBookRequest, error)
+	CreateBook(ctx context.Context, in *CreateBookRequest, opts ...grpc.CallOption) (*Book, error)
+	GetBook(ctx context.Context, in *Book, opts ...grpc.CallOption) (*GetBookResponse, error)
+	Mirror(ctx context.Context, in *GetBookRequest, opts ...grpc.CallOption) (*GetBookRequest, error)
 	Empty(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	Error(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
@@ -37,9 +38,27 @@ func NewBookStoreClient(cc grpc.ClientConnInterface) BookStoreClient {
 	return &bookStoreClient{cc}
 }
 
-func (c *bookStoreClient) GetBook(ctx context.Context, in *GetBookRequest, opts ...grpc.CallOption) (*GetBookRequest, error) {
-	out := new(GetBookRequest)
+func (c *bookStoreClient) CreateBook(ctx context.Context, in *CreateBookRequest, opts ...grpc.CallOption) (*Book, error) {
+	out := new(Book)
+	err := c.cc.Invoke(ctx, "/kalisto.tests.examples.service.BookStore/CreateBook", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bookStoreClient) GetBook(ctx context.Context, in *Book, opts ...grpc.CallOption) (*GetBookResponse, error) {
+	out := new(GetBookResponse)
 	err := c.cc.Invoke(ctx, "/kalisto.tests.examples.service.BookStore/GetBook", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bookStoreClient) Mirror(ctx context.Context, in *GetBookRequest, opts ...grpc.CallOption) (*GetBookRequest, error) {
+	out := new(GetBookRequest)
+	err := c.cc.Invoke(ctx, "/kalisto.tests.examples.service.BookStore/Mirror", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +87,9 @@ func (c *bookStoreClient) Error(ctx context.Context, in *emptypb.Empty, opts ...
 // All implementations must embed UnimplementedBookStoreServer
 // for forward compatibility
 type BookStoreServer interface {
-	GetBook(context.Context, *GetBookRequest) (*GetBookRequest, error)
+	CreateBook(context.Context, *CreateBookRequest) (*Book, error)
+	GetBook(context.Context, *Book) (*GetBookResponse, error)
+	Mirror(context.Context, *GetBookRequest) (*GetBookRequest, error)
 	Empty(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
 	Error(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
 	mustEmbedUnimplementedBookStoreServer()
@@ -78,8 +99,14 @@ type BookStoreServer interface {
 type UnimplementedBookStoreServer struct {
 }
 
-func (UnimplementedBookStoreServer) GetBook(context.Context, *GetBookRequest) (*GetBookRequest, error) {
+func (UnimplementedBookStoreServer) CreateBook(context.Context, *CreateBookRequest) (*Book, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateBook not implemented")
+}
+func (UnimplementedBookStoreServer) GetBook(context.Context, *Book) (*GetBookResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetBook not implemented")
+}
+func (UnimplementedBookStoreServer) Mirror(context.Context, *GetBookRequest) (*GetBookRequest, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Mirror not implemented")
 }
 func (UnimplementedBookStoreServer) Empty(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Empty not implemented")
@@ -100,8 +127,26 @@ func RegisterBookStoreServer(s grpc.ServiceRegistrar, srv BookStoreServer) {
 	s.RegisterService(&BookStore_ServiceDesc, srv)
 }
 
+func _BookStore_CreateBook_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateBookRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BookStoreServer).CreateBook(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/kalisto.tests.examples.service.BookStore/CreateBook",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BookStoreServer).CreateBook(ctx, req.(*CreateBookRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _BookStore_GetBook_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetBookRequest)
+	in := new(Book)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -113,7 +158,25 @@ func _BookStore_GetBook_Handler(srv interface{}, ctx context.Context, dec func(i
 		FullMethod: "/kalisto.tests.examples.service.BookStore/GetBook",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BookStoreServer).GetBook(ctx, req.(*GetBookRequest))
+		return srv.(BookStoreServer).GetBook(ctx, req.(*Book))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BookStore_Mirror_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetBookRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BookStoreServer).Mirror(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/kalisto.tests.examples.service.BookStore/Mirror",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BookStoreServer).Mirror(ctx, req.(*GetBookRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -162,8 +225,16 @@ var BookStore_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*BookStoreServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
+			MethodName: "CreateBook",
+			Handler:    _BookStore_CreateBook_Handler,
+		},
+		{
 			MethodName: "GetBook",
 			Handler:    _BookStore_GetBook_Handler,
+		},
+		{
+			MethodName: "Mirror",
+			Handler:    _BookStore_Mirror_Handler,
 		},
 		{
 			MethodName: "Empty",

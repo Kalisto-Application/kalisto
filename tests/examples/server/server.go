@@ -21,7 +21,19 @@ type server struct {
 	pb.UnimplementedBookStoreServer
 }
 
-func (s *server) GetBook(ctx context.Context, in *pb.GetBookRequest) (*pb.GetBookRequest, error) {
+func (s *server) CreateBook(context.Context, *pb.CreateBookRequest) (*pb.Book, error) {
+	return &pb.Book{
+		Id: "1",
+	}, nil
+}
+func (s *server) GetBook(context.Context, *pb.Book) (*pb.GetBookResponse, error) {
+	return &pb.GetBookResponse{
+		Id:   "1",
+		Name: "Clean Code",
+	}, nil
+}
+
+func (s *server) Mirror(ctx context.Context, in *pb.GetBookRequest) (*pb.GetBookRequest, error) {
 	md, _ := metadata.FromIncomingContext(ctx)
 	fmt.Println("time: ", in.Time.AsTime().String())
 	fmt.Println("dur: ", in.Dur.AsDuration().String())

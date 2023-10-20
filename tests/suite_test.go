@@ -1,7 +1,7 @@
 package tests
 
 import (
-	"kalisto/src/proto/interpreter"
+	"kalisto/src/definitions/proto/interpreter"
 	"testing"
 
 	"github.com/stretchr/testify/assert"

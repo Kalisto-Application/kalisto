@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"kalisto/src/api"
 	"kalisto/src/db"
+	"kalisto/src/definitions"
+	"kalisto/src/definitions/proto/client"
+	"kalisto/src/definitions/proto/compiler"
 	"kalisto/src/pkg/runtime"
-	"kalisto/src/proto/client"
-	"kalisto/src/proto/compiler"
-	"kalisto/src/proto/spec"
 )
 
 // App struct
@@ -27,9 +27,7 @@ func NewApp(homeDir string) (*App, error) {
 		return nil, fmt.Errorf("failed to init db: %w", err)
 	}
 
-	protoRegistry := compiler.NewProtoRegistry()
 	protoCompiler := compiler.NewFileCompiler()
-	specFactory := spec.NewFactory()
 
 	newClient := func(ctx context.Context, addr string) (*client.Client, error) {
 		return client.NewClient(ctx, client.Config{
@@ -37,7 +35,7 @@ func NewApp(homeDir string) (*App, error) {
 		})
 	}
 
-	a := api.New(protoCompiler, specFactory, store, newClient, protoRegistry, runtime.New())
+	a := api.New(protoCompiler, store, newClient, definitions.NewRegistryStore(), runtime.New())
 
 	return &App{Api: a, db: store}, nil
 }

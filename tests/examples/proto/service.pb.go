@@ -7,9 +7,6 @@
 package service
 
 import (
-	reflect "reflect"
-	sync "sync"
-
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	anypb "google.golang.org/protobuf/types/known/anypb"
@@ -17,6 +14,8 @@ import (
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	structpb "google.golang.org/protobuf/types/known/structpb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
+	reflect "reflect"
+	sync "sync"
 )
 
 const (
@@ -72,7 +71,109 @@ func (x GetBookRequest_Enum) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use GetBookRequest_Enum.Descriptor instead.
 func (GetBookRequest_Enum) EnumDescriptor() ([]byte, []int) {
-	return file_service_proto_rawDescGZIP(), []int{4, 0}
+	return file_service_proto_rawDescGZIP(), []int{6, 0}
+}
+
+type CreateBookRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+}
+
+func (x *CreateBookRequest) Reset() {
+	*x = CreateBookRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_service_proto_msgTypes[0]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CreateBookRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateBookRequest) ProtoMessage() {}
+
+func (x *CreateBookRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_service_proto_msgTypes[0]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateBookRequest.ProtoReflect.Descriptor instead.
+func (*CreateBookRequest) Descriptor() ([]byte, []int) {
+	return file_service_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *CreateBookRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+type GetBookResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id   string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+}
+
+func (x *GetBookResponse) Reset() {
+	*x = GetBookResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_service_proto_msgTypes[1]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetBookResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetBookResponse) ProtoMessage() {}
+
+func (x *GetBookResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_service_proto_msgTypes[1]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetBookResponse.ProtoReflect.Descriptor instead.
+func (*GetBookResponse) Descriptor() ([]byte, []int) {
+	return file_service_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *GetBookResponse) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *GetBookResponse) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
 }
 
 type Book struct {
@@ -86,7 +187,7 @@ type Book struct {
 func (x *Book) Reset() {
 	*x = Book{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_service_proto_msgTypes[0]
+		mi := &file_service_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -99,7 +200,7 @@ func (x *Book) String() string {
 func (*Book) ProtoMessage() {}
 
 func (x *Book) ProtoReflect() protoreflect.Message {
-	mi := &file_service_proto_msgTypes[0]
+	mi := &file_service_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -112,7 +213,7 @@ func (x *Book) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Book.ProtoReflect.Descriptor instead.
 func (*Book) Descriptor() ([]byte, []int) {
-	return file_service_proto_rawDescGZIP(), []int{0}
+	return file_service_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *Book) GetId() string {
@@ -134,7 +235,7 @@ type RepeatedNestedBook struct {
 func (x *RepeatedNestedBook) Reset() {
 	*x = RepeatedNestedBook{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_service_proto_msgTypes[1]
+		mi := &file_service_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -147,7 +248,7 @@ func (x *RepeatedNestedBook) String() string {
 func (*RepeatedNestedBook) ProtoMessage() {}
 
 func (x *RepeatedNestedBook) ProtoReflect() protoreflect.Message {
-	mi := &file_service_proto_msgTypes[1]
+	mi := &file_service_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -160,7 +261,7 @@ func (x *RepeatedNestedBook) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RepeatedNestedBook.ProtoReflect.Descriptor instead.
 func (*RepeatedNestedBook) Descriptor() ([]byte, []int) {
-	return file_service_proto_rawDescGZIP(), []int{1}
+	return file_service_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *RepeatedNestedBook) GetBooks() []*RepeatedNestedBook {
@@ -188,7 +289,7 @@ type DeepNestedBook struct {
 func (x *DeepNestedBook) Reset() {
 	*x = DeepNestedBook{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_service_proto_msgTypes[2]
+		mi := &file_service_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -201,7 +302,7 @@ func (x *DeepNestedBook) String() string {
 func (*DeepNestedBook) ProtoMessage() {}
 
 func (x *DeepNestedBook) ProtoReflect() protoreflect.Message {
-	mi := &file_service_proto_msgTypes[2]
+	mi := &file_service_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -214,7 +315,7 @@ func (x *DeepNestedBook) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeepNestedBook.ProtoReflect.Descriptor instead.
 func (*DeepNestedBook) Descriptor() ([]byte, []int) {
-	return file_service_proto_rawDescGZIP(), []int{2}
+	return file_service_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *DeepNestedBook) GetHasNested() *BookHasDeepNested {
@@ -235,7 +336,7 @@ type BookHasDeepNested struct {
 func (x *BookHasDeepNested) Reset() {
 	*x = BookHasDeepNested{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_service_proto_msgTypes[3]
+		mi := &file_service_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -248,7 +349,7 @@ func (x *BookHasDeepNested) String() string {
 func (*BookHasDeepNested) ProtoMessage() {}
 
 func (x *BookHasDeepNested) ProtoReflect() protoreflect.Message {
-	mi := &file_service_proto_msgTypes[3]
+	mi := &file_service_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -261,7 +362,7 @@ func (x *BookHasDeepNested) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BookHasDeepNested.ProtoReflect.Descriptor instead.
 func (*BookHasDeepNested) Descriptor() ([]byte, []int) {
-	return file_service_proto_rawDescGZIP(), []int{3}
+	return file_service_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *BookHasDeepNested) GetDeepNested() *DeepNestedBook {
@@ -323,7 +424,7 @@ type GetBookRequest struct {
 func (x *GetBookRequest) Reset() {
 	*x = GetBookRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_service_proto_msgTypes[4]
+		mi := &file_service_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -336,7 +437,7 @@ func (x *GetBookRequest) String() string {
 func (*GetBookRequest) ProtoMessage() {}
 
 func (x *GetBookRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_service_proto_msgTypes[4]
+	mi := &file_service_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -349,7 +450,7 @@ func (x *GetBookRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetBookRequest.ProtoReflect.Descriptor instead.
 func (*GetBookRequest) Descriptor() ([]byte, []int) {
-	return file_service_proto_rawDescGZIP(), []int{4}
+	return file_service_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *GetBookRequest) GetId() string {
@@ -662,7 +763,7 @@ type Leveled struct {
 func (x *Leveled) Reset() {
 	*x = Leveled{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_service_proto_msgTypes[5]
+		mi := &file_service_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -675,7 +776,7 @@ func (x *Leveled) String() string {
 func (*Leveled) ProtoMessage() {}
 
 func (x *Leveled) ProtoReflect() protoreflect.Message {
-	mi := &file_service_proto_msgTypes[5]
+	mi := &file_service_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -688,7 +789,7 @@ func (x *Leveled) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Leveled.ProtoReflect.Descriptor instead.
 func (*Leveled) Descriptor() ([]byte, []int) {
-	return file_service_proto_rawDescGZIP(), []int{5}
+	return file_service_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *Leveled) GetF1() *L2 {
@@ -717,7 +818,7 @@ type L2 struct {
 func (x *L2) Reset() {
 	*x = L2{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_service_proto_msgTypes[6]
+		mi := &file_service_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -730,7 +831,7 @@ func (x *L2) String() string {
 func (*L2) ProtoMessage() {}
 
 func (x *L2) ProtoReflect() protoreflect.Message {
-	mi := &file_service_proto_msgTypes[6]
+	mi := &file_service_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -743,7 +844,7 @@ func (x *L2) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use L2.ProtoReflect.Descriptor instead.
 func (*L2) Descriptor() ([]byte, []int) {
-	return file_service_proto_rawDescGZIP(), []int{6}
+	return file_service_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *L2) GetF1() *L3 {
@@ -772,7 +873,7 @@ type L3 struct {
 func (x *L3) Reset() {
 	*x = L3{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_service_proto_msgTypes[7]
+		mi := &file_service_proto_msgTypes[9]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -785,7 +886,7 @@ func (x *L3) String() string {
 func (*L3) ProtoMessage() {}
 
 func (x *L3) ProtoReflect() protoreflect.Message {
-	mi := &file_service_proto_msgTypes[7]
+	mi := &file_service_proto_msgTypes[9]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -798,7 +899,7 @@ func (x *L3) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use L3.ProtoReflect.Descriptor instead.
 func (*L3) Descriptor() ([]byte, []int) {
-	return file_service_proto_rawDescGZIP(), []int{7}
+	return file_service_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *L3) GetF1() string {
@@ -830,7 +931,13 @@ var file_service_proto_rawDesc = []byte{
 	0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2f, 0x64, 0x75, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2e,
 	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x1f, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2f, 0x70, 0x72,
 	0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2f, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70,
-	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x16, 0x0a, 0x04, 0x42, 0x6f, 0x6f, 0x6b, 0x12, 0x0e,
+	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x27, 0x0a, 0x11, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65,
+	0x42, 0x6f, 0x6f, 0x6b, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x6e,
+	0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x22,
+	0x35, 0x0a, 0x0f, 0x47, 0x65, 0x74, 0x42, 0x6f, 0x6f, 0x6b, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02,
+	0x69, 0x64, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x22, 0x16, 0x0a, 0x04, 0x42, 0x6f, 0x6f, 0x6b, 0x12, 0x0e,
 	0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x22, 0xa6,
 	0x01, 0x0a, 0x12, 0x52, 0x65, 0x70, 0x65, 0x61, 0x74, 0x65, 0x64, 0x4e, 0x65, 0x73, 0x74, 0x65,
 	0x64, 0x42, 0x6f, 0x6f, 0x6b, 0x12, 0x48, 0x0a, 0x05, 0x62, 0x6f, 0x6f, 0x6b, 0x73, 0x18, 0x01,
@@ -1000,24 +1107,37 @@ var file_service_proto_rawDesc = []byte{
 	0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x4c, 0x33, 0x52, 0x02, 0x66, 0x32, 0x22, 0x24,
 	0x0a, 0x02, 0x4c, 0x33, 0x12, 0x0e, 0x0a, 0x02, 0x66, 0x31, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
 	0x52, 0x02, 0x66, 0x31, 0x12, 0x0e, 0x0a, 0x02, 0x66, 0x32, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09,
-	0x52, 0x02, 0x66, 0x32, 0x32, 0xee, 0x01, 0x0a, 0x09, 0x42, 0x6f, 0x6f, 0x6b, 0x53, 0x74, 0x6f,
-	0x72, 0x65, 0x12, 0x6b, 0x0a, 0x07, 0x47, 0x65, 0x74, 0x42, 0x6f, 0x6f, 0x6b, 0x12, 0x2e, 0x2e,
-	0x6b, 0x61, 0x6c, 0x69, 0x73, 0x74, 0x6f, 0x2e, 0x74, 0x65, 0x73, 0x74, 0x73, 0x2e, 0x65, 0x78,
-	0x61, 0x6d, 0x70, 0x6c, 0x65, 0x73, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x47,
-	0x65, 0x74, 0x42, 0x6f, 0x6f, 0x6b, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x2e, 0x2e,
-	0x6b, 0x61, 0x6c, 0x69, 0x73, 0x74, 0x6f, 0x2e, 0x74, 0x65, 0x73, 0x74, 0x73, 0x2e, 0x65, 0x78,
-	0x61, 0x6d, 0x70, 0x6c, 0x65, 0x73, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x47,
-	0x65, 0x74, 0x42, 0x6f, 0x6f, 0x6b, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x00, 0x12,
-	0x39, 0x0a, 0x05, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x12, 0x16, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c,
-	0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79,
-	0x1a, 0x16, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62,
-	0x75, 0x66, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x22, 0x00, 0x12, 0x39, 0x0a, 0x05, 0x45, 0x72,
-	0x72, 0x6f, 0x72, 0x12, 0x16, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f,
-	0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x1a, 0x16, 0x2e, 0x67, 0x6f,
-	0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x45, 0x6d,
-	0x70, 0x74, 0x79, 0x22, 0x00, 0x42, 0x17, 0x5a, 0x15, 0x6b, 0x61, 0x6c, 0x69, 0x73, 0x74, 0x6f,
-	0x2f, 0x74, 0x65, 0x73, 0x74, 0x73, 0x2f, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x62, 0x06,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x52, 0x02, 0x66, 0x32, 0x32, 0xba, 0x03, 0x0a, 0x09, 0x42, 0x6f, 0x6f, 0x6b, 0x53, 0x74, 0x6f,
+	0x72, 0x65, 0x12, 0x67, 0x0a, 0x0a, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x42, 0x6f, 0x6f, 0x6b,
+	0x12, 0x31, 0x2e, 0x6b, 0x61, 0x6c, 0x69, 0x73, 0x74, 0x6f, 0x2e, 0x74, 0x65, 0x73, 0x74, 0x73,
+	0x2e, 0x65, 0x78, 0x61, 0x6d, 0x70, 0x6c, 0x65, 0x73, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63,
+	0x65, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x42, 0x6f, 0x6f, 0x6b, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x1a, 0x24, 0x2e, 0x6b, 0x61, 0x6c, 0x69, 0x73, 0x74, 0x6f, 0x2e, 0x74, 0x65,
+	0x73, 0x74, 0x73, 0x2e, 0x65, 0x78, 0x61, 0x6d, 0x70, 0x6c, 0x65, 0x73, 0x2e, 0x73, 0x65, 0x72,
+	0x76, 0x69, 0x63, 0x65, 0x2e, 0x42, 0x6f, 0x6f, 0x6b, 0x22, 0x00, 0x12, 0x62, 0x0a, 0x07, 0x47,
+	0x65, 0x74, 0x42, 0x6f, 0x6f, 0x6b, 0x12, 0x24, 0x2e, 0x6b, 0x61, 0x6c, 0x69, 0x73, 0x74, 0x6f,
+	0x2e, 0x74, 0x65, 0x73, 0x74, 0x73, 0x2e, 0x65, 0x78, 0x61, 0x6d, 0x70, 0x6c, 0x65, 0x73, 0x2e,
+	0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x42, 0x6f, 0x6f, 0x6b, 0x1a, 0x2f, 0x2e, 0x6b,
+	0x61, 0x6c, 0x69, 0x73, 0x74, 0x6f, 0x2e, 0x74, 0x65, 0x73, 0x74, 0x73, 0x2e, 0x65, 0x78, 0x61,
+	0x6d, 0x70, 0x6c, 0x65, 0x73, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x47, 0x65,
+	0x74, 0x42, 0x6f, 0x6f, 0x6b, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12,
+	0x6a, 0x0a, 0x06, 0x4d, 0x69, 0x72, 0x72, 0x6f, 0x72, 0x12, 0x2e, 0x2e, 0x6b, 0x61, 0x6c, 0x69,
+	0x73, 0x74, 0x6f, 0x2e, 0x74, 0x65, 0x73, 0x74, 0x73, 0x2e, 0x65, 0x78, 0x61, 0x6d, 0x70, 0x6c,
+	0x65, 0x73, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x47, 0x65, 0x74, 0x42, 0x6f,
+	0x6f, 0x6b, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x2e, 0x2e, 0x6b, 0x61, 0x6c, 0x69,
+	0x73, 0x74, 0x6f, 0x2e, 0x74, 0x65, 0x73, 0x74, 0x73, 0x2e, 0x65, 0x78, 0x61, 0x6d, 0x70, 0x6c,
+	0x65, 0x73, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x47, 0x65, 0x74, 0x42, 0x6f,
+	0x6f, 0x6b, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x00, 0x12, 0x39, 0x0a, 0x05, 0x45,
+	0x6d, 0x70, 0x74, 0x79, 0x12, 0x16, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72,
+	0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x1a, 0x16, 0x2e, 0x67,
+	0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x45,
+	0x6d, 0x70, 0x74, 0x79, 0x22, 0x00, 0x12, 0x39, 0x0a, 0x05, 0x45, 0x72, 0x72, 0x6f, 0x72, 0x12,
+	0x16, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75,
+	0x66, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x1a, 0x16, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65,
+	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x22,
+	0x00, 0x42, 0x17, 0x5a, 0x15, 0x6b, 0x61, 0x6c, 0x69, 0x73, 0x74, 0x6f, 0x2f, 0x74, 0x65, 0x73,
+	0x74, 0x73, 0x2f, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x33,
 }
 
 var (
@@ -1033,63 +1153,69 @@ func file_service_proto_rawDescGZIP() []byte {
 }
 
 var file_service_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_service_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
+var file_service_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_service_proto_goTypes = []interface{}{
 	(GetBookRequest_Enum)(0),      // 0: kalisto.tests.examples.service.GetBookRequest.Enum
-	(*Book)(nil),                  // 1: kalisto.tests.examples.service.Book
-	(*RepeatedNestedBook)(nil),    // 2: kalisto.tests.examples.service.RepeatedNestedBook
-	(*DeepNestedBook)(nil),        // 3: kalisto.tests.examples.service.DeepNestedBook
-	(*BookHasDeepNested)(nil),     // 4: kalisto.tests.examples.service.BookHasDeepNested
-	(*GetBookRequest)(nil),        // 5: kalisto.tests.examples.service.GetBookRequest
-	(*Leveled)(nil),               // 6: kalisto.tests.examples.service.Leveled
-	(*L2)(nil),                    // 7: kalisto.tests.examples.service.L2
-	(*L3)(nil),                    // 8: kalisto.tests.examples.service.L3
-	nil,                           // 9: kalisto.tests.examples.service.GetBookRequest.StrToStrEntry
-	nil,                           // 10: kalisto.tests.examples.service.GetBookRequest.IntToBooksEntry
-	nil,                           // 11: kalisto.tests.examples.service.GetBookRequest.BtoeEntry
-	(*durationpb.Duration)(nil),   // 12: google.protobuf.Duration
-	(*timestamppb.Timestamp)(nil), // 13: google.protobuf.Timestamp
-	(*anypb.Any)(nil),             // 14: google.protobuf.Any
-	(*structpb.Struct)(nil),       // 15: google.protobuf.Struct
-	(*emptypb.Empty)(nil),         // 16: google.protobuf.Empty
+	(*CreateBookRequest)(nil),     // 1: kalisto.tests.examples.service.CreateBookRequest
+	(*GetBookResponse)(nil),       // 2: kalisto.tests.examples.service.GetBookResponse
+	(*Book)(nil),                  // 3: kalisto.tests.examples.service.Book
+	(*RepeatedNestedBook)(nil),    // 4: kalisto.tests.examples.service.RepeatedNestedBook
+	(*DeepNestedBook)(nil),        // 5: kalisto.tests.examples.service.DeepNestedBook
+	(*BookHasDeepNested)(nil),     // 6: kalisto.tests.examples.service.BookHasDeepNested
+	(*GetBookRequest)(nil),        // 7: kalisto.tests.examples.service.GetBookRequest
+	(*Leveled)(nil),               // 8: kalisto.tests.examples.service.Leveled
+	(*L2)(nil),                    // 9: kalisto.tests.examples.service.L2
+	(*L3)(nil),                    // 10: kalisto.tests.examples.service.L3
+	nil,                           // 11: kalisto.tests.examples.service.GetBookRequest.StrToStrEntry
+	nil,                           // 12: kalisto.tests.examples.service.GetBookRequest.IntToBooksEntry
+	nil,                           // 13: kalisto.tests.examples.service.GetBookRequest.BtoeEntry
+	(*durationpb.Duration)(nil),   // 14: google.protobuf.Duration
+	(*timestamppb.Timestamp)(nil), // 15: google.protobuf.Timestamp
+	(*anypb.Any)(nil),             // 16: google.protobuf.Any
+	(*structpb.Struct)(nil),       // 17: google.protobuf.Struct
+	(*emptypb.Empty)(nil),         // 18: google.protobuf.Empty
 }
 var file_service_proto_depIdxs = []int32{
-	2,  // 0: kalisto.tests.examples.service.RepeatedNestedBook.books:type_name -> kalisto.tests.examples.service.RepeatedNestedBook
-	1,  // 1: kalisto.tests.examples.service.RepeatedNestedBook.simpleBooks:type_name -> kalisto.tests.examples.service.Book
-	4,  // 2: kalisto.tests.examples.service.DeepNestedBook.hasNested:type_name -> kalisto.tests.examples.service.BookHasDeepNested
-	3,  // 3: kalisto.tests.examples.service.BookHasDeepNested.deepNested:type_name -> kalisto.tests.examples.service.DeepNestedBook
+	4,  // 0: kalisto.tests.examples.service.RepeatedNestedBook.books:type_name -> kalisto.tests.examples.service.RepeatedNestedBook
+	3,  // 1: kalisto.tests.examples.service.RepeatedNestedBook.simpleBooks:type_name -> kalisto.tests.examples.service.Book
+	6,  // 2: kalisto.tests.examples.service.DeepNestedBook.hasNested:type_name -> kalisto.tests.examples.service.BookHasDeepNested
+	5,  // 3: kalisto.tests.examples.service.BookHasDeepNested.deepNested:type_name -> kalisto.tests.examples.service.DeepNestedBook
 	0,  // 4: kalisto.tests.examples.service.GetBookRequest.enum:type_name -> kalisto.tests.examples.service.GetBookRequest.Enum
-	1,  // 5: kalisto.tests.examples.service.GetBookRequest.Book:type_name -> kalisto.tests.examples.service.Book
-	9,  // 6: kalisto.tests.examples.service.GetBookRequest.strToStr:type_name -> kalisto.tests.examples.service.GetBookRequest.StrToStrEntry
-	10, // 7: kalisto.tests.examples.service.GetBookRequest.intToBooks:type_name -> kalisto.tests.examples.service.GetBookRequest.IntToBooksEntry
-	11, // 8: kalisto.tests.examples.service.GetBookRequest.btoe:type_name -> kalisto.tests.examples.service.GetBookRequest.BtoeEntry
+	3,  // 5: kalisto.tests.examples.service.GetBookRequest.Book:type_name -> kalisto.tests.examples.service.Book
+	11, // 6: kalisto.tests.examples.service.GetBookRequest.strToStr:type_name -> kalisto.tests.examples.service.GetBookRequest.StrToStrEntry
+	12, // 7: kalisto.tests.examples.service.GetBookRequest.intToBooks:type_name -> kalisto.tests.examples.service.GetBookRequest.IntToBooksEntry
+	13, // 8: kalisto.tests.examples.service.GetBookRequest.btoe:type_name -> kalisto.tests.examples.service.GetBookRequest.BtoeEntry
 	0,  // 9: kalisto.tests.examples.service.GetBookRequest.enums:type_name -> kalisto.tests.examples.service.GetBookRequest.Enum
-	1,  // 10: kalisto.tests.examples.service.GetBookRequest.books:type_name -> kalisto.tests.examples.service.Book
-	3,  // 11: kalisto.tests.examples.service.GetBookRequest.deepNestedBook:type_name -> kalisto.tests.examples.service.DeepNestedBook
-	3,  // 12: kalisto.tests.examples.service.GetBookRequest.repeatedNestedBook:type_name -> kalisto.tests.examples.service.DeepNestedBook
+	3,  // 10: kalisto.tests.examples.service.GetBookRequest.books:type_name -> kalisto.tests.examples.service.Book
+	5,  // 11: kalisto.tests.examples.service.GetBookRequest.deepNestedBook:type_name -> kalisto.tests.examples.service.DeepNestedBook
+	5,  // 12: kalisto.tests.examples.service.GetBookRequest.repeatedNestedBook:type_name -> kalisto.tests.examples.service.DeepNestedBook
 	0,  // 13: kalisto.tests.examples.service.GetBookRequest.oneEnum:type_name -> kalisto.tests.examples.service.GetBookRequest.Enum
-	1,  // 14: kalisto.tests.examples.service.GetBookRequest.anotherBookObject:type_name -> kalisto.tests.examples.service.Book
-	3,  // 15: kalisto.tests.examples.service.GetBookRequest.anotherNestedBook:type_name -> kalisto.tests.examples.service.DeepNestedBook
-	12, // 16: kalisto.tests.examples.service.GetBookRequest.dur:type_name -> google.protobuf.Duration
-	13, // 17: kalisto.tests.examples.service.GetBookRequest.time:type_name -> google.protobuf.Timestamp
-	6,  // 18: kalisto.tests.examples.service.GetBookRequest.l1:type_name -> kalisto.tests.examples.service.Leveled
-	6,  // 19: kalisto.tests.examples.service.GetBookRequest.l2:type_name -> kalisto.tests.examples.service.Leveled
-	14, // 20: kalisto.tests.examples.service.GetBookRequest.any:type_name -> google.protobuf.Any
-	15, // 21: kalisto.tests.examples.service.GetBookRequest.struct:type_name -> google.protobuf.Struct
-	7,  // 22: kalisto.tests.examples.service.Leveled.f1:type_name -> kalisto.tests.examples.service.L2
-	7,  // 23: kalisto.tests.examples.service.Leveled.f2:type_name -> kalisto.tests.examples.service.L2
-	8,  // 24: kalisto.tests.examples.service.L2.f1:type_name -> kalisto.tests.examples.service.L3
-	8,  // 25: kalisto.tests.examples.service.L2.f2:type_name -> kalisto.tests.examples.service.L3
-	1,  // 26: kalisto.tests.examples.service.GetBookRequest.IntToBooksEntry.value:type_name -> kalisto.tests.examples.service.Book
+	3,  // 14: kalisto.tests.examples.service.GetBookRequest.anotherBookObject:type_name -> kalisto.tests.examples.service.Book
+	5,  // 15: kalisto.tests.examples.service.GetBookRequest.anotherNestedBook:type_name -> kalisto.tests.examples.service.DeepNestedBook
+	14, // 16: kalisto.tests.examples.service.GetBookRequest.dur:type_name -> google.protobuf.Duration
+	15, // 17: kalisto.tests.examples.service.GetBookRequest.time:type_name -> google.protobuf.Timestamp
+	8,  // 18: kalisto.tests.examples.service.GetBookRequest.l1:type_name -> kalisto.tests.examples.service.Leveled
+	8,  // 19: kalisto.tests.examples.service.GetBookRequest.l2:type_name -> kalisto.tests.examples.service.Leveled
+	16, // 20: kalisto.tests.examples.service.GetBookRequest.any:type_name -> google.protobuf.Any
+	17, // 21: kalisto.tests.examples.service.GetBookRequest.struct:type_name -> google.protobuf.Struct
+	9,  // 22: kalisto.tests.examples.service.Leveled.f1:type_name -> kalisto.tests.examples.service.L2
+	9,  // 23: kalisto.tests.examples.service.Leveled.f2:type_name -> kalisto.tests.examples.service.L2
+	10, // 24: kalisto.tests.examples.service.L2.f1:type_name -> kalisto.tests.examples.service.L3
+	10, // 25: kalisto.tests.examples.service.L2.f2:type_name -> kalisto.tests.examples.service.L3
+	3,  // 26: kalisto.tests.examples.service.GetBookRequest.IntToBooksEntry.value:type_name -> kalisto.tests.examples.service.Book
 	0,  // 27: kalisto.tests.examples.service.GetBookRequest.BtoeEntry.value:type_name -> kalisto.tests.examples.service.GetBookRequest.Enum
-	5,  // 28: kalisto.tests.examples.service.BookStore.GetBook:input_type -> kalisto.tests.examples.service.GetBookRequest
-	16, // 29: kalisto.tests.examples.service.BookStore.Empty:input_type -> google.protobuf.Empty
-	16, // 30: kalisto.tests.examples.service.BookStore.Error:input_type -> google.protobuf.Empty
-	5,  // 31: kalisto.tests.examples.service.BookStore.GetBook:output_type -> kalisto.tests.examples.service.GetBookRequest
-	16, // 32: kalisto.tests.examples.service.BookStore.Empty:output_type -> google.protobuf.Empty
-	16, // 33: kalisto.tests.examples.service.BookStore.Error:output_type -> google.protobuf.Empty
-	31, // [31:34] is the sub-list for method output_type
-	28, // [28:31] is the sub-list for method input_type
+	1,  // 28: kalisto.tests.examples.service.BookStore.CreateBook:input_type -> kalisto.tests.examples.service.CreateBookRequest
+	3,  // 29: kalisto.tests.examples.service.BookStore.GetBook:input_type -> kalisto.tests.examples.service.Book
+	7,  // 30: kalisto.tests.examples.service.BookStore.Mirror:input_type -> kalisto.tests.examples.service.GetBookRequest
+	18, // 31: kalisto.tests.examples.service.BookStore.Empty:input_type -> google.protobuf.Empty
+	18, // 32: kalisto.tests.examples.service.BookStore.Error:input_type -> google.protobuf.Empty
+	3,  // 33: kalisto.tests.examples.service.BookStore.CreateBook:output_type -> kalisto.tests.examples.service.Book
+	2,  // 34: kalisto.tests.examples.service.BookStore.GetBook:output_type -> kalisto.tests.examples.service.GetBookResponse
+	7,  // 35: kalisto.tests.examples.service.BookStore.Mirror:output_type -> kalisto.tests.examples.service.GetBookRequest
+	18, // 36: kalisto.tests.examples.service.BookStore.Empty:output_type -> google.protobuf.Empty
+	18, // 37: kalisto.tests.examples.service.BookStore.Error:output_type -> google.protobuf.Empty
+	33, // [33:38] is the sub-list for method output_type
+	28, // [28:33] is the sub-list for method input_type
 	28, // [28:28] is the sub-list for extension type_name
 	28, // [28:28] is the sub-list for extension extendee
 	0,  // [0:28] is the sub-list for field type_name
@@ -1102,7 +1228,7 @@ func file_service_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_service_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Book); i {
+			switch v := v.(*CreateBookRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1114,7 +1240,7 @@ func file_service_proto_init() {
 			}
 		}
 		file_service_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*RepeatedNestedBook); i {
+			switch v := v.(*GetBookResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1126,7 +1252,7 @@ func file_service_proto_init() {
 			}
 		}
 		file_service_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*DeepNestedBook); i {
+			switch v := v.(*Book); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1138,7 +1264,7 @@ func file_service_proto_init() {
 			}
 		}
 		file_service_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*BookHasDeepNested); i {
+			switch v := v.(*RepeatedNestedBook); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1150,7 +1276,7 @@ func file_service_proto_init() {
 			}
 		}
 		file_service_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetBookRequest); i {
+			switch v := v.(*DeepNestedBook); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1162,7 +1288,7 @@ func file_service_proto_init() {
 			}
 		}
 		file_service_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Leveled); i {
+			switch v := v.(*BookHasDeepNested); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1174,7 +1300,7 @@ func file_service_proto_init() {
 			}
 		}
 		file_service_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*L2); i {
+			switch v := v.(*GetBookRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1186,6 +1312,30 @@ func file_service_proto_init() {
 			}
 		}
 		file_service_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Leveled); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_service_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*L2); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_service_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*L3); i {
 			case 0:
 				return &v.state
@@ -1198,7 +1348,7 @@ func file_service_proto_init() {
 			}
 		}
 	}
-	file_service_proto_msgTypes[4].OneofWrappers = []interface{}{
+	file_service_proto_msgTypes[6].OneofWrappers = []interface{}{
 		(*GetBookRequest_OneId)(nil),
 		(*GetBookRequest_OneEnum)(nil),
 		(*GetBookRequest_AnotherBookObject)(nil),
@@ -1210,7 +1360,7 @@ func file_service_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_service_proto_rawDesc,
 			NumEnums:      1,
-			NumMessages:   11,
+			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

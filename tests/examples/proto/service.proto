@@ -11,9 +11,20 @@ import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 
 service BookStore {
-    rpc GetBook(GetBookRequest) returns (GetBookRequest) {}
+    rpc CreateBook(CreateBookRequest) returns (Book) {}
+    rpc GetBook(Book) returns (GetBookResponse) {}
+    rpc Mirror(GetBookRequest) returns (GetBookRequest) {}
     rpc Empty(google.protobuf.Empty) returns (google.protobuf.Empty) {}
     rpc Error(google.protobuf.Empty) returns (google.protobuf.Empty) {}
+}
+
+message CreateBookRequest {
+    string name = 1;
+}
+
+message GetBookResponse {
+    string id = 1;
+    string name = 2;
 }
 
 message Book {

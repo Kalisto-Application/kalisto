@@ -86,9 +86,9 @@ func main() {
 		Bind: []interface{}{
 			app.Api,
 		},
-		ErrorFormatter: models.NewErrorFormatter(func(err error) {
+		ErrorFormatter: models.NewErrorFormatter(app.Api.Context, func(err error) {
 			sentry.CaptureException(err)
-		}),
+		}, app.Api.Runtime()),
 		Menu:   AppMenu,
 		Logger: l,
 	}); err != nil {

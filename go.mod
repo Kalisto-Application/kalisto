@@ -11,7 +11,6 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/jhump/protoreflect v1.15.1
 	github.com/minio/selfupdate v0.6.0
-	github.com/onsi/gomega v1.27.8
 	github.com/stretchr/testify v1.8.4
 	github.com/wailsapp/wails/v2 v2.6.0
 	golang.org/x/mod v0.12.0
@@ -37,7 +36,6 @@ require (
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/flatbuffers v1.12.1 // indirect
-	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/google/pprof v0.0.0-20230207041349-798e818bf904 // indirect
 	github.com/jchv/go-winloader v0.0.0-20210711035445-715c2860da7e // indirect
 	github.com/klauspost/compress v1.16.0 // indirect

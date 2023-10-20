@@ -6,13 +6,14 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
+	"kalisto/src/definitions"
+	"kalisto/src/definitions/proto/client"
+	"kalisto/src/definitions/proto/compiler"
+	"kalisto/src/definitions/proto/interpreter"
+	"kalisto/src/definitions/proto/render"
 	"kalisto/src/filesystem"
 	"kalisto/src/models"
 	"kalisto/src/pkg/runtime"
-	"kalisto/src/proto/client"
-	"kalisto/src/proto/compiler"
-	"kalisto/src/proto/interpreter"
-	"kalisto/src/proto/spec"
 	"reflect"
 	"sort"
 	"strings"
@@ -33,28 +34,25 @@ type Api struct {
 	mx  sync.RWMutex
 
 	compiler      *compiler.FileCompiler
-	specFactory   *spec.Factory
 	store         *db.DB
 	newClient     func(ctx context.Context, addr string) (*client.Client, error)
-	protoRegistry *compiler.Descritors
+	registryStore *definitions.RegistryStore
 
 	runtime runtime.Runtime
 }
 
 func New(
 	compiler *compiler.FileCompiler,
-	specFactory *spec.Factory,
 	store *db.DB,
 	newClient func(ctx context.Context, addr string) (*client.Client, error),
-	protoRegistry *compiler.Descritors,
+	registryStore *definitions.RegistryStore,
 	runtime runtime.Runtime,
 ) *Api {
 	return &Api{
 		compiler:      compiler,
-		specFactory:   specFactory,
 		store:         store,
 		newClient:     newClient,
-		protoRegistry: protoRegistry,
+		registryStore: registryStore,
 		runtime:       runtime,
 	}
 }
@@ -65,16 +63,20 @@ func SetContext(a *Api, ctx context.Context) {
 	a.mx.Unlock()
 }
 
-func (a *Api) context() context.Context {
+func (a *Api) Context() context.Context {
 	a.mx.RLock()
 	defer a.mx.RUnlock()
 	return a.ctx
 }
 
+func (a *Api) Runtime() runtime.Runtime {
+	return a.runtime
+}
+
 // WORKSPACE API
 
 func (a *Api) FindProtoFiles() (models.ProtoDir, error) {
-	path, err := a.runtime.OpenDirectoryDialog(a.context(), rpkg.OpenDialogOptions{})
+	path, err := a.runtime.OpenDirectoryDialog(a.Context(), rpkg.OpenDialogOptions{})
 	if err != nil {
 		return models.ProtoDir{}, nil
 	}
@@ -131,7 +133,7 @@ func (a *Api) CreateWorkspace(name string, dirs []string) (models.Workspace, err
 		return models.Workspace{}, fmt.Errorf("api: failed to compile proto files: %w", err)
 	}
 
-	spc, err := a.specFactory.FromRegistry(registry)
+	spc, err := registry.Schema()
 	if err != nil {
 		return models.Workspace{}, fmt.Errorf("api: failed to create spec from registry: %w", err)
 	}
@@ -157,7 +159,7 @@ func (a *Api) CreateWorkspace(name string, dirs []string) (models.Workspace, err
 		return ws, fmt.Errorf("api: failed to save workspace: %w", err)
 	}
 
-	a.protoRegistry.Add(ws.ID, registry)
+	a.registryStore.Add(ws.ID, registry)
 
 	return ws, nil
 }
@@ -258,9 +260,9 @@ func (s *Api) enrichWorkspace(ws models.Workspace) (models.Workspace, error) {
 	if err != nil {
 		return ws, err
 	}
-	s.protoRegistry.Add(ws.ID, registry)
+	s.registryStore.Add(ws.ID, registry)
 
-	spec, err := s.specFactory.FromRegistry(registry)
+	spec, err := registry.Schema()
 	if err != nil {
 		return ws, err
 	}
@@ -302,11 +304,7 @@ func (a *Api) SendGrpc(request models.Request) (models.Response, error) {
 		return models.Response{}, nil
 	}
 
-	reg, err := a.protoRegistry.Get(request.WorkspaceID)
-	if err != nil {
-		return models.Response{}, err
-	}
-	sd, md, err := reg.FindMethod(models.MethodName(request.Method))
+	reg, err := a.registryStore.Get(request.WorkspaceID)
 	if err != nil {
 		return models.Response{}, err
 	}
@@ -329,12 +327,16 @@ func (a *Api) SendGrpc(request models.Request) (models.Response, error) {
 		return models.Response{}, fmt.Errorf("failed to get global vars: %w", err)
 	}
 	ip := interpreter.NewInterpreter(vars)
-	specInputMessage, err := ws.Spec.FindInputMessage(sd.GetFullyQualifiedName(), md.GetName())
+	specInputMessage, err := ws.Spec.FindInputMessage(models.MethodName(request.Method).ServiceAndShort())
 	if err != nil {
 		return models.Response{}, err
 	}
 
-	req, err := ip.CreateMessageFromScript(request.Body, md.GetInputType(), ws.Spec, specInputMessage)
+	inputType, err := reg.GetInputType(request.Method)
+	if err != nil {
+		return models.Response{}, fmt.Errorf("failed to find input type: %w", err)
+	}
+	req, err := ip.CreateMessageFromScript(request.Body, inputType, ws.Spec, specInputMessage)
 	if err != nil {
 		return models.Response{}, fmt.Errorf("api: failed to create request: %w", err)
 	}
@@ -344,16 +346,24 @@ func (a *Api) SendGrpc(request models.Request) (models.Response, error) {
 		return models.Response{}, fmt.Errorf("api: failed to create metadata: %w", err)
 	}
 
-	resp := dynamic.NewMessage(md.GetOutputType())
+	outputType, err := reg.GetOutputType(request.Method)
+	if err != nil {
+		return models.Response{}, fmt.Errorf("failed to find output type: %w", err)
+	}
+	resp := dynamic.NewMessage(outputType)
 
 	ctx = metadata.NewOutgoingContext(ctx, meta)
 	responseMeta := metadata.MD{}
-	apiErr, err := c.Invoke(ctx, "/"+sd.GetFullyQualifiedName()+"/"+md.GetName(), req, resp, &responseMeta)
+	path, err := reg.MethodPath(request.Method)
+	if err != nil {
+		return models.Response{}, fmt.Errorf("failed to find method path: %w", err)
+	}
+	apiErr, err := c.Invoke(ctx, path, req, resp, &responseMeta)
 	if err != nil {
 		return models.Response{}, fmt.Errorf("api: failed to invoke method: %w", err)
 	}
 
-	specOutputMessage, err := ws.Spec.FindOutputMessage(sd.GetFullyQualifiedName(), md.GetName())
+	specOutputMessage, err := ws.Spec.FindOutputMessage(models.MethodName(request.Method).ServiceAndShort())
 	if err != nil {
 		return models.Response{}, err
 	}
@@ -361,7 +371,7 @@ func (a *Api) SendGrpc(request models.Request) (models.Response, error) {
 	if apiErr != "" {
 		body = apiErr
 	} else {
-		body, err = a.specFactory.MessageAsJsString(specOutputMessage, resp)
+		body, err = render.New(reg.Links()).MessageAsJsString(specOutputMessage, resp)
 		if err != nil {
 			return models.Response{}, fmt.Errorf("api: failed to present response as js object: %w", err)
 		}
@@ -385,7 +395,7 @@ func (a *Api) RunScript(request models.ScriptCall) (string, error) {
 		return "", nil
 	}
 
-	reg, err := a.protoRegistry.Get(request.WorkspaceID)
+	reg, err := a.registryStore.Get(request.WorkspaceID)
 	if err != nil {
 		return "", err
 	}
@@ -409,7 +419,7 @@ func (a *Api) RunScript(request models.ScriptCall) (string, error) {
 	}
 	ip := interpreter.NewInterpreter(vars)
 
-	resp, err := ip.RunScript(ctx, request.Body, request.Meta, ws.Spec, reg, c, a.specFactory)
+	resp, err := ip.RunScript(ctx, request.Body, request.Meta, ws.Spec, reg, c, render.New(reg.Links()))
 	if err != nil {
 		return "", fmt.Errorf("api: failed to create request: %w", err)
 	}

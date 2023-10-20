@@ -3,8 +3,8 @@ package tests
 import (
 	"context"
 	"kalisto/src/assembly"
+	"kalisto/src/definitions/proto/interpreter"
 	"kalisto/src/models"
-	"kalisto/src/proto/interpreter"
 	"kalisto/tests/examples/server"
 	"kalisto/tests/examples/server_seq"
 	"os"
