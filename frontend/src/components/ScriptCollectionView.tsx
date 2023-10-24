@@ -31,9 +31,15 @@ const ScriptCollectionView: React.FC = () => {
 
   // Delete
   const deleteFile = () => {
-    RemoveScriptFile(workspaceId || '', activeScript).then((res) =>
-      ctx.dispatch({ type: 'deleteScriptFile', listFiles: res })
-    );
+    // вызввать апдейт вайлов
+    RemoveScriptFile(workspaceId || '', activeScript).then((res) => {
+      let ws = new models.Workspace({
+        ...ctx.state.activeWorkspace,
+        scriptFiles: [...res],
+      });
+
+      ctx.dispatch({ type: 'updateWorkspace', workspace: ws });
+    });
   };
 
   // Edit

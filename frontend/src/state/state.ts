@@ -22,7 +22,6 @@ type Action =
   | { type: 'setActiveScriptId'; id: string }
   | { type: 'updateScriptFile'; content: string }
   | { type: 'addScriptFile'; scriptFile: models.File }
-  | { type: 'deleteScriptFile'; listFiles: models.File[] }
   | { type: 'renameScriptFile'; idFile: string; value: string };
 
 export type State = {
@@ -210,14 +209,7 @@ export const reducer = (state: State, action: Action): State => {
           ],
         }),
       };
-    case 'deleteScriptFile':
-      return {
-        ...state,
-        activeWorkspace: new models.Workspace({
-          ...state.activeWorkspace,
-          scriptFiles: [...action.listFiles],
-        }),
-      };
+   
     case 'renameScriptFile':
       return {
         ...state,

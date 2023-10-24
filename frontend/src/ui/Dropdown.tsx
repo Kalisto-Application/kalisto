@@ -139,7 +139,7 @@ const EditableItem: React.FC<EditableItemProps> = ({ value, onDone }) => {
         }}
       />
       <div className=" bg-primaryFill pl-1 pt-1 text-xs">
-        Нажми Entre для переименования
+        Push Enter to rename
       </div>
     </div>
   );
