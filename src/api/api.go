@@ -7,8 +7,9 @@ import (
 	"fmt"
 	"io/fs"
 	"kalisto/src/definitions"
+	ocompiler "kalisto/src/definitions/openapi/compiler"
 	"kalisto/src/definitions/proto/client"
-	"kalisto/src/definitions/proto/compiler"
+	pcompiler "kalisto/src/definitions/proto/compiler"
 	"kalisto/src/definitions/proto/interpreter"
 	"kalisto/src/definitions/proto/render"
 	"kalisto/src/filesystem"
@@ -33,7 +34,9 @@ type Api struct {
 	ctx context.Context
 	mx  sync.RWMutex
 
-	compiler      *compiler.FileCompiler
+	protoCompiler   *pcompiler.FileCompiler
+	openapiCompiler *ocompiler.Compiler
+
 	store         *db.DB
 	newClient     func(ctx context.Context, addr string) (*client.Client, error)
 	registryStore *definitions.RegistryStore
@@ -42,18 +45,20 @@ type Api struct {
 }
 
 func New(
-	compiler *compiler.FileCompiler,
+	protoCompiler *pcompiler.FileCompiler,
+	openapiCompiler *ocompiler.Compiler,
 	store *db.DB,
 	newClient func(ctx context.Context, addr string) (*client.Client, error),
 	registryStore *definitions.RegistryStore,
 	runtime runtime.Runtime,
 ) *Api {
 	return &Api{
-		compiler:      compiler,
-		store:         store,
-		newClient:     newClient,
-		registryStore: registryStore,
-		runtime:       runtime,
+		protoCompiler:   protoCompiler,
+		openapiCompiler: openapiCompiler,
+		store:           store,
+		newClient:       newClient,
+		registryStore:   registryStore,
+		runtime:         runtime,
 	}
 }
 
@@ -101,6 +106,82 @@ func (a *Api) FindProtoFiles() (models.ProtoDir, error) {
 
 func (a *Api) CreateWorkspace(name string, dirs []string) (models.Workspace, error) {
 	registry, err := a.protoRegistryFromPath(dirs)
+	if err != nil {
+		var e reporter.ErrorWithPos
+		if errors.As(err, &e) {
+			var pathE *fs.PathError
+			if errors.As(e.Unwrap(), &pathE) {
+				pos := e.GetPosition()
+				a.runtime.MessageDialog(a.ctx, rpkg.MessageDialogOptions{
+					Type:    "error",
+					Title:   fmt.Sprintf("Can't resolve import proto file %s", pathE.Path),
+					Message: fmt.Sprintf("%s:%d:%d", pos.Filename, pos.Line, pos.Col),
+				})
+			}
+
+			if strings.Contains(e.Error(), "already defined at") {
+				pos := e.GetPosition()
+				a.runtime.MessageDialog(a.ctx, rpkg.MessageDialogOptions{
+					Type:    "error",
+					Title:   "Duplicated type definition found",
+					Message: fmt.Sprintf("%s:%d:%d", pos.Filename, pos.Line, pos.Col),
+				})
+			}
+		}
+		if errors.Is(err, models.ErrNoProtoFilesFound) {
+			a.runtime.MessageDialog(a.ctx, rpkg.MessageDialogOptions{
+				Type:    "error",
+				Title:   "Can't create a workspace",
+				Message: "No proto files found",
+			})
+		}
+		return models.Workspace{}, fmt.Errorf("api: failed to compile proto files: %w", err)
+	}
+
+	spc, err := registry.Schema()
+	if err != nil {
+		return models.Workspace{}, fmt.Errorf("api: failed to create spec from registry: %w", err)
+	}
+	if len(spc.Services) == 0 {
+		a.runtime.MessageDialog(a.ctx, rpkg.MessageDialogOptions{
+			Type:    "error",
+			Title:   "Can't create a workspace",
+			Message: "No services found",
+		})
+		return models.Workspace{}, fmt.Errorf("no services found")
+	}
+
+	ws := models.Workspace{
+		ID:          uuid.NewString(),
+		Name:        name,
+		Spec:        spc,
+		BasePath:    dirs,
+		TargetUrl:   "localhost:9000",
+		LastUsage:   time.Now().UTC().Round(time.Nanosecond),
+		ScriptFiles: make([]models.File, 0),
+	}
+	if err := a.store.SaveWorkspace(ws); err != nil {
+		return ws, fmt.Errorf("api: failed to save workspace: %w", err)
+	}
+
+	a.registryStore.Add(ws.ID, registry)
+
+	return ws, nil
+}
+
+func (a *Api) CreateWorkspaceV2(name string, dirs []string, workspaceKind models.WorkspaceKind) (models.Workspace, error) {
+	var registry definitions.Registry
+	var err error
+
+	switch workspaceKind {
+	case models.WorkspaceKindProto:
+		registry, err = a.protoRegistryFromPath(dirs)
+	case models.WorkspaceKindOpenapi:
+		registry, err = a.openapiRegistryFromPath(dirs)
+	default:
+		return models.Workspace{}, fmt.Errorf("given unknown workspace kind: %s", workspaceKind)
+	}
+
 	if err != nil {
 		var e reporter.ErrorWithPos
 		if errors.As(err, &e) {
@@ -426,13 +507,27 @@ func (a *Api) RunScript(request models.ScriptCall) (string, error) {
 	return resp, nil
 }
 
-func (s *Api) protoRegistryFromPath(dirs []string) (*compiler.Registry, error) {
+func (s *Api) protoRegistryFromPath(dirs []string) (*pcompiler.Registry, error) {
 	protoFiles, err := filesystem.SearchProtoFiles(dirs)
 	if err != nil {
 		return nil, fmt.Errorf("api: failed to search proto files: %w", err)
 	}
 
-	registry, err := s.compiler.Compile(protoFiles.AbsoluteDirsPath, protoFiles.RelativeProtoPaths, protoFiles.BufDirs)
+	registry, err := s.protoCompiler.Compile(protoFiles.AbsoluteDirsPath, protoFiles.RelativeProtoPaths, protoFiles.BufDirs)
+	if err != nil {
+		return nil, fmt.Errorf("api: failed to compile proto files: %w", err)
+	}
+
+	return registry, nil
+}
+
+func (s *Api) openapiRegistryFromPath(dirs []string) (*ocompiler.Registry, error) {
+	protoFiles, err := filesystem.SearchOpenapiFiles(dirs)
+	if err != nil {
+		return nil, fmt.Errorf("api: failed to search openapi files: %w", err)
+	}
+
+	registry, err := s.openapiCompiler.Compile(protoFiles)
 	if err != nil {
 		return nil, fmt.Errorf("api: failed to compile proto files: %w", err)
 	}

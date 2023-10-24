@@ -98,6 +98,15 @@ func SearchOpenapiFiles(files []string) ([]string, error) {
 		if !path.IsAbs(filename) {
 			return nil, &models.ErrorFileMustBeAbsolute{File: filename}
 		}
+
+		stat, err := os.Stat(filename)
+		if err != nil {
+			return nil, err
+		}
+
+		if stat.IsDir() {
+			return nil, &models.ErrorOpenapiFileCantBeDir{File: filename}
+		}
 	}
 
 	return files, nil

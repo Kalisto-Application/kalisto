@@ -22,6 +22,7 @@ func NewErrorFormatter(ctxGetter func() context.Context, errHandler func(err err
 		if errors.Is(err, JsTypeError) {
 			return ApiError{Code: "SYNTAX_ERROR", Value: err.Error()}
 		}
+		/////
 		var errFileMustBeAbsolute *ErrorFileMustBeAbsolute
 		if errors.As(err, &errFileMustBeAbsolute) {
 			runtime.MessageDialog(ctxGetter(), rpkg.MessageDialogOptions{
@@ -30,6 +31,16 @@ func NewErrorFormatter(ctxGetter func() context.Context, errHandler func(err err
 				Message: errFileMustBeAbsolute.File,
 			})
 			return ApiError{Code: "FILE_MUST_BE_ABSOLUTE", Value: errFileMustBeAbsolute.File}
+		}
+		/////
+		var errOpenapiFileCantBeDir *ErrorOpenapiFileCantBeDir
+		if errors.As(err, &errOpenapiFileCantBeDir) {
+			runtime.MessageDialog(ctxGetter(), rpkg.MessageDialogOptions{
+				Type:    "error",
+				Title:   "File can't be a directory",
+				Message: errOpenapiFileCantBeDir.File,
+			})
+			return ApiError{Code: "OPENAPI_FILE_CANT_BE_DIR", Value: errFileMustBeAbsolute.File}
 		}
 
 		errHandler(err)
@@ -61,6 +72,14 @@ type ErrorFileMustBeAbsolute struct {
 
 func (e *ErrorFileMustBeAbsolute) Error() string {
 	return "filename must be absolute"
+}
+
+type ErrorOpenapiFileCantBeDir struct {
+	File string
+}
+
+func (e *ErrorOpenapiFileCantBeDir) Error() string {
+	return "openapi file can't be a directory"
 }
 
 var JsTypeError = fmt.Errorf("TypeError: expected an object")

@@ -27,6 +27,13 @@ type Workspace struct {
 	ScriptFiles []File    `json:"scriptFiles"`
 }
 
+type WorkspaceKind string
+
+const (
+	WorkspaceKindProto   WorkspaceKind = "proto"
+	WorkspaceKindOpenapi WorkspaceKind = "openapi"
+)
+
 type Spec struct {
 	Services []Service          `json:"services"`
 	Links    map[string]Message `json:"-"`

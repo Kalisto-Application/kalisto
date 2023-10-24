@@ -6,8 +6,9 @@ import (
 	"kalisto/src/api"
 	"kalisto/src/db"
 	"kalisto/src/definitions"
+	ocompiler "kalisto/src/definitions/openapi/compiler"
 	"kalisto/src/definitions/proto/client"
-	"kalisto/src/definitions/proto/compiler"
+	pcompiler "kalisto/src/definitions/proto/compiler"
 	"kalisto/src/pkg/runtime"
 )
 
@@ -27,7 +28,8 @@ func NewApp(homeDir string) (*App, error) {
 		return nil, fmt.Errorf("failed to init db: %w", err)
 	}
 
-	protoCompiler := compiler.NewFileCompiler()
+	protoCompiler := pcompiler.NewFileCompiler()
+	openapiCompiler := ocompiler.NewCompiler()
 
 	newClient := func(ctx context.Context, addr string) (*client.Client, error) {
 		return client.NewClient(ctx, client.Config{
@@ -35,7 +37,7 @@ func NewApp(homeDir string) (*App, error) {
 		})
 	}
 
-	a := api.New(protoCompiler, store, newClient, definitions.NewRegistryStore(), runtime.New())
+	a := api.New(protoCompiler, openapiCompiler, store, newClient, definitions.NewRegistryStore(), runtime.New())
 
 	return &App{Api: a, db: store}, nil
 }
