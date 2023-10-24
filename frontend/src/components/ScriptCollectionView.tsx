@@ -31,7 +31,6 @@ const ScriptCollectionView: React.FC = () => {
 
   // Delete
   const deleteFile = () => {
-    // вызввать апдейт вайлов
     RemoveScriptFile(workspaceId || '', activeScript).then((res) => {
       let ws = new models.Workspace({
         ...ctx.state.activeWorkspace,
@@ -54,7 +53,6 @@ const ScriptCollectionView: React.FC = () => {
   };
 
   // Copy
-
   const CopyFile = () => {
     let nameScript = '';
     let contentScript = '';

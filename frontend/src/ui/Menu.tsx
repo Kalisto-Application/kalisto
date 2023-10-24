@@ -6,7 +6,7 @@ interface props {
 
 export const Menu: React.FC<props> = ({ items }) => {
   return (
-    <div className=" relative z-10  cursor-pointer rounded-md border-[1px] border-borderFill bg-primaryFill">
+    <div className=" relative z-10  cursor-pointer rounded-md border-[1px] border-borderFill bg-primaryFill ">
       {items.map((it, i) => {
         return <MenuItem key={i} {...it} />;
       })}
@@ -25,7 +25,7 @@ interface itemProps {
 export const MenuItem: React.FC<itemProps> = ({ text, icon, onClick }) => {
   return (
     <div
-      className="flex gap-x-5 px-4 py-2.5 hover:bg-textBlockFill"
+      className=" flex gap-x-5  px-4 py-2.5   hover:bg-textBlockFill"
       onClick={onClick}
     >
       {icon && <img src={icon} className="w-[18px]" />}
