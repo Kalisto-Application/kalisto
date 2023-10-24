@@ -75,13 +75,13 @@ const DropdownItem: React.FC<DropdownItemProps> = ({
         let el = (
           <div
             onClick={onClick}
-            className="ui-active:text-white relative flex h-11 w-[259.5px]  gap-x-11 px-4 py-2.5  ui-active:bg-textBlockFill"
+            className="ui-active:text-white relative flex h-11 w-[259.5px] flex-row items-center gap-x-[42px] px-4 py-2.5  ui-active:bg-textBlockFill"
           >
             {icon && <img src={icon} />}
             <a>{text}</a>
             {tip}
             {render.active && (
-              <div className="absolute  left-[200px] top-0 z-20 w-1/2">
+              <div className="absolute left-[200px] top-0 z-20 w-1/2">
                 {menu && (
                   <M
                     items={menu.map((menu) => ({
