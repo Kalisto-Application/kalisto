@@ -54,23 +54,6 @@ const ScriptCollectionView: React.FC = () => {
     let contentScript = '';
     ctx.state.activeWorkspace?.scriptFiles.forEach((file) => {
       if (file.id === activeScript) {
-        if (
-          file.name.slice(-1).match(/[0-9]/) &&
-          file.name.includes(` copy `)
-        ) {
-          let copyNumber = Number(file.name.slice(-1));
-          let strlength = file.name.length - 1;
-          let str = file.name.slice(0, strlength);
-
-          nameScript = str + ++copyNumber;
-          contentScript = file.content;
-          return;
-        }
-        if (file.name.includes(` copy`)) {
-          nameScript = `${file.name} 2`;
-          contentScript = file.content;
-          return;
-        }
         nameScript = `${file.name} copy`;
         contentScript = file.content;
         return;
