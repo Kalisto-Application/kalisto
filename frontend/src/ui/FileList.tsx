@@ -17,6 +17,7 @@ type fileListtProps = {
   isModeSubMenu: boolean;
   closeSubMenu: () => void;
   openSubMenu: () => void;
+  activeScript: string;
 };
 interface itemProps {
   text: string;
@@ -34,6 +35,7 @@ const FileList: React.FC<fileListtProps> = ({
   isModeSubMenu,
   closeSubMenu,
   openSubMenu,
+  activeScript,
 }) => {
   return (
     <>
@@ -49,6 +51,7 @@ const FileList: React.FC<fileListtProps> = ({
         isModeSubMenu={isModeSubMenu}
         closeSubMenu={closeSubMenu}
         openSubMenu={openSubMenu}
+        activeScript={activeScript}
       />
     </>
   );
@@ -130,6 +133,7 @@ type ItemListProps = {
   isModeSubMenu: boolean;
   closeSubMenu: () => void;
   openSubMenu: () => void;
+  activeScript: string;
 };
 
 const ItemList: React.FC<ItemListProps> = ({
@@ -142,10 +146,10 @@ const ItemList: React.FC<ItemListProps> = ({
   isModeSubMenu,
   closeSubMenu,
   openSubMenu,
+  activeScript,
 }) => {
-  const [idSubMenu, setIdSubMenu] = useState('');
+  const [idSubMenu, setIdSubMenu] = useState(activeScript);
   const [valueEdit, setValueEdit] = useState('');
-
   const subMenuRef = useRef(null);
 
   useOnClickOutside(subMenuRef, () => closeSubMenu());
@@ -165,7 +169,7 @@ const ItemList: React.FC<ItemListProps> = ({
   };
   return (
     <ul className="text-center">
-      {activeWorkspace?.scriptFiles ? (
+      {activeWorkspace?.scriptFiles.length !== 0 ? (
         activeWorkspace?.scriptFiles.map((it, indx) => (
           <li
             key={indx}

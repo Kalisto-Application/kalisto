@@ -53,7 +53,6 @@ const ScriptCollectionView: React.FC = () => {
     let nameScript = '';
     let contentScript = '';
     ctx.state.activeWorkspace?.scriptFiles.forEach((file) => {
-      debugger;
       if (file.id === activeScript) {
         if (
           file.name.slice(-1).match(/[0-9]/) &&
@@ -122,6 +121,7 @@ const ScriptCollectionView: React.FC = () => {
             activeWorkspace={ctx.state.activeWorkspace}
             setActiveScript={setActiveScript}
             items={items}
+            activeScript={activeScript}
             isOpenEditInput={isOpenEditInput}
             onCloseInput={() => setIsOpenEditInput(false)}
             editFile={(value) => editFile(value)}

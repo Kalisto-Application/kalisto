@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { CodeEditor } from '../ui/Editor';
 
 import { Context } from '../state';
@@ -6,10 +6,10 @@ import { UpdateScriptFileContent } from '../../wailsjs/go/api/Api';
 
 export const ScriptEditor: React.FC = () => {
   const ctx = useContext(Context);
-
   let fileId = ctx.state.scriptIdFile;
+
   const ws = ctx.state.activeWorkspace;
-  const activeFile = ws?.scriptFiles?.find((it) => it.id == fileId);
+  let activeFile = ws?.scriptFiles?.find((it) => it.id == fileId);
 
   const saveScript = (content: string) => {
     if (!ws?.id || !activeFile?.id) {

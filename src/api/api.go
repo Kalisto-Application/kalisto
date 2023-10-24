@@ -151,6 +151,7 @@ func (a *Api) CreateWorkspace(name string, dirs []string) (models.Workspace, err
 		BasePath:  dirs,
 		TargetUrl: "localhost:9000",
 		LastUsage: time.Now().UTC().Round(time.Nanosecond),
+		ScriptFiles: make([]models.File, 0),
 	}
 	if err := a.store.SaveWorkspace(ws); err != nil {
 		return ws, fmt.Errorf("api: failed to save workspace: %w", err)
