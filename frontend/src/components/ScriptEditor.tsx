@@ -1,48 +1,36 @@
-import React, { useContext } from 'react';
-import { CodeEditor } from './CodeEditor';
+import React, { useContext, useEffect } from 'react';
+import { CodeEditor } from '../ui/Editor';
 
 import { Context } from '../state';
-import { UpdateWorkspace } from '../../wailsjs/go/api/Api';
-import { models } from '../../wailsjs/go/models';
+import { UpdateScriptFileContent } from '../../wailsjs/go/api/Api';
 
 export const ScriptEditor: React.FC = () => {
   const ctx = useContext(Context);
+  let fileId = ctx.state.scriptIdFile;
 
-  const saveScript = (script: string) => {
-    if (!ctx.state.activeWorkspace) {
-      console.log('no active workspace');
+  const ws = ctx.state.activeWorkspace;
+  let activeFile = ws?.scriptFiles?.find((it) => it.id == fileId);
+
+  const saveScript = (content: string) => {
+    if (!ws?.id || !activeFile?.id) {
       return;
     }
 
-    const ws = ctx.state.activeWorkspace;
-    if (!ws) {
-      console.log('workspace not found');
-      return;
-    }
-    const updatedWs = new models.Workspace({ ...ws, script: script });
-    console.log(updatedWs);
-
-    UpdateWorkspace(updatedWs)
-      .then((_) => {
-        console.log('workspace script saved');
-      })
-      .catch((err) => {
-        console.log('failed to save script: ', err);
-        if (err?.Code === 'SYNTAX_ERROR') {
-          ctx.dispatch({ type: 'scriptError', value: err.Value });
-          return;
-        }
-        console.log('failed to save global vars: ', err);
+    UpdateScriptFileContent(ws?.id, fileId, content).then(() => {
+      ctx.dispatch({
+        type: 'updateScriptFile',
+        content: content,
       });
+      console.log('workspace script saved');
+    });
   };
 
   return (
-    <div className="bg-textBlockFill w-1/2">
+    <div className="w-1/2 bg-textBlockFill">
       <CodeEditor
-        key={0}
-        text={ctx.state.scriptText}
-        type="changeScriptText"
-        action={saveScript}
+        text={activeFile?.content || ''}
+        fileId={ctx.state.scriptIdFile}
+        onChange={saveScript}
       />
     </div>
   );

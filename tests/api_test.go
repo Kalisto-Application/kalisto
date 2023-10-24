@@ -81,6 +81,61 @@ func (s *ApiSuite) TestList() {
 	app.OnShutdown(context.Background())
 }
 
+func (s *ApiSuite) TestScriptFiles() {
+	wd, err := os.Getwd()
+	s.Require().NoError(err)
+	dirs := []string{
+		path.Join(wd, "examples/buf/workspace/observabilityapi"),
+		path.Join(wd, "examples/buf/workspace/observabilitytypes"),
+	}
+
+	app, err := assembly.NewApp(xdg.DataHome + "/kalisto.db/test-" + s.T().Name())
+	s.Require().NoError(err)
+
+	res, err := app.Api.WorkspaceList("")
+	s.Require().NoError(err)
+	for _, ws := range res.List {
+		err = app.Api.DeleteWorkspace(ws.ID)
+		s.Require().NoError(err)
+	}
+	wsList, err := app.Api.WorkspaceList("")
+	s.Require().NoError(err)
+	s.Require().Len(wsList.List, 0)
+
+	ws, err := app.Api.CreateWorkspace("1", dirs)
+	s.Require().NoError(err)
+
+	newFile, err := app.Api.CreateScriptFile(ws.ID, "f1", "")
+	s.Require().NoError(err)
+	s.Equal(newFile.Name, "f1")
+	s.Equal(newFile.Content, "")
+
+	newFile2, err := app.Api.CreateScriptFile(ws.ID, "f2", "content")
+	s.Require().NoError(err)
+	s.Equal(newFile2.Name, "f2")
+	s.Equal(newFile2.Content, "content")
+
+	err = app.Api.RenameScriptFile(ws.ID, newFile.Id, "f11")
+	s.Require().NoError(err)
+	newFile.Name = "f11"
+
+	err = app.Api.UpdateScriptFileContent(ws.ID, newFile.Id, "content1")
+	s.Require().NoError(err)
+	newFile.Content = "content1"
+
+	err = app.Api.RenameScriptFile(ws.ID, newFile2.Id, "f22")
+	s.Require().NoError(err)
+	newFile2.Name = "f22"
+
+	err = app.Api.UpdateScriptFileContent(ws.ID, newFile2.Id, "content2")
+	s.Require().NoError(err)
+	newFile2.Content = "content2"
+
+	wsList, err = app.Api.WorkspaceList(ws.ID)
+	s.Require().NoError(err)
+	s.Equal(wsList.Main.ScriptFiles, []models.File{newFile2, newFile})
+}
+
 func TestApi(t *testing.T) {
 	suite.Run(t, new(ApiSuite))
 }

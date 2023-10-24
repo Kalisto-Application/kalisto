@@ -74,8 +74,8 @@ body {
   font-weight: 400;
 }
 
-input {
-  padding-left: 16px;
+ul li {
+  list-style: none;
 }
 
 .divide {

@@ -151,6 +151,7 @@ func (a *Api) CreateWorkspace(name string, dirs []string) (models.Workspace, err
 		BasePath:  dirs,
 		TargetUrl: "localhost:9000",
 		LastUsage: time.Now().UTC().Round(time.Nanosecond),
+		ScriptFiles: make([]models.File, 0),
 	}
 	if err := a.store.SaveWorkspace(ws); err != nil {
 		return ws, fmt.Errorf("api: failed to save workspace: %w", err)
@@ -427,4 +428,76 @@ func (s *Api) protoRegistryFromPath(dirs []string) (*compiler.Registry, error) {
 	}
 
 	return registry, nil
+}
+
+// SCRIPTING FILES API
+
+func (s *Api) CreateScriptFile(workspaceID, name, content string) (models.File, error) {
+	file := models.File{
+		Id:        uuid.NewString(),
+		Name:      name,
+		CreatedAt: time.Now().UTC().Round(time.Nanosecond),
+		Content:   content,
+	}
+
+	ws, err := s.store.GetWorkspace(workspaceID)
+	if err != nil {
+		return file, err
+	}
+
+	ws.ScriptFiles = append([]models.File{file}, ws.ScriptFiles...)
+	err = s.store.SaveWorkspace(ws)
+	return file, err
+}
+
+func (s *Api) RemoveScriptFile(workspaceID, fileID string) ([]models.File, error) {
+	ws, err := s.store.GetWorkspace(workspaceID)
+	if err != nil {
+		return nil, err
+	}
+
+	filtered := make([]models.File, 0, len(ws.ScriptFiles))
+	for _, file := range ws.ScriptFiles {
+		if file.Id == fileID {
+			continue
+		}
+
+		filtered = append(filtered, file)
+	}
+
+	ws.ScriptFiles = filtered
+	err = s.store.SaveWorkspace(ws)
+	return ws.ScriptFiles, err
+}
+
+func (s *Api) RenameScriptFile(workspaceID, fileID, name string) error {
+	ws, err := s.store.GetWorkspace(workspaceID)
+	if err != nil {
+		return err
+	}
+
+	for i, file := range ws.ScriptFiles {
+		if file.Id == fileID {
+			ws.ScriptFiles[i].Name = name
+			break
+		}
+	}
+
+	return s.store.SaveWorkspace(ws)
+}
+
+func (s *Api) UpdateScriptFileContent(workspaceID, fileID, content string) error {
+	ws, err := s.store.GetWorkspace(workspaceID)
+	if err != nil {
+		return err
+	}
+
+	for i, file := range ws.ScriptFiles {
+		if file.Id == fileID {
+			ws.ScriptFiles[i].Content = content
+			break
+		}
+	}
+
+	return s.store.SaveWorkspace(ws)
 }

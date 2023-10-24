@@ -6,13 +6,15 @@ import { ScriptResponse } from '../components/ScriptResponse';
 import TabList from '../ui/TabList';
 import ScriptError from '../components/ScriptError';
 import { ScriptSender } from '../components/ScriptSender';
+import ScriptCollectionView from '../components/ScriptCollectionView';
 
 export const ScriptingPage: React.FC = () => {
   return (
-    <div className="flex flex-1 w-full">
-      <div className="flex flex-[0_0_220px] justify-items-start flex-col">
+    <div className="flex w-full flex-1">
+      <div className="flex flex-[0_0_220px] flex-col justify-items-start">
         <WorkspaceList />
         <SearchBox />
+        <ScriptCollectionView />
       </div>
       <div className="flex flex-1 flex-col">
         <TabList />

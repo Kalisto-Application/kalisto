@@ -17,7 +17,12 @@ type Action =
   | { type: 'varsError'; value: string }
   | { type: 'changeScriptText'; text: string }
   | { type: 'scriptResponse'; response: string }
-  | { type: 'scriptError'; value: string };
+  | { type: 'scriptError'; value: string }
+  | { type: 'updateWorkspace'; workspace: models.Workspace }
+  | { type: 'setActiveScriptId'; id: string }
+  | { type: 'updateScriptFile'; content: string }
+  | { type: 'addScriptFile'; scriptFile: models.File }
+  | { type: 'renameScriptFile'; idFile: string; value: string };
 
 export type State = {
   activeRequestEditor: number;
@@ -34,6 +39,8 @@ export type State = {
   scriptText: string;
   scriptResponse: string;
   scriptError: string;
+  // test
+  scriptIdFile: string;
 };
 
 export const newState = (): State => {
@@ -52,6 +59,7 @@ export const newState = (): State => {
     scriptText: '',
     scriptResponse: '',
     scriptError: '',
+    scriptIdFile: '',
   };
 };
 
@@ -84,7 +92,7 @@ export const reducer = (state: State, action: Action): State => {
       return {
         ...state,
         workspaceList: [action.workspace as models.WorkspaceShort].concat(
-          state.workspaceList || [],
+          state.workspaceList || []
         ),
         activeWorkspace: action.workspace,
       };
@@ -99,12 +107,12 @@ export const reducer = (state: State, action: Action): State => {
             : state.activeWorkspace,
       };
     case 'renameWorkspace':
-      let ws = state.activeWorkspace
+      let ws = state.activeWorkspace;
       if (state.activeWorkspace && state.activeWorkspace?.id === action.id) {
         ws = new models.Workspace({
           ...ws,
           name: action.name,
-        })
+        });
       }
       return {
         ...state,
@@ -158,6 +166,18 @@ export const reducer = (state: State, action: Action): State => {
         ...state,
         scriptText: action.text,
       };
+    case 'updateScriptFile':
+      return {
+        ...state,
+        activeWorkspace: new models.Workspace({
+          ...state.activeWorkspace,
+          scriptFiles: state.activeWorkspace?.scriptFiles.map((it) => {
+            if (it.id !== state.scriptIdFile) return it;
+            it.content = action.content;
+            return it;
+          }),
+        }),
+      };
     case 'scriptResponse':
       return {
         ...state,
@@ -167,6 +187,42 @@ export const reducer = (state: State, action: Action): State => {
       return {
         ...state,
         scriptError: action.value,
+      };
+    case 'updateWorkspace':
+      return {
+        ...state,
+        activeWorkspace: action.workspace,
+      };
+    case 'setActiveScriptId':
+      return {
+        ...state,
+        scriptIdFile: action.id,
+      };
+    case 'addScriptFile':
+      return {
+        ...state,
+        activeWorkspace: new models.Workspace({
+          ...state.activeWorkspace,
+          scriptFiles: [
+            ...(state.activeWorkspace?.scriptFiles || []),
+            action.scriptFile,
+          ],
+        }),
+      };
+   
+    case 'renameScriptFile':
+      return {
+        ...state,
+        activeWorkspace: new models.Workspace({
+          ...state.activeWorkspace,
+          scriptFiles: state.activeWorkspace?.scriptFiles.map((file) => {
+            if (file.id === action.idFile) {
+              file.name = action.value;
+              return file;
+            }
+            return file;
+          }),
+        }),
       };
     default:
       return state;

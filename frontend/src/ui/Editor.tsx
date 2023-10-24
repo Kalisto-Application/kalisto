@@ -1,5 +1,34 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useMemo } from 'react';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
+
+import { debounce } from '../pkg';
+
+type CodeEditorProps = {
+  text: string;
+  fileId: string;
+  onChange: (text: string) => void;
+};
+
+export const CodeEditor: React.FC<CodeEditorProps> = ({
+  text,
+  fileId,
+  onChange,
+}) => {
+  const handleOnChange = useMemo(() => {
+    return debounce(onChange, 400);
+  }, [fileId]);
+
+  return <Editor key={fileId} value={text} onChange={handleOnChange} />;
+};
+
+type CodeViewerProps = {
+  text: string;
+  fileId: string;
+};
+
+export const CodeViewer: React.FC<CodeViewerProps> = ({ text, fileId }) => {
+  return <Editor key={fileId} value={text} readonly />;
+};
 
 type props = {
   value: string;
@@ -7,7 +36,7 @@ type props = {
   readonly?: boolean;
 };
 
-export const Editor: React.FC<props> = ({ value, onChange, readonly }) => {
+const Editor: React.FC<props> = ({ value, onChange, readonly }) => {
   const [editor, setEditor] =
     useState<monaco.editor.IStandaloneCodeEditor | null>(null);
   const [sub, setSub] = useState<monaco.IDisposable | undefined>();
@@ -41,7 +70,7 @@ export const Editor: React.FC<props> = ({ value, onChange, readonly }) => {
             if (onChange) {
               onChange(ed.getModel()?.getValue() || '');
             }
-          }),
+          })
         );
 
         return ed;

@@ -91,9 +91,6 @@ func main() {
 		}),
 		Menu:   AppMenu,
 		Logger: l,
-		Debug: options.Debug{
-			OpenInspectorOnStartup: version == "",
-		},
 	}); err != nil {
 		sentry.CaptureException(err)
 	}

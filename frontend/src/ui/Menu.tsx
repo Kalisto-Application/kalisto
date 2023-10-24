@@ -6,7 +6,7 @@ interface props {
 
 export const Menu: React.FC<props> = ({ items }) => {
   return (
-    <div className="flex justify-center items-center px-0 py-1 flex-col content-normal rounded-md border-[1px] border-borderFill absolute z-10 bg-primaryFill cursor-pointer">
+    <div className=" relative z-10  cursor-pointer rounded-md border-[1px] border-borderFill bg-primaryFill">
       {items.map((it, i) => {
         return <MenuItem key={i} {...it} />;
       })}
@@ -23,33 +23,13 @@ interface itemProps {
 }
 
 export const MenuItem: React.FC<itemProps> = ({ text, icon, onClick }) => {
-  const [isHovered, setIsHovered] = useState(false);
-
-  const onMouseEnter = () => {
-    setIsHovered(true);
-  };
-
-  const onMouseLeave = () => {
-    setIsHovered(false);
-  };
-
-  let className =
-    'flex flex-row w-[259.5px] h-11 items-center gap-[42px] px-4 py-2.5 leading-6';
-  if (isHovered) {
-    className += ' bg-textBlockFill';
-  }
-
   return (
     <div
-      className={className}
+      className="flex gap-x-5 px-4 py-2.5 hover:bg-textBlockFill"
       onClick={onClick}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
     >
-      {icon && <img src={icon} />}
-      <div>
-        <div>{text}</div>
-      </div>
+      {icon && <img src={icon} className="w-[18px]" />}
+      <span>{text}</span>
     </div>
   );
 };

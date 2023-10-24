@@ -1,11 +1,11 @@
 package models
 
-import (
-	"time"
-)
+import "time"
 
 type File struct {
+	Id        string    `json:"id"`
 	Name      string    `json:"name"`
 	Content   string    `json:"content"`
-	CreatedAt time.Time `json:"createdAt"`
+	Headers   string    `json:"headers"`
+	CreatedAt time.Time `json:"createdAt" ts_type:"Date" ts_transform:"new Date(__VALUE__)"`
 }
