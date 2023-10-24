@@ -228,12 +228,12 @@ func (a *Api) CreateWorkspaceV2(name string, dirs []string, workspaceKind models
 	}
 
 	ws := models.Workspace{
-		ID:        uuid.NewString(),
-		Name:      name,
-		Spec:      spc,
-		BasePath:  dirs,
-		TargetUrl: "localhost:9000",
-		LastUsage: time.Now().UTC().Round(time.Nanosecond),
+		ID:          uuid.NewString(),
+		Name:        name,
+		Spec:        spc,
+		BasePath:    dirs,
+		TargetUrl:   "localhost:9000",
+		LastUsage:   time.Now().UTC().Round(time.Nanosecond),
 		ScriptFiles: make([]models.File, 0),
 	}
 	if err := a.store.SaveWorkspace(ws); err != nil {
@@ -284,6 +284,7 @@ func (a *Api) WorkspaceList(id string) (models.WorkspaceList, error) {
 		if list[i].ID == id {
 			list[i].LastUsage = time.Now().UTC().Round(time.Nanosecond)
 			main = list[i]
+			main.ScriptFiles = make([]models.File, 0)
 			break
 		}
 	}

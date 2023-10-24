@@ -17,7 +17,6 @@ export const VariablesPage: React.FC<VariablesPageProps> = () => {
       .catch((err) => {
         console.log('failed to save global vars: ', err);
         if (err?.Code === 'SYNTAX_ERROR') {
-          console.log('dispatcyhed  ');
           ctx.dispatch({ type: 'varsError', value: err.Value });
           return;
         }

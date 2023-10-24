@@ -40,7 +40,10 @@ export const ScriptSender: React.FC = () => {
     RunScript({
       addr: url,
       workspaceId: activeWorkspace.id,
-      body: ctx.state.scriptText,
+      body:
+        activeWorkspace.scriptFiles.find(
+          (it) => it.id === ctx.state.activeScriptFileId
+        )?.content || '',
       meta: '',
     })
       .then((res) => {

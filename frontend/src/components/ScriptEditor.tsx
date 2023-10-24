@@ -6,7 +6,7 @@ import { UpdateScriptFileContent } from '../../wailsjs/go/api/Api';
 
 export const ScriptEditor: React.FC = () => {
   const ctx = useContext(Context);
-  let fileId = ctx.state.scriptIdFile;
+  let fileId = ctx.state.activeScriptFileId;
 
   const ws = ctx.state.activeWorkspace;
   let activeFile = ws?.scriptFiles?.find((it) => it.id == fileId);
@@ -21,7 +21,6 @@ export const ScriptEditor: React.FC = () => {
         type: 'updateScriptFile',
         content: content,
       });
-      console.log('workspace script saved');
     });
   };
 
@@ -29,7 +28,7 @@ export const ScriptEditor: React.FC = () => {
     <div className="w-1/2 bg-textBlockFill">
       <CodeEditor
         text={activeFile?.content || ''}
-        fileId={ctx.state.scriptIdFile}
+        fileId={ctx.state.activeScriptFileId}
         onChange={saveScript}
       />
     </div>

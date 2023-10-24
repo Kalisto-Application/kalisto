@@ -15,7 +15,7 @@ const ScriptCollectionView: React.FC = () => {
   const [isOpenEditInput, setIsOpenEditInput] = useState(false);
   const [isModeSubMenu, setIsModeSubMenu] = useState(false);
 
-  const activeScript = ctx.state.scriptIdFile;
+  const activeScript = ctx.state.activeScriptFileId;
   const workspaceId = ctx.state.activeWorkspace?.id;
 
   const setActiveScript = (id: string) => {
