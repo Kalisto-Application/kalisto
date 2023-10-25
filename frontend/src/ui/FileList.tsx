@@ -40,7 +40,6 @@ const FileList: React.FC<fileListtProps> = ({
   return (
     <>
       <ScriptNewCreate addFile={addFile} />
-
       <FileItem
         setActiveScript={(id) => setActiveScript(id)}
         activeWorkspace={activeWorkspace}
@@ -171,7 +170,7 @@ const FileItem: React.FC<FileItemProps> = ({
       {activeWorkspace?.scriptFiles.map((it, indx) => (
         <li
           key={indx}
-          className={`relative flex h-[32px] justify-between pl-10 pr-4 hover:bg-borderFill ${
+          className={`relative flex h-[32px] cursor-pointer justify-between pl-10 pr-4 hover:bg-borderFill ${
             it.id === activeScriptId ? 'bg-textBlockFill' : ''
           }`}
           onClick={() => {
