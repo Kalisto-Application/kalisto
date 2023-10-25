@@ -20,8 +20,6 @@ export function GetGlobalVars():Promise<string>;
 
 export function RemoveScriptFile(arg1:string,arg2:string):Promise<Array<models.File>>;
 
-export function RenameScriptFile(arg1:string,arg2:string,arg3:string):Promise<void>;
-
 export function RenameWorkspace(arg1:string,arg2:string):Promise<void>;
 
 export function RunScript(arg1:models.ScriptCall):Promise<string>;
@@ -32,7 +30,7 @@ export function SaveGlovalVars(arg1:string):Promise<void>;
 
 export function SendGrpc(arg1:models.Request):Promise<models.Response>;
 
-export function UpdateScriptFileContent(arg1:string,arg2:string,arg3:string):Promise<void>;
+export function UpdateScriptFile(arg1:string,arg2:models.File):Promise<void>;
 
 export function UpdateWorkspace(arg1:models.Workspace):Promise<void>;
 

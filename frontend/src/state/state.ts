@@ -1,4 +1,4 @@
-import { Dispatch, createContext } from 'react';
+import { createContext, Dispatch } from 'react';
 import { models } from '../../wailsjs/go/models';
 
 type Action =
@@ -19,9 +19,8 @@ type Action =
   | { type: 'scriptError'; value: string }
   | { type: 'updateWorkspace'; workspace: models.Workspace }
   | { type: 'setActiveScriptId'; id: string }
-  | { type: 'updateScriptFile'; content: string }
-  | { type: 'addScriptFile'; scriptFile: models.File }
-  | { type: 'renameScriptFile'; idFile: string; value: string };
+  | { type: 'updateScriptFile'; file: models.File }
+  | { type: 'addScriptFile'; file: models.File };
 
 export type State = {
   activeRequestEditor: number;
@@ -165,8 +164,7 @@ export const reducer = (state: State, action: Action): State => {
           ...state.activeWorkspace,
           scriptFiles: state.activeWorkspace?.scriptFiles.map((it) => {
             if (it.id !== state.activeScriptFileId) return it;
-            it.content = action.content;
-            return it;
+            return action.file;
           }),
         }),
       };
@@ -197,25 +195,11 @@ export const reducer = (state: State, action: Action): State => {
           ...state.activeWorkspace,
           scriptFiles: [
             ...(state.activeWorkspace?.scriptFiles || []),
-            action.scriptFile,
+            action.file,
           ],
         }),
       };
 
-    case 'renameScriptFile':
-      return {
-        ...state,
-        activeWorkspace: new models.Workspace({
-          ...state.activeWorkspace,
-          scriptFiles: state.activeWorkspace?.scriptFiles.map((file) => {
-            if (file.id === action.idFile) {
-              file.name = action.value;
-              return file;
-            }
-            return file;
-          }),
-        }),
-      };
     default:
       return state;
   }

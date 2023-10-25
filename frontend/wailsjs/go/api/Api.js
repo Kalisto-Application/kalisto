@@ -34,10 +34,6 @@ export function RemoveScriptFile(arg1, arg2) {
   return window['go']['api']['Api']['RemoveScriptFile'](arg1, arg2);
 }
 
-export function RenameScriptFile(arg1, arg2, arg3) {
-  return window['go']['api']['Api']['RenameScriptFile'](arg1, arg2, arg3);
-}
-
 export function RenameWorkspace(arg1, arg2) {
   return window['go']['api']['Api']['RenameWorkspace'](arg1, arg2);
 }
@@ -58,8 +54,8 @@ export function SendGrpc(arg1) {
   return window['go']['api']['Api']['SendGrpc'](arg1);
 }
 
-export function UpdateScriptFileContent(arg1, arg2, arg3) {
-  return window['go']['api']['Api']['UpdateScriptFileContent'](arg1, arg2, arg3);
+export function UpdateScriptFile(arg1, arg2) {
+  return window['go']['api']['Api']['UpdateScriptFile'](arg1, arg2);
 }
 
 export function UpdateWorkspace(arg1) {

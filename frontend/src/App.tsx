@@ -1,11 +1,11 @@
+import * as Sentry from '@sentry/react';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import config from './config';
 import MainLayout from './layout';
-import { Route, Routes, MemoryRouter } from 'react-router-dom';
 import { ApiPage } from './pages/ApiPage';
+import { ScriptingPage } from './pages/ScriptingPage';
 import { VariablesPage } from './pages/VariablesPage';
 import { ContextProvider } from './state/ContextProvider';
-import * as Sentry from '@sentry/react';
-import config from './config';
-import { ScriptingPage } from './pages/ScriptingPage';
 
 Sentry.init({
   dsn: config.sentryDsn,

@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
-import { CodeViewer } from '../ui/Editor';
 import { Context } from '../state';
+import { CodeViewer } from '../ui/Editor';
 
 export const ScriptResponse: React.FC = () => {
   const ctx = useContext(Context);

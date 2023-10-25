@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
-import { EditorSwitcher } from '../ui/EditorSwitcher';
-import { CodeViewer } from '../ui/Editor';
 import { Context } from '../state';
+import { CodeViewer } from '../ui/Editor';
+import { EditorSwitcher } from '../ui/EditorSwitcher';
 
 export const ResponseText: React.FC = () => {
   const ctx = useContext(Context);

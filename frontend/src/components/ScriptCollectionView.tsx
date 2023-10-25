@@ -1,22 +1,28 @@
 import React, { useContext, useState } from 'react';
-import { Context } from '../state';
-import { models } from '../../wailsjs/go/models';
-import DeletePopup from './DeletePopup';
-import FileList from '../ui/FileList';
-import { RemoveScriptFile, RenameScriptFile } from '../../wailsjs/go/api/Api';
-import editIcon from '../../assets/icons/edit.svg';
-import deleteIcon from '../../assets/icons/delete.svg';
 import copyIcon from '../../assets/icons/copy.svg';
-import { CreateScriptFile } from './../../wailsjs/go/api/Api';
+import deleteIcon from '../../assets/icons/delete.svg';
+import editIcon from '../../assets/icons/edit.svg';
+import { RemoveScriptFile, UpdateScriptFile } from '../../wailsjs/go/api/Api';
+import { models } from '../../wailsjs/go/models';
+import { Context } from '../state';
+import FileList from '../ui/FileList';
+import { CreateScriptFile } from '../../wailsjs/go/api/Api';
+import DeletePopup from './DeletePopup';
 
 const ScriptCollectionView: React.FC = () => {
   const ctx = useContext(Context);
+  if (!ctx.state.activeWorkspace) {
+    return <></>;
+  }
+
   const [isOpenDeletePopup, setIsOpenDeletePopup] = useState('');
   const [isOpenEditInput, setIsOpenEditInput] = useState(false);
   const [isModeSubMenu, setIsModeSubMenu] = useState(false);
 
-  const activeScript = ctx.state.activeScriptFileId;
-  const workspaceId = ctx.state.activeWorkspace?.id;
+  const workspace = ctx.state.activeWorkspace;
+  const activeScript = workspace.scriptFiles.find(
+    (it) => it.id === ctx.state.activeScriptFileId
+  );
 
   const setActiveScript = (id: string) => {
     ctx.dispatch({ type: 'setActiveScriptId', id });
@@ -24,15 +30,14 @@ const ScriptCollectionView: React.FC = () => {
 
   // Add
   const addFile = (value: string) => {
-    CreateScriptFile(workspaceId || '', value, '').then((res) => {
-      ctx.dispatch({ type: 'addScriptFile', scriptFile: res });
+    CreateScriptFile(workspace.id, value, '').then((res) => {
+      ctx.dispatch({ type: 'addScriptFile', file: res });
     });
   };
 
   // Delete
   const deleteFile = () => {
-    // вызввать апдейт вайлов
-    RemoveScriptFile(workspaceId || '', activeScript).then((res) => {
+    RemoveScriptFile(workspace.id, activeScript?.id || '').then((res) => {
       let ws = new models.Workspace({
         ...ctx.state.activeWorkspace,
         scriptFiles: [...res],
@@ -43,34 +48,29 @@ const ScriptCollectionView: React.FC = () => {
   };
 
   // Edit
-  const editFile = (rename: string) => {
-    RenameScriptFile(workspaceId || '', activeScript, rename).then((res) =>
+  const renameFile = (name: string) => {
+    const renamed = new models.File({
+      ...activeScript,
+      name: name,
+    });
+    UpdateScriptFile(workspace.id, renamed).then((res) =>
       ctx.dispatch({
-        type: 'renameScriptFile',
-        idFile: activeScript,
-        value: rename,
+        type: 'updateScriptFile',
+        file: renamed,
       })
     );
   };
 
   // Copy
 
-  const CopyFile = () => {
-    let nameScript = '';
-    let contentScript = '';
-    ctx.state.activeWorkspace?.scriptFiles.forEach((file) => {
-      if (file.id === activeScript) {
-        nameScript = `${file.name} copy`;
-        contentScript = file.content;
-        return;
-      }
+  const copyFile = () => {
+    CreateScriptFile(
+      workspace.id,
+      `${activeScript?.name} copy`,
+      activeScript?.content || ''
+    ).then((res) => {
+      ctx.dispatch({ type: 'addScriptFile', file: res });
     });
-
-    CreateScriptFile(workspaceId || '', nameScript, contentScript).then(
-      (res) => {
-        ctx.dispatch({ type: 'addScriptFile', scriptFile: res });
-      }
-    );
   };
   // sub menu items
   const items = [
@@ -87,7 +87,7 @@ const ScriptCollectionView: React.FC = () => {
       icon: copyIcon,
       text: 'Copy',
       onClick: () => {
-        CopyFile();
+        copyFile();
         setIsModeSubMenu(false);
       },
     },
@@ -95,7 +95,7 @@ const ScriptCollectionView: React.FC = () => {
       icon: deleteIcon,
       text: 'Delete',
       onClick: () => {
-        setIsOpenDeletePopup(activeScript);
+        setIsOpenDeletePopup(activeScript?.id || '');
         setIsModeSubMenu(false);
       },
     },
@@ -103,30 +103,26 @@ const ScriptCollectionView: React.FC = () => {
 
   return (
     <>
-      {workspaceId ? (
-        <>
-          <FileList
-            addFile={(value: string) => addFile(value)}
-            activeWorkspace={ctx.state.activeWorkspace}
-            setActiveScript={setActiveScript}
-            items={items}
-            activeScript={activeScript}
-            isOpenEditInput={isOpenEditInput}
-            onCloseInput={() => setIsOpenEditInput(false)}
-            editFile={(value) => editFile(value)}
-            isModeSubMenu={isModeSubMenu}
-            closeSubMenu={() => setIsModeSubMenu(false)}
-            openSubMenu={() => setIsModeSubMenu(true)}
-          />
-          <DeletePopup
-            id={isOpenDeletePopup}
-            isOpen={isOpenDeletePopup !== ''}
-            onClose={() => setIsOpenDeletePopup('')}
-            deleteScript={() => deleteFile()}
-            title="Delete script?"
-          />
-        </>
-      ) : null}
+      <FileList
+        addFile={addFile}
+        activeWorkspace={ctx.state.activeWorkspace}
+        setActiveScript={setActiveScript}
+        items={items}
+        activeScript={activeScript?.id || ''}
+        isOpenEditInput={isOpenEditInput}
+        onCloseInput={() => setIsOpenEditInput(false)}
+        editFile={renameFile}
+        isModeSubMenu={isModeSubMenu}
+        closeSubMenu={() => setIsModeSubMenu(false)}
+        openSubMenu={() => setIsModeSubMenu(true)}
+      />
+      <DeletePopup
+        id={isOpenDeletePopup}
+        isOpen={isOpenDeletePopup !== ''}
+        onClose={() => setIsOpenDeletePopup('')}
+        deleteScript={() => deleteFile()}
+        title="Delete script?"
+      />
     </>
   );
 };

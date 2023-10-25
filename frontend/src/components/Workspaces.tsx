@@ -1,20 +1,20 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Context } from '../state';
 
 import {
+  DeleteWorkspace,
   RenameWorkspace,
   WorkspaceList as GetWorkspaceList,
-  DeleteWorkspace,
 } from '../../wailsjs/go/api/Api';
 
 import Dropdown, { DropdownItemProps } from './../ui/Dropdown';
 import CreateWorkspacePopup from './CreateWorkspacePopup';
 import DeletePopup from './DeletePopup';
 
-import folderIcon from '../../assets/icons/folder.svg';
+import deleteIcon from '../../assets/icons/delete.svg';
 import dropdownIcon from '../../assets/icons/dropdown.svg';
 import editIcon from '../../assets/icons/edit.svg';
-import deleteIcon from '../../assets/icons/delete.svg';
+import folderIcon from '../../assets/icons/folder.svg';
 import plusIcon from '../../assets/icons/plus.svg';
 
 export const WorkspaceList: React.FC = () => {
@@ -40,7 +40,7 @@ export const WorkspaceList: React.FC = () => {
       })
       .catch((err) => {
         console.log(
-          `failed to rename workspace id=${id}, new name=${name}: ${err}`
+          `failed to rename workspace id=${id}, new name=${name}: ${err}`,
         );
       });
   };
@@ -51,7 +51,7 @@ export const WorkspaceList: React.FC = () => {
         ctx.dispatch({ type: 'workspaceList', workspaceList: res });
       })
       .catch((err) =>
-        console.log(`failed to get active workspace, id==${id}: ${err}`)
+        console.log(`failed to get active workspace, id==${id}: ${err}`),
       );
   };
 

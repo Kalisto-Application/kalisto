@@ -1,6 +1,6 @@
-import React, { Fragment, useState, useRef, ChangeEvent } from 'react';
-import { Menu as M, MenuItem } from './Menu';
 import { Menu, Transition } from '@headlessui/react';
+import React, { ChangeEvent, Fragment, useRef, useState } from 'react';
+import { Menu as M, MenuItem } from './Menu';
 
 export type DropdownProps = {
   main: DropdownItemProps;

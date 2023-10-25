@@ -1,12 +1,12 @@
 import React from 'react';
-import SearchBox from '../ui/SearchBox';
-import { WorkspaceList } from '../components/Workspaces';
-import { ScriptEditor } from '../components/ScriptEditor';
-import { ScriptResponse } from '../components/ScriptResponse';
-import TabList from '../ui/TabList';
-import ScriptError from '../components/ScriptError';
-import { ScriptSender } from '../components/ScriptSender';
 import ScriptCollectionView from '../components/ScriptCollectionView';
+import { ScriptEditor } from '../components/ScriptEditor';
+import ScriptError from '../components/ScriptError';
+import { ScriptResponse } from '../components/ScriptResponse';
+import { ScriptSender } from '../components/ScriptSender';
+import { WorkspaceList } from '../components/Workspaces';
+import SearchBox from '../ui/SearchBox';
+import TabList from '../ui/TabList';
 
 export const ScriptingPage: React.FC = () => {
   return (

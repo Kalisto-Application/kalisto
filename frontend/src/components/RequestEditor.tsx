@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
-import { EditorSwitcher } from '../ui/EditorSwitcher';
 import { CodeEditor } from '../ui/Editor';
+import { EditorSwitcher } from '../ui/EditorSwitcher';
 
 import { Context } from '../state';
 

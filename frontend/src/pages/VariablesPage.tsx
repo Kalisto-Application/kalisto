@@ -1,8 +1,8 @@
 import React, { useContext } from 'react';
-import { CodeEditor } from '../ui/Editor';
-import { Context } from '../state';
 import { SaveGlovalVars } from '../../wailsjs/go/api/Api';
 import VarsError from '../components/VarsError';
+import { Context } from '../state';
+import { CodeEditor } from '../ui/Editor';
 
 type VariablesPageProps = {};
 

@@ -1,10 +1,10 @@
-import React, { useContext, useState, useMemo, useEffect } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 
-import { UrlInput } from '../ui/UrlInput';
-import { Context } from '../state';
-import { UpdateWorkspace, SendGrpc } from '../../wailsjs/go/api/Api';
+import { SendGrpc, UpdateWorkspace } from '../../wailsjs/go/api/Api';
 import { models } from '../../wailsjs/go/models';
 import { Action, debounce } from '../pkg';
+import { Context } from '../state';
+import { UrlInput } from '../ui/UrlInput';
 
 export const ApiRequestSender: React.FC = () => {
   const ctx = useContext(Context);

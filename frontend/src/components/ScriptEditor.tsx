@@ -1,25 +1,32 @@
-import React, { useContext, useEffect } from 'react';
-import { CodeEditor } from '../ui/Editor';
-
+import React, { useContext } from 'react';
+import { UpdateScriptFile } from '../../wailsjs/go/api/Api';
+import { models } from '../../wailsjs/go/models';
 import { Context } from '../state';
-import { UpdateScriptFileContent } from '../../wailsjs/go/api/Api';
+import { CodeEditor } from '../ui/Editor';
 
 export const ScriptEditor: React.FC = () => {
   const ctx = useContext(Context);
-  let fileId = ctx.state.activeScriptFileId;
-
   const ws = ctx.state.activeWorkspace;
-  let activeFile = ws?.scriptFiles?.find((it) => it.id == fileId);
+  const activeFile = ws?.scriptFiles.find(
+    (it) => it.id === ctx.state.activeScriptFileId
+  );
+  if (!activeFile) {
+    return <div className="w-1/2 bg-textBlockFill"></div>;
+  }
 
   const saveScript = (content: string) => {
     if (!ws?.id || !activeFile?.id) {
       return;
     }
+    const updatedFile = new models.File({
+      ...activeFile,
+      content: content,
+    });
 
-    UpdateScriptFileContent(ws?.id, fileId, content).then(() => {
+    UpdateScriptFile(ws?.id, updatedFile).then(() => {
       ctx.dispatch({
         type: 'updateScriptFile',
-        content: content,
+        file: updatedFile,
       });
     });
   };
