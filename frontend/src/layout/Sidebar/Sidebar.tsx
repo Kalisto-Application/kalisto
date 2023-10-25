@@ -3,11 +3,11 @@ import React from 'react';
 import { Link, useMatch } from 'react-router-dom';
 
 import apiIcon from '../../../assets/icons/sideApi.svg';
-import varsIcon from '../../../assets/icons/sideVars.svg';
-import scriptIcon from '../../../assets/icons/sideScript.svg';
 import apiIconActive from '../../../assets/icons/sideApiActive.svg';
-import varsIconActive from '../../../assets/icons/sideVarsActive.svg';
+import scriptIcon from '../../../assets/icons/sideScript.svg';
 import scriptIconActive from '../../../assets/icons/sideScriptActive.svg';
+import varsIcon from '../../../assets/icons/sideVars.svg';
+import varsIconActive from '../../../assets/icons/sideVarsActive.svg';
 
 export const Sidebar: React.FC = ({}) => (
   <aside className="justify-star flex flex-[0_0_90px] flex-col border-[1px] border-y-0 border-l-0 border-r-borderFill">

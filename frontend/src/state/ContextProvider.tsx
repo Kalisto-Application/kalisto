@@ -1,10 +1,10 @@
-import { ReactNode, useEffect, useReducer } from 'react';
 import * as Sentry from '@sentry/react';
+import { ReactNode, useEffect, useReducer } from 'react';
 
-import { reducer, Context, newState } from './state';
+import { Context, newState, reducer } from './state';
 
+import { GetGlobalVars, WorkspaceList } from '../../wailsjs/go/api/Api';
 import { models } from '../../wailsjs/go/models';
-import { WorkspaceList, GetGlobalVars } from '../../wailsjs/go/api/Api';
 
 type ContextProps = {
   children?: ReactNode;

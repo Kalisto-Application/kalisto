@@ -16,16 +16,16 @@ export const UrlInput: React.FC<UrlInputProps> = ({
   };
 
   return (
-    <div className="flex h-[50px]  border-2 border-borderFill">
+    <div className="flex border-2 border-borderFill">
       <input
         type="text"
         value={value}
         onChange={handleInputChange}
-        className=" w-full bg-textBlockFill text-secondaryText"
+        className=" w-full bg-textBlockFill px-5 font-['Roboto_Mono'] text-secondaryText"
       ></input>
       <button
         onClick={onClick}
-        className=" flex-[0_0_106px] rounded-l-lg bg-primaryGeneral"
+        className=" rounded-l-lg bg-primaryGeneral px-8 py-3"
       >
         Send
       </button>

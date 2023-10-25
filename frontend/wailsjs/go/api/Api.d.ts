@@ -10,6 +10,8 @@ export function CreateScriptFile(arg1:string,arg2:string,arg3:string):Promise<mo
 
 export function CreateWorkspace(arg1:string,arg2:Array<string>):Promise<models.Workspace>;
 
+export function CreateWorkspaceV2(arg1:string,arg2:Array<string>,arg3:models.WorkspaceKind):Promise<models.Workspace>;
+
 export function DeleteWorkspace(arg1:string):Promise<void>;
 
 export function FindProtoFiles():Promise<models.ProtoDir>;
@@ -17,8 +19,6 @@ export function FindProtoFiles():Promise<models.ProtoDir>;
 export function GetGlobalVars():Promise<string>;
 
 export function RemoveScriptFile(arg1:string,arg2:string):Promise<Array<models.File>>;
-
-export function RenameScriptFile(arg1:string,arg2:string,arg3:string):Promise<void>;
 
 export function RenameWorkspace(arg1:string,arg2:string):Promise<void>;
 
@@ -30,7 +30,7 @@ export function SaveGlovalVars(arg1:string):Promise<void>;
 
 export function SendGrpc(arg1:models.Request):Promise<models.Response>;
 
-export function UpdateScriptFileContent(arg1:string,arg2:string,arg3:string):Promise<void>;
+export function UpdateScriptFile(arg1:string,arg2:models.File):Promise<void>;
 
 export function UpdateWorkspace(arg1:models.Workspace):Promise<void>;
 

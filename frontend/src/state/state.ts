@@ -1,4 +1,4 @@
-import { Dispatch, createContext } from 'react';
+import { createContext, Dispatch } from 'react';
 import { models } from '../../wailsjs/go/models';
 
 type Action =
@@ -15,14 +15,12 @@ type Action =
   | { type: 'apiError'; value: string }
   | { type: 'changeVariables'; text: string }
   | { type: 'varsError'; value: string }
-  | { type: 'changeScriptText'; text: string }
   | { type: 'scriptResponse'; response: string }
   | { type: 'scriptError'; value: string }
   | { type: 'updateWorkspace'; workspace: models.Workspace }
   | { type: 'setActiveScriptId'; id: string }
-  | { type: 'updateScriptFile'; content: string }
-  | { type: 'addScriptFile'; scriptFile: models.File }
-  | { type: 'renameScriptFile'; idFile: string; value: string };
+  | { type: 'updateScriptFile'; file: models.File }
+  | { type: 'addScriptFile'; file: models.File };
 
 export type State = {
   activeRequestEditor: number;
@@ -36,11 +34,9 @@ export type State = {
   apiError: string;
   vars: string;
   varsError: string;
-  scriptText: string;
   scriptResponse: string;
   scriptError: string;
-  // test
-  scriptIdFile: string;
+  activeScriptFileId: string;
 };
 
 export const newState = (): State => {
@@ -56,10 +52,9 @@ export const newState = (): State => {
     apiError: '',
     vars: '{}',
     varsError: '',
-    scriptText: '',
     scriptResponse: '',
     scriptError: '',
-    scriptIdFile: '',
+    activeScriptFileId: '',
   };
 };
 
@@ -128,8 +123,9 @@ export const reducer = (state: State, action: Action): State => {
       return {
         ...state,
         workspaceList: action.workspaceList.list,
-        activeWorkspace: action.workspaceList.main,
-        scriptText: action.workspaceList.main.script || '',
+        activeWorkspace: action.workspaceList.main.id
+          ? action.workspaceList.main
+          : undefined,
       };
     case 'activeMethod':
       return {
@@ -161,20 +157,14 @@ export const reducer = (state: State, action: Action): State => {
         ...state,
         varsError: action.value,
       };
-    case 'changeScriptText':
-      return {
-        ...state,
-        scriptText: action.text,
-      };
     case 'updateScriptFile':
       return {
         ...state,
         activeWorkspace: new models.Workspace({
           ...state.activeWorkspace,
           scriptFiles: state.activeWorkspace?.scriptFiles.map((it) => {
-            if (it.id !== state.scriptIdFile) return it;
-            it.content = action.content;
-            return it;
+            if (it.id !== state.activeScriptFileId) return it;
+            return action.file;
           }),
         }),
       };
@@ -196,7 +186,7 @@ export const reducer = (state: State, action: Action): State => {
     case 'setActiveScriptId':
       return {
         ...state,
-        scriptIdFile: action.id,
+        activeScriptFileId: action.id,
       };
     case 'addScriptFile':
       return {
@@ -205,25 +195,11 @@ export const reducer = (state: State, action: Action): State => {
           ...state.activeWorkspace,
           scriptFiles: [
             ...(state.activeWorkspace?.scriptFiles || []),
-            action.scriptFile,
+            action.file,
           ],
         }),
       };
-   
-    case 'renameScriptFile':
-      return {
-        ...state,
-        activeWorkspace: new models.Workspace({
-          ...state.activeWorkspace,
-          scriptFiles: state.activeWorkspace?.scriptFiles.map((file) => {
-            if (file.id === action.idFile) {
-              file.name = action.value;
-              return file;
-            }
-            return file;
-          }),
-        }),
-      };
+
     default:
       return state;
   }

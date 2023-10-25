@@ -1,6 +1,6 @@
 import { Dialog, Transition } from '@headlessui/react';
-import close from '../../assets/icons/close.svg';
 import { Fragment } from 'react';
+import close from '../../assets/icons/close.svg';
 interface propsPopup {
   children?: React.ReactNode;
   isOpen: boolean;

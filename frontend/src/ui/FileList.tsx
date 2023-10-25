@@ -1,8 +1,8 @@
 import { useRef, useState } from 'react';
-import { models } from '../../wailsjs/go/models';
-import { Menu } from './Menu';
 import { useOnClickOutside } from 'usehooks-ts';
 import plusIcon from '../../assets/icons/plus.svg';
+import { models } from '../../wailsjs/go/models';
+import { Menu } from './Menu';
 
 import subMenuIcon from '../../assets/icons/subMenu.svg';
 
@@ -41,7 +41,7 @@ const FileList: React.FC<fileListtProps> = ({
     <>
       <ScriptNewCreate addFile={addFile} />
 
-      <ItemList
+      <FileItem
         setActiveScript={(id) => setActiveScript(id)}
         activeWorkspace={activeWorkspace}
         items={items}
@@ -123,7 +123,7 @@ const ScriptNewCreate: React.FC<ScriptNewProps> = ({ addFile }) => {
   );
 };
 
-type ItemListProps = {
+type FileItemProps = {
   activeWorkspace?: models.Workspace;
   setActiveScript: (id: string) => void;
   items: itemProps[];
@@ -136,7 +136,7 @@ type ItemListProps = {
   activeScript: string;
 };
 
-const ItemList: React.FC<ItemListProps> = ({
+const FileItem: React.FC<FileItemProps> = ({
   activeWorkspace,
   setActiveScript,
   items,
@@ -167,6 +167,7 @@ const ItemList: React.FC<ItemListProps> = ({
   const updateValueEdit = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValueEdit(e.target.value);
   };
+
   return (
     <ul className="text-center">
       {activeWorkspace?.scriptFiles.length !== 0 ? (

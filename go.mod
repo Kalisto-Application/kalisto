@@ -7,6 +7,7 @@ require (
 	github.com/bufbuild/protocompile v0.4.0
 	github.com/dgraph-io/badger/v4 v4.2.0
 	github.com/dop251/goja v0.0.0-20230605162241-28ee0ee714f3
+	github.com/getkin/kin-openapi v0.120.0
 	github.com/getsentry/sentry-go v0.22.0
 	github.com/google/uuid v1.3.0
 	github.com/jhump/protoreflect v1.15.1
@@ -28,7 +29,6 @@ require (
 	github.com/dgraph-io/ristretto v0.1.1 // indirect
 	github.com/dlclark/regexp2 v1.7.0 // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
-	github.com/getkin/kin-openapi v0.120.0 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/go-openapi/jsonpointer v0.19.6 // indirect
 	github.com/go-openapi/swag v0.22.4 // indirect

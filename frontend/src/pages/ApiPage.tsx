@@ -1,12 +1,12 @@
 import React from 'react';
-import SearchBox from '../ui/SearchBox';
+import ApiError from '../components/ApiError';
+import { ApiRequestSender } from '../components/ApiRequestSender';
 import { MethodCollection } from '../components/MethodCollectionView';
-import { WorkspaceList } from '../components/Workspaces';
 import { RequestEditor } from '../components/RequestEditor';
 import { ResponseText } from '../components/ResponseText';
+import { WorkspaceList } from '../components/Workspaces';
+import SearchBox from '../ui/SearchBox';
 import TabList from '../ui/TabList';
-import { ApiRequestSender } from '../components/ApiRequestSender';
-import ApiError from '../components/ApiError';
 
 export const ApiPage: React.FC = () => {
   return (

@@ -228,12 +228,12 @@ func (a *Api) CreateWorkspaceV2(name string, dirs []string, workspaceKind models
 	}
 
 	ws := models.Workspace{
-		ID:        uuid.NewString(),
-		Name:      name,
-		Spec:      spc,
-		BasePath:  dirs,
-		TargetUrl: "localhost:9000",
-		LastUsage: time.Now().UTC().Round(time.Nanosecond),
+		ID:          uuid.NewString(),
+		Name:        name,
+		Spec:        spc,
+		BasePath:    dirs,
+		TargetUrl:   "localhost:9000",
+		LastUsage:   time.Now().UTC().Round(time.Nanosecond),
 		ScriptFiles: make([]models.File, 0),
 	}
 	if err := a.store.SaveWorkspace(ws); err != nil {
@@ -284,6 +284,9 @@ func (a *Api) WorkspaceList(id string) (models.WorkspaceList, error) {
 		if list[i].ID == id {
 			list[i].LastUsage = time.Now().UTC().Round(time.Nanosecond)
 			main = list[i]
+			if main.ScriptFiles == nil {
+				main.ScriptFiles = make([]models.File, 0)
+			}
 			break
 		}
 	}
@@ -550,7 +553,7 @@ func (s *Api) CreateScriptFile(workspaceID, name, content string) (models.File, 
 		return file, err
 	}
 
-	ws.ScriptFiles = append([]models.File{file}, ws.ScriptFiles...)
+	ws.ScriptFiles = append(ws.ScriptFiles, file)
 	err = s.store.SaveWorkspace(ws)
 	return file, err
 }
@@ -575,31 +578,17 @@ func (s *Api) RemoveScriptFile(workspaceID, fileID string) ([]models.File, error
 	return ws.ScriptFiles, err
 }
 
-func (s *Api) RenameScriptFile(workspaceID, fileID, name string) error {
+func (s *Api) UpdateScriptFile(workspaceID string, file models.File) error {
 	ws, err := s.store.GetWorkspace(workspaceID)
 	if err != nil {
 		return err
 	}
 
-	for i, file := range ws.ScriptFiles {
-		if file.Id == fileID {
-			ws.ScriptFiles[i].Name = name
-			break
-		}
-	}
-
-	return s.store.SaveWorkspace(ws)
-}
-
-func (s *Api) UpdateScriptFileContent(workspaceID, fileID, content string) error {
-	ws, err := s.store.GetWorkspace(workspaceID)
-	if err != nil {
-		return err
-	}
-
-	for i, file := range ws.ScriptFiles {
-		if file.Id == fileID {
-			ws.ScriptFiles[i].Content = content
+	for i, f := range ws.ScriptFiles {
+		if file.Id == f.Id {
+			ws.ScriptFiles[i].Name = file.Name
+			ws.ScriptFiles[i].Content = file.Content
+			ws.ScriptFiles[i].Headers = file.Headers
 			break
 		}
 	}

@@ -1,10 +1,10 @@
-import React, { useContext, useState, useMemo, useEffect } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 
-import { UrlInput } from '../ui/UrlInput';
-import { Context } from '../state';
-import { UpdateWorkspace, RunScript } from '../../wailsjs/go/api/Api';
+import { RunScript, UpdateWorkspace } from '../../wailsjs/go/api/Api';
 import { models } from '../../wailsjs/go/models';
 import { Action, debounce } from '../pkg';
+import { Context } from '../state';
+import { UrlInput } from '../ui/UrlInput';
 
 export const ScriptSender: React.FC = () => {
   const ctx = useContext(Context);
@@ -18,7 +18,7 @@ export const ScriptSender: React.FC = () => {
 
   const action: Action = (url: string) => {
     UpdateWorkspace(
-      new models.Workspace({ ...activeWorkspace, targetUrl: url })
+      new models.Workspace({ ...activeWorkspace, targetUrl: url }),
     ).catch((err) => {
       console.log('failed to save the workspace url: ', err);
     });
@@ -40,7 +40,10 @@ export const ScriptSender: React.FC = () => {
     RunScript({
       addr: url,
       workspaceId: activeWorkspace.id,
-      body: ctx.state.scriptText,
+      body:
+        activeWorkspace.scriptFiles.find(
+          (it) => it.id === ctx.state.activeScriptFileId,
+        )?.content || '',
       meta: '',
     })
       .then((res) => {
