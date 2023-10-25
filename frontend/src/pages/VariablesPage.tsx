@@ -9,26 +9,6 @@ import TabList from '../ui/TabList';
 type VariablesPageProps = {};
 
 export const VariablesPage: React.FC<VariablesPageProps> = () => {
-  /*
-    <div className="flex w-full flex-1">
-      <div className="flex flex-[0_0_220px] flex-col justify-items-start">
-        <WorkspaceList />
-        <SearchBox />
-        <ScriptCollectionView />
-      </div>
-      <div className="flex flex-1 flex-col">
-        <TabList />
-        <ScriptSender />
-        <div className="flex flex-1">
-          <ScriptEditor />
-          <ScriptResponse />
-        </div>
-        <ScriptError />
-      </div>
-    </div>
-  );
-*/
-
   return (
     <div className="flex w-full flex-1">
       <div className="flex flex-[0_0_220px] flex-col justify-items-start">
