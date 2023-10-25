@@ -1,15 +1,15 @@
 import { useRef, useState } from 'react';
-import { models } from '../../wailsjs/go/models';
-import { Menu } from './Menu';
 import { useOnClickOutside } from 'usehooks-ts';
 import plusIcon from '../../assets/icons/plus.svg';
+import { models } from '../../wailsjs/go/models';
+import { Menu } from './Menu';
 
 import subMenuIcon from '../../assets/icons/subMenu.svg';
 
 type fileListtProps = {
   addFile: (value: string) => void;
   activeWorkspace?: models.Workspace;
-  setActiveScript: (id: string) => void;
+  getActiveScript: (id: string) => void;
   items: itemProps[];
   isOpenEditInput: boolean;
   onCloseInput: () => void;
@@ -28,7 +28,7 @@ const FileList: React.FC<fileListtProps> = ({
   addFile,
   activeWorkspace,
   items,
-  setActiveScript,
+  getActiveScript,
   isOpenEditInput,
   onCloseInput,
   editFile,
@@ -41,8 +41,8 @@ const FileList: React.FC<fileListtProps> = ({
     <>
       <ScriptNewCreate addFile={addFile} />
 
-      <ItemList
-        setActiveScript={(id) => setActiveScript(id)}
+      <FileItem
+        getActiveScript={(id) => getActiveScript(id)}
         activeWorkspace={activeWorkspace}
         items={items}
         isOpenEditInput={isOpenEditInput}
@@ -123,9 +123,9 @@ const ScriptNewCreate: React.FC<ScriptNewProps> = ({ addFile }) => {
   );
 };
 
-type ItemListProps = {
+type FileItemProps = {
   activeWorkspace?: models.Workspace;
-  setActiveScript: (id: string) => void;
+  getActiveScript: (id: string) => void;
   items: itemProps[];
   isOpenEditInput: boolean;
   onCloseInput: () => void;
@@ -136,9 +136,9 @@ type ItemListProps = {
   activeScript: string;
 };
 
-const ItemList: React.FC<ItemListProps> = ({
+const FileItem: React.FC<FileItemProps> = ({
   activeWorkspace,
-  setActiveScript,
+  getActiveScript,
   items,
   isOpenEditInput,
   onCloseInput,
@@ -148,13 +148,13 @@ const ItemList: React.FC<ItemListProps> = ({
   openSubMenu,
   activeScript,
 }) => {
-  const [idSubMenu, setIdSubMenu] = useState(activeScript);
+  const [idSubMenu, setIdSubMenu] = useState('');
   const [valueEdit, setValueEdit] = useState('');
   const subMenuRef = useRef(null);
 
   useOnClickOutside(subMenuRef, () => closeSubMenu());
 
-  const active = 'text-red';
+ 
 
   const onKeyDown = (e: React.KeyboardEvent) => {
     if (e.code == 'Enter' && valueEdit !== '') {
@@ -167,21 +167,19 @@ const ItemList: React.FC<ItemListProps> = ({
   const updateValueEdit = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValueEdit(e.target.value);
   };
+
   return (
     <ul className="text-center">
       {activeWorkspace?.scriptFiles.length !== 0 ? (
         activeWorkspace?.scriptFiles.map((it, indx) => (
           <li
             key={indx}
-            className=" text-ms relative  flex cursor-pointer justify-between px-3"
-            onClick={() => {
-              setIdSubMenu(it.id);
-              setActiveScript(it.id);
-            }}
+            className=" text-ms relative  flex cursor-pointer justify-between px-3 "
+           id={it.id}
           >
-            {isOpenEditInput && idSubMenu === it.id ? (
+            {isOpenEditInput && activeScript === it.id ? (
               <input
-                className="border-1   w-[75%] border-[1px]  border-borderFill bg-textBlockFill px-3 placeholder:text-[14px] placeholder:text-secondaryText"
+                className="border-1 w-[75%] border-[1px]  border-borderFill bg-textBlockFill px-3 placeholder:text-[14px] placeholder:text-secondaryText"
                 type="text"
                 onFocus={(e) => {
                   e.target.select();
@@ -193,16 +191,18 @@ const ItemList: React.FC<ItemListProps> = ({
                 onKeyDown={onKeyDown}
               />
             ) : (
-              <button className={`${idSubMenu === it.id ? active : ''}`}>
+              <span  onClick={(e) => {
+                setIdSubMenu(it.id)
+              }}  className={`${idSubMenu === it.id ? 'text-red' : ''} w-full text-left`}>
                 {it.name}
-              </button>
+              </span>
             )}
             {/* button submenu  */}
-            <button onClick={openSubMenu}>
+            <button onClick={()=>{openSubMenu(); getActiveScript(it.id); }}>
               <img src={subMenuIcon} alt="" />
             </button>
             {/* Sub menu */}
-            {isModeSubMenu && idSubMenu === it.id ? (
+            {isModeSubMenu && activeScript === it.id ? (
               <div ref={subMenuRef} className="absolute right-2 top-5 w-[70%]">
                 <Menu items={items} />
               </div>

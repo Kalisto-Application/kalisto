@@ -1,6 +1,7 @@
 package filesystem
 
 import (
+	"kalisto/src/models"
 	"os"
 	"path"
 	"testing"
@@ -16,34 +17,31 @@ func TestSearchProtoFiles(t *testing.T) {
 		name    string
 		path    string
 		want    ProtoSearchResult
-		wantErr string
+		errorIs error
+		wantErr error
 	}{
-		{name: "file or directory not found", path: path.Join(wd, "fake_path"), want: ProtoSearchResult{}, wantErr: "no such file or directory"},
-		{name: "path must be absolute", path: "testdata/search_proto", want: ProtoSearchResult{}, wantErr: "path must be absolute"},
-		{name: "no proto files in directory", path: path.Join(wd, "testdata/search_proto/empty_dir"), wantErr: "no proto files found"},
-		{name: "single file is not a proto file", path: path.Join(wd, "testdata/search_proto/not_proto_file.txt"), wantErr: "not a proto file"},
-		{name: "happy path: single file", path: path.Join(wd, "testdata/search_proto/file1.proto"), want: ProtoSearchResult{
-			AbsoluteDirPath:    path.Join(wd, "testdata/search_proto"),
-			RelativeProtoPaths: []string{"file1.proto"},
-		}},
+		{name: "file or directory not found", path: path.Join(wd, "fake_path"), want: ProtoSearchResult{}, errorIs: os.ErrNotExist},
+		{name: "path must be absolute", path: "testdata/search_proto", want: ProtoSearchResult{}, wantErr: &models.ErrorFileMustBeAbsolute{File: "testdata/search_proto"}},
+		{name: "no proto files in directory", path: path.Join(wd, "testdata/search_proto/empty_dir"), errorIs: models.ErrNoProtoFilesFound},
 		{name: "happy path: search in directory", path: path.Join(wd, "testdata/search_proto"), want: ProtoSearchResult{
-			AbsoluteDirPath:    path.Join(wd, "testdata/search_proto"),
+			AbsoluteDirsPath:   []string{path.Join(wd, "testdata/search_proto")},
 			RelativeProtoPaths: []string{"file1.proto", "sub_dir/file2.proto", "sub_dir/sub_dir2/file3.proto"},
 		}},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := SearchProtoFiles(tt.path)
-			if tt.wantErr != "" {
-				require.Error(t, err)
-				require.Contains(t, err.Error(), tt.wantErr)
-				return
-			}
+			got, err := SearchProtoFiles([]string{tt.path})
 
-			require.NoError(t, err)
-			require.Equal(t, tt.want.AbsoluteDirPath, got.AbsoluteDirPath)
-			require.ElementsMatch(t, tt.want.RelativeProtoPaths, got.RelativeProtoPaths)
+			if tt.errorIs != nil {
+				require.ErrorIs(t, err, tt.errorIs)
+			} else if tt.wantErr != nil {
+				require.Contains(t, err.Error(), tt.wantErr.Error())
+			} else {
+				require.NoError(t, err)
+				require.Equal(t, tt.want.AbsoluteDirsPath, got.AbsoluteDirsPath)
+				require.ElementsMatch(t, tt.want.RelativeProtoPaths, got.RelativeProtoPaths)
+			}
 		})
 	}
 }

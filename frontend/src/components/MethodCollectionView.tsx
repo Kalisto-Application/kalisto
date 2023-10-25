@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
   ControlledTreeEnvironment,
   Tree,
-  TreeItemIndex,
   TreeItem,
+  TreeItemIndex,
 } from 'react-complex-tree';
 import { models } from '../../wailsjs/go/models';
 import { Context } from '../state';
@@ -11,7 +11,7 @@ import { Context } from '../state';
 const findMethod = (
   s: models.Service[] = [],
   serviceName: string,
-  name: string
+  name: string,
 ): models.Method | undefined => {
   for (const service of s) {
     if (service.fullName == serviceName) {
@@ -83,7 +83,7 @@ export const MethodCollection: React.FC = () => {
             const method = findMethod(
               services,
               item.data.parent || '',
-              item.index as string
+              item.index as string,
             );
 
             ctx.dispatch({ type: 'activeMethod', activeMethod: method! });
@@ -93,8 +93,8 @@ export const MethodCollection: React.FC = () => {
         onCollapseItem={(item) => {
           setExpandedItems(
             expandedItems.filter(
-              (expandedItemIndex) => expandedItemIndex !== item.index
-            )
+              (expandedItemIndex) => expandedItemIndex !== item.index,
+            ),
           );
         }}
         onFocusItem={(item) => {
@@ -102,7 +102,7 @@ export const MethodCollection: React.FC = () => {
             const method = findMethod(
               services,
               item.data.parent || '',
-              item.index as string
+              item.index as string,
             );
             ctx.dispatch({ type: 'activeMethod', activeMethod: method! });
           }

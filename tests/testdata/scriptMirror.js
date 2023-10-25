@@ -1,4 +1,4 @@
-res = BookStore.GetBook({
+res = BookStore.Mirror({
   id: 'book-id',
   double: 3.14,
   float: 4.14,
@@ -108,7 +108,7 @@ res = BookStore.GetBook({
   },
 });
 
-res = BookStore.GetBook({
+res = BookStore.Mirror({
   id: res.id,
   double: res.double,
   float: res.float,

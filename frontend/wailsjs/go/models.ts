@@ -285,7 +285,6 @@ export namespace models {
 	    spec: Spec;
 	    lastUsage: Date;
 	    basePath: string[];
-	    script: string;
 	    scriptFiles: File[];
 	
 	    static createFrom(source: any = {}) {
@@ -300,7 +299,6 @@ export namespace models {
 	        this.spec = this.convertValues(source["spec"], Spec);
 	        this.lastUsage = new Date(source["lastUsage"]);
 	        this.basePath = source["basePath"];
-	        this.script = source["script"];
 	        this.scriptFiles = this.convertValues(source["scriptFiles"], File);
 	    }
 	

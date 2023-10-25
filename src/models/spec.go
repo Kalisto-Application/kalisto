@@ -23,9 +23,15 @@ type Workspace struct {
 	Spec        Spec      `json:"spec"`
 	LastUsage   time.Time `json:"lastUsage" ts_type:"Date" ts_transform:"new Date(__VALUE__)"`
 	BasePath    []string  `json:"basePath"`
-	Script      string    `json:"script"`
 	ScriptFiles []File    `json:"scriptFiles"`
 }
+
+type WorkspaceKind string
+
+const (
+	WorkspaceKindProto   WorkspaceKind = "proto"
+	WorkspaceKindOpenapi WorkspaceKind = "openapi"
+)
 
 type Spec struct {
 	Services []Service          `json:"services"`

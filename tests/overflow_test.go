@@ -106,7 +106,7 @@ func (s *OverflowSuite) TestOverflow() {
 			_, err = api.SendGrpc(models.Request{
 				Addr:        "localhost:9000",
 				WorkspaceID: ws.ID,
-				Method:      "kalisto.tests.examples.service.BookStore.GetBook",
+				Method:      "kalisto.tests.examples.service.BookStore.Mirror",
 				Body:        string(tt.req),
 				Meta:        meta,
 			})

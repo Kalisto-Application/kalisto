@@ -1,5 +1,5 @@
-import React, { useRef, useState, useEffect, useMemo } from 'react';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { debounce } from '../pkg';
 
@@ -70,7 +70,7 @@ const Editor: React.FC<props> = ({ value, onChange, readonly }) => {
             if (onChange) {
               onChange(ed.getModel()?.getValue() || '');
             }
-          })
+          }),
         );
 
         return ed;

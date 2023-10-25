@@ -70,7 +70,7 @@ func (s *MirrorRequestSuite) TestMirrorRequest() {
 			response, err := api.SendGrpc(models.Request{
 				Addr:        "localhost:9000",
 				WorkspaceID: ws.ID,
-				Method:      "kalisto.tests.examples.service.BookStore.GetBook",
+				Method:      "kalisto.tests.examples.service.BookStore.Mirror",
 				Body:        string(tt.req),
 				Meta:        meta,
 			})
@@ -79,7 +79,7 @@ func (s *MirrorRequestSuite) TestMirrorRequest() {
 			responseMirror, err := api.SendGrpc(models.Request{
 				Addr:        "localhost:9000",
 				WorkspaceID: ws.ID,
-				Method:      "kalisto.tests.examples.service.BookStore.GetBook",
+				Method:      "kalisto.tests.examples.service.BookStore.Mirror",
 				Body:        string(response.Body),
 				Meta:        response.MetaData,
 			})

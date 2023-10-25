@@ -1,4 +1,4 @@
 import { ContextProvider } from './ContextProvider';
-export { reducer, type State, Context } from './state';
+export { Context, reducer, type State } from './state';
 
 export default ContextProvider;

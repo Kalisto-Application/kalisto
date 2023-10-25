@@ -1,13 +1,13 @@
 import React, { useContext, useState } from 'react';
-import { FindProtoFiles, CreateWorkspace } from './../../wailsjs/go/api/Api';
+import close from '../../assets/icons/close.svg';
+import file from '../../assets/icons/file.svg';
+import folder from '../../assets/icons/folder.svg';
+import upload from '../../assets/icons/upload.svg';
 import { models } from '../../wailsjs/go/models';
 import { Context } from '../state';
 import Button from '../ui/Button';
 import Popup from '../ui/Popup';
-import upload from '../../assets/icons/upload.svg';
-import folder from '../../assets/icons/folder.svg';
-import close from '../../assets/icons/close.svg';
-import file from '../../assets/icons/file.svg';
+import { CreateWorkspace, FindProtoFiles } from './../../wailsjs/go/api/Api';
 
 interface propsCreateWorkspacePopup {
   onClose: () => void;
@@ -50,7 +50,7 @@ const CreateWorkspaceComponets: React.FC<propsCreateWorkspace> = ({
   const createNewWorkspace = () => {
     CreateWorkspace(
       name,
-      data.map((it) => it.dir)
+      data.map((it) => it.dir),
     ).then((res) => {
       ctx.dispatch({ type: 'newWorkspace', workspace: res });
       onClose();

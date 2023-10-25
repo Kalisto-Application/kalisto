@@ -1,11 +1,10 @@
 package filesystem
 
 import (
-	"errors"
-	"fmt"
 	"io/fs"
 	"kalisto/src/models"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 
@@ -29,26 +28,26 @@ func SearchProtoFiles(dirs []string) (ProtoSearchResult, error) {
 	for _, dir := range dirs {
 		// Check if the path is absolute
 		if !filepath.IsAbs(dir) {
-			return result, fmt.Errorf("path must be absolute. given: %s", dir)
+			return result, &models.ErrorFileMustBeAbsolute{File: dir}
 		}
 
 		// Check if the path is a directory or a file
-		info, err := os.Stat(dir)
-		if err != nil {
-			return result, err
-		}
+		// info, err := os.Stat(dir)
+		// if err != nil {
+		// 	return result, err
+		// }
 		result.BufDirs = append(result.BufDirs, readBufWorkDirs(dir)...)
 
-		// This is a file
-		if !info.IsDir() {
-			if !strings.HasSuffix(info.Name(), ".proto") {
-				return result, errors.New("chosen file is not a proto file")
-			}
+		// // This is a file
+		// if !info.IsDir() {
+		// 	if !strings.HasSuffix(info.Name(), ".proto") {
+		// 		return result, errors.New("chosen file is not a proto file")r
+		// 	}
 
-			result.AbsoluteDirsPath = append(result.AbsoluteDirsPath, filepath.Dir(dir))
-			result.RelativeProtoPaths = append(result.RelativeProtoPaths, filepath.Base(dir))
-			continue
-		}
+		// 	result.AbsoluteDirsPath = append(result.AbsoluteDirsPath, filepath.Dir(dir))
+		// 	result.RelativeProtoPaths = append(result.RelativeProtoPaths, filepath.Base(dir))
+		// 	continue
+		// }
 
 		// This is a directory, find all .proto files recursively
 		result.AbsoluteDirsPath = append(result.AbsoluteDirsPath, dir)
@@ -92,4 +91,23 @@ func readBufWorkDirs(path string) []string {
 	}
 
 	return buf.Directories
+}
+
+func SearchOpenapiFiles(files []string) ([]string, error) {
+	for _, filename := range files {
+		if !path.IsAbs(filename) {
+			return nil, &models.ErrorFileMustBeAbsolute{File: filename}
+		}
+
+		stat, err := os.Stat(filename)
+		if err != nil {
+			return nil, err
+		}
+
+		if stat.IsDir() {
+			return nil, &models.ErrorOpenapiFileCantBeDir{File: filename}
+		}
+	}
+
+	return files, nil
 }

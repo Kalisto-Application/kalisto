@@ -115,25 +115,25 @@ func (s *ApiSuite) TestScriptFiles() {
 	s.Equal(newFile2.Name, "f2")
 	s.Equal(newFile2.Content, "content")
 
-	err = app.Api.RenameScriptFile(ws.ID, newFile.Id, "f11")
-	s.Require().NoError(err)
 	newFile.Name = "f11"
-
-	err = app.Api.UpdateScriptFileContent(ws.ID, newFile.Id, "content1")
+	err = app.Api.UpdateScriptFile(ws.ID, newFile)
 	s.Require().NoError(err)
+
 	newFile.Content = "content1"
-
-	err = app.Api.RenameScriptFile(ws.ID, newFile2.Id, "f22")
+	err = app.Api.UpdateScriptFile(ws.ID, newFile)
 	s.Require().NoError(err)
+
 	newFile2.Name = "f22"
-
-	err = app.Api.UpdateScriptFileContent(ws.ID, newFile2.Id, "content2")
+	err = app.Api.UpdateScriptFile(ws.ID, newFile2)
 	s.Require().NoError(err)
+
 	newFile2.Content = "content2"
+	err = app.Api.UpdateScriptFile(ws.ID, newFile2)
+	s.Require().NoError(err)
 
 	wsList, err = app.Api.WorkspaceList(ws.ID)
 	s.Require().NoError(err)
-	s.Equal(wsList.Main.ScriptFiles, []models.File{newFile2, newFile})
+	s.Equal(wsList.Main.ScriptFiles, []models.File{newFile, newFile2})
 }
 
 func TestApi(t *testing.T) {
