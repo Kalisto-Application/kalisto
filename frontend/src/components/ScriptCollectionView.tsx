@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react';
 import copyIcon from '../../assets/icons/copy.svg';
 import deleteIcon from '../../assets/icons/delete.svg';
 import editIcon from '../../assets/icons/edit.svg';
-import { RemoveScriptFile, UpdateScriptFile } from '../../wailsjs/go/api/Api';
+import { RemoveScriptFile, RenameWorkspace } from '../../wailsjs/go/api/Api';
 import { models } from '../../wailsjs/go/models';
 import { Context } from '../state';
 import FileList from '../ui/FileList';
@@ -53,7 +53,7 @@ const ScriptCollectionView: React.FC = () => {
       ...activeScript,
       name: name,
     });
-    UpdateScriptFile(workspace.id, renamed).then((res) =>
+    RenameWorkspace(workspace.id, name).then((res) =>
       ctx.dispatch({
         type: 'updateScriptFile',
         file: renamed,
