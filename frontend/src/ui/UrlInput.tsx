@@ -21,7 +21,7 @@ export const UrlInput: React.FC<UrlInputProps> = ({
         type="text"
         value={value}
         onChange={handleInputChange}
-        className=" w-full bg-textBlockFill px-5 font-['Roboto_Mono'] text-secondaryText"
+        className="w-full bg-textBlockFill px-5 font-['Roboto_Mono'] text-secondaryText"
       ></input>
       <button
         onClick={onClick}
