@@ -2,11 +2,14 @@ import React, { useContext, useState } from 'react';
 import copyIcon from '../../assets/icons/copy.svg';
 import deleteIcon from '../../assets/icons/delete.svg';
 import editIcon from '../../assets/icons/edit.svg';
-import { RemoveScriptFile, UpdateScriptFile } from '../../wailsjs/go/api/Api';
+import {
+  CreateScriptFile,
+  RemoveScriptFile,
+  UpdateScriptFile,
+} from '../../wailsjs/go/api/Api';
 import { models } from '../../wailsjs/go/models';
 import { Context } from '../state';
 import FileList from '../ui/FileList';
-import { CreateScriptFile } from '../../wailsjs/go/api/Api';
 import DeletePopup from './DeletePopup';
 
 const ScriptCollectionView: React.FC = () => {
@@ -25,7 +28,6 @@ const ScriptCollectionView: React.FC = () => {
     (it) => it.id === ctx.state.activeScriptFileId
   );
 
-debugger
   const setActiveScript = (id: string) => {
     ctx.dispatch({ type: 'setActiveScriptId', id });
   };
@@ -39,9 +41,7 @@ debugger
 
   // Delete
   const deleteFile = () => {
-
     RemoveScriptFile(workspace.id, activeScript?.id || '').then((res) => {
-
       let ws = new models.Workspace({
         ...ctx.state.activeWorkspace,
         scriptFiles: [...res],
@@ -53,7 +53,6 @@ debugger
 
   // Edit
   const renameFile = (name: string) => {
-
     const renamed = new models.File({
       ...activeScript,
       name: name,
@@ -84,7 +83,6 @@ debugger
       icon: editIcon,
       text: 'Edit',
       onClick: () => {
-        
         setIsOpenEditInput(true);
         setIsModeSubMenu('');
       },
@@ -94,17 +92,14 @@ debugger
       icon: copyIcon,
       text: 'Copy',
       onClick: () => {
-        
         copyFile();
         setIsModeSubMenu('');
-
       },
     },
     {
       icon: deleteIcon,
       text: 'Delete',
       onClick: () => {
-        
         setIsOpenDeletePopup(activeScript?.id || '');
         setIsModeSubMenu('');
       },
@@ -117,30 +112,29 @@ debugger
         addFile={addFile}
         activeWorkspace={ctx.state.activeWorkspace}
         setActiveScript={setActiveScript}
-       
-  // const items = ctx.state.activeWorkspace?.scriptFiles.map(it => {
-  //   return {
-  //     file: it,
-  //     menu: [
-  //       {
-  //         icon: deleteIcon,
-  //         text: 'Delete',
-  //         onClick: () => {
-  //           setIsOpenDeletePopup(it.id);
-  //           setIsModeSubMenu(false);
-  //         },
-  //       },
-  //     ]
-  //   }
-  // })
- items={items}
+        // const items = ctx.state.activeWorkspace?.scriptFiles.map(it => {
+        //   return {
+        //     file: it,
+        //     menu: [
+        //       {
+        //         icon: deleteIcon,
+        //         text: 'Delete',
+        //         onClick: () => {
+        //           setIsOpenDeletePopup(it.id);
+        //           setIsModeSubMenu(false);
+        //         },
+        //       },
+        //     ]
+        //   }
+        // })
+        items={items}
         activeScript={activeScript?.id || ''}
         isOpenEditInput={isOpenEditInput}
         onCloseInput={() => setIsOpenEditInput(false)}
         editFile={renameFile}
         isModeSubMenu={isModeSubMenu}
         closeSubMenu={() => setIsModeSubMenu('')}
-        openSubMenu={(id:string) => setIsModeSubMenu(id)}
+        openSubMenu={() => setIsModeSubMenu(activeScript?.id || '')}
       />
       <DeletePopup
         id={isOpenDeletePopup}

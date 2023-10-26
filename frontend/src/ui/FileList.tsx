@@ -16,7 +16,7 @@ type fileListtProps = {
   editFile: (value: string) => void;
   isModeSubMenu: string;
   closeSubMenu: () => void;
-  openSubMenu: (id: string) => void;
+  openSubMenu: () => void;
   activeScript: string;
 };
 interface itemProps {
