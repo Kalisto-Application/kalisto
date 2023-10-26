@@ -10,6 +10,7 @@ import {
 import { models } from '../../wailsjs/go/models';
 import { Context } from '../state';
 import FileList from '../ui/FileList';
+import NewScript from './../ui/NewScript';
 import DeletePopup from './DeletePopup';
 
 const ScriptCollectionView: React.FC = () => {
@@ -79,57 +80,47 @@ const ScriptCollectionView: React.FC = () => {
     });
   };
   // sub menu items
-  const items = [
-    {
-      icon: editIcon,
-      text: 'Edit',
-      onClick: () => {
-        setIsOpenEditInput(true);
-        setIsModeSubMenu('');
-      },
-    },
+  const items = ctx.state.activeWorkspace?.scriptFiles.map((it) => {
+    return {
+      file: it,
+      menu: [
+        {
+          icon: editIcon,
+          text: 'Edit',
+          onClick: () => {
+            setIsOpenEditInput(true);
+            setIsModeSubMenu('');
+          },
+        },
 
-    {
-      icon: copyIcon,
-      text: 'Copy',
-      onClick: () => {
-        copyFile();
-        setIsModeSubMenu('');
-      },
-    },
-    {
-      icon: deleteIcon,
-      text: 'Delete',
-      onClick: () => {
-        setIsOpenDeletePopup(activeScript?.id || '');
-        setIsModeSubMenu('');
-      },
-    },
-  ];
+        {
+          icon: copyIcon,
+          text: 'Copy',
+          onClick: () => {
+            copyFile();
+            setIsModeSubMenu('');
+          },
+        },
+        {
+          icon: deleteIcon,
+          text: 'Delete',
+          onClick: () => {
+            setIsOpenDeletePopup(activeScript?.id || '');
+            setIsModeSubMenu('');
+          },
+        },
+      ],
+    };
+  });
 
   return (
     <>
+      <NewScript addFile={addFile} />
       <FileList
-        addFile={addFile}
         activeWorkspace={ctx.state.activeWorkspace}
         setActiveScript={setActiveScript}
-        // const items = ctx.state.activeWorkspace?.scriptFiles.map(it => {
-        //   return {
-        //     file: it,
-        //     menu: [
-        //       {
-        //         icon: deleteIcon,
-        //         text: 'Delete',
-        //         onClick: () => {
-        //           setIsOpenDeletePopup(it.id);
-        //           setIsModeSubMenu(false);
-        //         },
-        //       },
-        //     ]
-        //   }
-        // })
         items={items}
-        activeScript={activeScript?.id || ''}
+        activeScriptId={activeScript?.id || ''}
         isOpenEditInput={isOpenEditInput}
         onCloseInput={() => setIsOpenEditInput(false)}
         editFile={renameFile}
