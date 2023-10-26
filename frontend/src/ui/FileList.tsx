@@ -9,14 +9,14 @@ import subMenuIcon from '../../assets/icons/subMenu.svg';
 type fileListtProps = {
   addFile: (value: string) => void;
   activeWorkspace?: models.Workspace;
-  getActiveScript: (id: string) => void;
+  setActiveScript: (id: string) => void;
   items: itemProps[];
   isOpenEditInput: boolean;
   onCloseInput: () => void;
   editFile: (value: string) => void;
-  isModeSubMenu: boolean;
+  isModeSubMenu: string;
   closeSubMenu: () => void;
-  openSubMenu: () => void;
+  openSubMenu: (id:string) => void;
   activeScript: string;
 };
 interface itemProps {
@@ -28,7 +28,7 @@ const FileList: React.FC<fileListtProps> = ({
   addFile,
   activeWorkspace,
   items,
-  getActiveScript,
+  setActiveScript,
   isOpenEditInput,
   onCloseInput,
   editFile,
@@ -42,7 +42,7 @@ const FileList: React.FC<fileListtProps> = ({
       <ScriptNewCreate addFile={addFile} />
 
       <FileItem
-        getActiveScript={(id) => getActiveScript(id)}
+        setActiveScript={(id) => setActiveScript(id)}
         activeWorkspace={activeWorkspace}
         items={items}
         isOpenEditInput={isOpenEditInput}
@@ -125,20 +125,20 @@ const ScriptNewCreate: React.FC<ScriptNewProps> = ({ addFile }) => {
 
 type FileItemProps = {
   activeWorkspace?: models.Workspace;
-  getActiveScript: (id: string) => void;
+  setActiveScript: (id: string) => void;
   items: itemProps[];
   isOpenEditInput: boolean;
   onCloseInput: () => void;
   editFile: (value: string) => void;
-  isModeSubMenu: boolean;
+  isModeSubMenu: string;
   closeSubMenu: () => void;
-  openSubMenu: () => void;
+  openSubMenu: (id:string) => void;
   activeScript: string;
 };
 
 const FileItem: React.FC<FileItemProps> = ({
   activeWorkspace,
-  getActiveScript,
+  setActiveScript,
   items,
   isOpenEditInput,
   onCloseInput,
@@ -148,7 +148,7 @@ const FileItem: React.FC<FileItemProps> = ({
   openSubMenu,
   activeScript,
 }) => {
-  const [idSubMenu, setIdSubMenu] = useState('');
+  const [activeFile, setActiveFile] = useState(activeScript);
   const [valueEdit, setValueEdit] = useState('');
   const subMenuRef = useRef(null);
 
@@ -175,7 +175,7 @@ const FileItem: React.FC<FileItemProps> = ({
           <li
             key={indx}
             className=" text-ms relative  flex cursor-pointer justify-between px-3 "
-           id={it.id}
+          
           >
             {isOpenEditInput && activeScript === it.id ? (
               <input
@@ -192,17 +192,17 @@ const FileItem: React.FC<FileItemProps> = ({
               />
             ) : (
               <span  onClick={(e) => {
-                setIdSubMenu(it.id)
-              }}  className={`${idSubMenu === it.id ? 'text-red' : ''} w-full text-left`}>
+                setActiveFile(it.id)
+              }}  className={`${activeFile === it.id ? 'text-red' : ''} w-full text-left`}>
                 {it.name}
               </span>
             )}
             {/* button submenu  */}
-            <button onClick={()=>{openSubMenu(); getActiveScript(it.id); }}>
+            <button onClick={()=>{ openSubMenu(it.id);  }}>
               <img src={subMenuIcon} alt="" />
             </button>
             {/* Sub menu */}
-            {isModeSubMenu && activeScript === it.id ? (
+            {isModeSubMenu  === it.id ? (
               <div ref={subMenuRef} className="absolute right-2 top-5 w-[70%]">
                 <Menu items={items} />
               </div>
