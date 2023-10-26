@@ -47,29 +47,7 @@ jobs:
       - name: Set envs
         run: echo "VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
 
-      # --- CACHING ---
-      # - name: Get npm cache directory
-      #   id: npm-cache-dir
-      #   shell: bash
-      #   run: echo "dir=$(npm config get cache)" >> ${GITHUB_OUTPUT}
-
-      # - uses: actions/cache@v3
-      #   id: npm-cache # use this to check for `cache-hit` ==> if: steps.npm-cache.outputs.cache-hit != 'true'
-      #   with:
-      #     path: ${{ steps.npm-cache-dir.outputs.dir }}
-      #     key: ${{ runner.os }}-node-${{ hashFiles('frontend/package-lock.json') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-node-
-
-      # - name: Get go cache
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: ${{ matrix.build.path }}
-      #     key: ${{ runner.os }}-go-${{ hashFiles('go.sum') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-go-
-
-        # --- DEPENDENCIES ---
+        # --- SETUP ---
       - name: Setup GoLang
         uses: actions/setup-go@v4
         with:
@@ -81,6 +59,30 @@ jobs:
         with:
           node-version: '18.16'
 
+      # --- CACHING ---
+      - name: Get npm cache directory
+        id: npm-cache-dir
+        shell: bash
+        run: echo "dir=$(npm config get cache)" >> ${GITHUB_OUTPUT}
+
+      - uses: actions/cache@v3
+        id: npm-cache # use this to check for `cache-hit` ==> if: steps.npm-cache.outputs.cache-hit != 'true'
+        with:
+          path: ${{ steps.npm-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-node-${{ hashFiles('frontend/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Get go cache
+        id: go-cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ matrix.build.path }}
+          key: ${{ runner.os }}-go-${{ hashFiles('go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+        # --- DEPENDENCIES ---
       - name: Install Wails
         run:  go install github.com/wailsapp/wails/v2/cmd/wails@v2.6.0 
 
@@ -110,6 +112,21 @@ jobs:
         shell: bash
         env:
           SENTRY_TOKEN: ${{ secrets.SENTRY_TOKEN }}
+
+        # --- SAVE CACHE ---
+      - name: Save Go cache
+        id: save-go-cache
+        uses: actions/cache/save@v3
+        with:
+          path: ${{ matrix.build.path }}
+          key: ${{ steps.go-cache.outputs.cache-primary-key }}
+
+      - name: Save Node cache
+        id: save-node-cache
+        uses: actions/cache/save@v3
+        with:
+          path: ${{ steps.npm-cache-dir.outputs.dir }}
+          key: ${{ steps.npm-cache.outputs.cache-primary-key }}
 
         # --- PRE UPLOADING ---
       - name: Add macOS perms
