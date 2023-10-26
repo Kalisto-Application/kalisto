@@ -10,7 +10,7 @@ import varsIcon from '../../../assets/icons/sideVars.svg';
 import varsIconActive from '../../../assets/icons/sideVarsActive.svg';
 
 export const Sidebar: React.FC = ({}) => (
-  <aside className="justify-star flex flex-[0_0_90px] flex-col border-[1px] border-y-0 border-l-0 border-r-borderFill">
+  <aside className="inline-flex flex-[0_0_90px] flex-col justify-evenly border-[1px] border-y-0 border-l-0 border-r-borderFill pb-60 pt-40">
     <SideIcon link="/api" icon={apiIcon} activeIcon={apiIconActive} />
     <SideIcon
       link="/scripting"

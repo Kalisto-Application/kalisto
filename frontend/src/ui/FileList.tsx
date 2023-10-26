@@ -4,7 +4,7 @@ import plusIcon from '../../assets/icons/plus.svg';
 import { models } from '../../wailsjs/go/models';
 import { Menu } from './Menu';
 
-import subMenuIcon from '../../assets/icons/subMenu.svg';
+import expandIcon from '../../assets/icons/expand.svg';
 
 type fileListtProps = {
   addFile: (value: string) => void;
@@ -14,7 +14,7 @@ type fileListtProps = {
   isOpenEditInput: boolean;
   onCloseInput: () => void;
   editFile: (value: string) => void;
-  isModeSubMenu: boolean;
+  isModeSubMenu: string;
   closeSubMenu: () => void;
   openSubMenu: () => void;
   activeScript: string;
@@ -40,7 +40,6 @@ const FileList: React.FC<fileListtProps> = ({
   return (
     <>
       <ScriptNewCreate addFile={addFile} />
-
       <FileItem
         setActiveScript={(id) => setActiveScript(id)}
         activeWorkspace={activeWorkspace}
@@ -51,7 +50,7 @@ const FileList: React.FC<fileListtProps> = ({
         isModeSubMenu={isModeSubMenu}
         closeSubMenu={closeSubMenu}
         openSubMenu={openSubMenu}
-        activeScript={activeScript}
+        activeScriptId={activeScript}
       />
     </>
   );
@@ -90,10 +89,10 @@ const ScriptNewCreate: React.FC<ScriptNewProps> = ({ addFile }) => {
     setIsMode(false);
   };
   return (
-    <div className="mb-3 flex flex-col items-center ">
+    <div className="mb-3 flex flex-col">
       {isMode ? (
         <button
-          className="flex items-center gap-x-2  rounded-md border-[1px] border-borderFill bg-primaryFill px-3 py-1 transition duration-500 ease-in-out hover:bg-textBlockFill"
+          className="flex items-center gap-x-2  rounded-md border-borderFill bg-primaryFill px-3 py-1 transition duration-500 ease-in-out hover:bg-textBlockFill"
           onClick={onClick}
         >
           <img src={plusIcon} alt="" />
@@ -111,7 +110,7 @@ const ScriptNewCreate: React.FC<ScriptNewProps> = ({ addFile }) => {
               onKeyDown={onKeyDown}
             />
           </div>
-          <div className="text-xs">Push Enter to rename </div>
+          <div className="pl-5 text-xs">Push Enter to rename </div>
         </>
       )}
       {valueValidate ? (
@@ -130,10 +129,10 @@ type FileItemProps = {
   isOpenEditInput: boolean;
   onCloseInput: () => void;
   editFile: (value: string) => void;
-  isModeSubMenu: boolean;
+  isModeSubMenu: string;
   closeSubMenu: () => void;
   openSubMenu: () => void;
-  activeScript: string;
+  activeScriptId: string;
 };
 
 const FileItem: React.FC<FileItemProps> = ({
@@ -146,15 +145,13 @@ const FileItem: React.FC<FileItemProps> = ({
   isModeSubMenu,
   closeSubMenu,
   openSubMenu,
-  activeScript,
+  activeScriptId,
 }) => {
-  const [idSubMenu, setIdSubMenu] = useState(activeScript);
+  const [idSubMenu, setIdSubMenu] = useState(activeScriptId);
   const [valueEdit, setValueEdit] = useState('');
   const subMenuRef = useRef(null);
 
   useOnClickOutside(subMenuRef, () => closeSubMenu());
-
-  const active = 'text-red';
 
   const onKeyDown = (e: React.KeyboardEvent) => {
     if (e.code == 'Enter' && valueEdit !== '') {
@@ -167,51 +164,48 @@ const FileItem: React.FC<FileItemProps> = ({
   const updateValueEdit = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValueEdit(e.target.value);
   };
+
   return (
-    <ul className="text-center">
-      {activeWorkspace?.scriptFiles.length !== 0 ? (
-        activeWorkspace?.scriptFiles.map((it, indx) => (
-          <li
-            key={indx}
-            className=" text-ms relative  flex cursor-pointer justify-between px-3"
-            onClick={() => {
-              setIdSubMenu(it.id);
-              setActiveScript(it.id);
-            }}
-          >
-            {isOpenEditInput && idSubMenu === it.id ? (
-              <input
-                className="border-1   w-[75%] border-[1px]  border-borderFill bg-textBlockFill px-3 placeholder:text-[14px] placeholder:text-secondaryText"
-                type="text"
-                onFocus={(e) => {
-                  e.target.select();
-                }}
-                autoFocus
-                value={valueEdit || it.name}
-                onChange={updateValueEdit}
-                onBlur={onCloseInput}
-                onKeyDown={onKeyDown}
-              />
-            ) : (
-              <button className={`${idSubMenu === it.id ? active : ''}`}>
-                {it.name}
-              </button>
-            )}
-            {/* button submenu  */}
-            <button onClick={openSubMenu}>
-              <img src={subMenuIcon} alt="" />
-            </button>
-            {/* Sub menu */}
-            {isModeSubMenu && idSubMenu === it.id ? (
-              <div ref={subMenuRef} className="absolute right-2 top-5 w-[70%]">
-                <Menu items={items} />
-              </div>
-            ) : null}
-          </li>
-        ))
-      ) : (
-        <h2>No scripts found</h2>
-      )}
+    <ul className="flex-1">
+      {activeWorkspace?.scriptFiles.map((it, indx) => (
+        <li
+          key={indx}
+          className={`relative flex h-[32px] cursor-pointer justify-between pl-10 pr-4 hover:bg-borderFill ${
+            it.id === activeScriptId ? 'bg-textBlockFill' : ''
+          }`}
+          onClick={() => {
+            setIdSubMenu(it.id);
+            setActiveScript(it.id);
+          }}
+        >
+          {isOpenEditInput && idSubMenu === it.id ? (
+            <input
+              className="border-1 w-[75%] border-[1px] border-borderFill bg-textBlockFill px-3 placeholder:text-[14px] placeholder:text-secondaryText"
+              type="text"
+              onFocus={(e) => {
+                e.target.select();
+              }}
+              autoFocus
+              value={valueEdit || it.name}
+              onChange={updateValueEdit}
+              onBlur={onCloseInput}
+              onKeyDown={onKeyDown}
+            />
+          ) : (
+            <span className="text-right font-[Inter]">{it.name}</span>
+          )}
+          {/* button submenu  */}
+          <button onClick={openSubMenu}>
+            <img src={expandIcon} alt="" />
+          </button>
+          {/* Sub menu */}
+          {isModeSubMenu && idSubMenu === it.id ? (
+            <div ref={subMenuRef} className="absolute right-2 top-9 w-[70%]">
+              <Menu items={items} />
+            </div>
+          ) : null}
+        </li>
+      ))}
     </ul>
   );
 };
