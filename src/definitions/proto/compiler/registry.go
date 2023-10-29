@@ -318,7 +318,7 @@ func (r *Registry) GetOutputType(methodFullName string) (*desc.MessageDescriptor
 		return nil, err
 	}
 
-	return md.GetInputType(), nil
+	return md.GetOutputType(), nil
 }
 
 func (r *Registry) MethodPath(methodFullName string) (string, error) {
