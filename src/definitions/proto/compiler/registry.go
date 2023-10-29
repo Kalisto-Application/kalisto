@@ -3,6 +3,7 @@ package compiler
 import (
 	"errors"
 	"fmt"
+	"kalisto/src/definitions"
 	"kalisto/src/models"
 	"strings"
 	"sync"
@@ -28,8 +29,6 @@ func New(descriptors []*desc.FileDescriptor) *Registry {
 var ErrFieldIsOneOf = errors.New("field is one of")
 
 func (r *Registry) Schema() (spec models.Spec, err error) {
-	r.mx.Lock()
-	defer r.mx.Unlock()
 	if err := r.linkMessages(); err != nil {
 		return spec, err
 	}
@@ -61,6 +60,7 @@ func (r *Registry) Schema() (spec models.Spec, err error) {
 					RequestMessage:  msg,
 					ResponseMessage: responseMsg,
 					Kind:            models.NewCommunicationKind(method.IsClientStreaming(), method.IsServerStreaming()),
+					RequestExample:  definitions.MakeRequestExample(msg, r.Links()),
 				}
 			}
 
@@ -84,7 +84,7 @@ func (r *Registry) Schema() (spec models.Spec, err error) {
 		spec.Services = append(spec.Services, specServices...)
 	}
 
-	spec.Links = r.links
+	spec.Links = r.Links()
 	return spec, err
 }
 
@@ -199,6 +199,9 @@ func (r *Registry) newField(fd *desc.FieldDescriptor, oneOfName string, set map[
 }
 
 func (r *Registry) linkMessages() (err error) {
+	r.mx.Lock()
+	defer r.mx.Unlock()
+
 	protoregistry.GlobalTypes.RangeMessages(func(t protoreflect.MessageType) bool {
 		mt, err := desc.WrapMessage(t.Descriptor())
 		if err != nil {
