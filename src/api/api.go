@@ -152,13 +152,14 @@ func (a *Api) CreateWorkspace(name string, dirs []string) (models.Workspace, err
 	}
 
 	ws := models.Workspace{
-		ID:          uuid.NewString(),
-		Name:        name,
-		Spec:        spc,
-		BasePath:    dirs,
-		TargetUrl:   "localhost:9000",
-		LastUsage:   time.Now().UTC().Round(time.Nanosecond),
-		ScriptFiles: make([]models.File, 0),
+		ID:           uuid.NewString(),
+		Name:         name,
+		Spec:         spc,
+		BasePath:     dirs,
+		TargetUrl:    "localhost:9000",
+		LastUsage:    time.Now().UTC().Round(time.Nanosecond),
+		ScriptFiles:  make([]models.File, 0),
+		RequestFiles: make([]models.File, 0),
 	}
 	if err := a.store.SaveWorkspace(ws); err != nil {
 		return ws, fmt.Errorf("api: failed to save workspace: %w", err)
@@ -228,13 +229,14 @@ func (a *Api) CreateWorkspaceV2(name string, dirs []string, workspaceKind models
 	}
 
 	ws := models.Workspace{
-		ID:          uuid.NewString(),
-		Name:        name,
-		Spec:        spc,
-		BasePath:    dirs,
-		TargetUrl:   "localhost:9000",
-		LastUsage:   time.Now().UTC().Round(time.Nanosecond),
-		ScriptFiles: make([]models.File, 0),
+		ID:           uuid.NewString(),
+		Name:         name,
+		Spec:         spc,
+		BasePath:     dirs,
+		TargetUrl:    "localhost:9000",
+		LastUsage:    time.Now().UTC().Round(time.Nanosecond),
+		ScriptFiles:  make([]models.File, 0),
+		RequestFiles: make([]models.File, 0),
 	}
 	if err := a.store.SaveWorkspace(ws); err != nil {
 		return ws, fmt.Errorf("api: failed to save workspace: %w", err)
@@ -286,6 +288,9 @@ func (a *Api) WorkspaceList(id string) (models.WorkspaceList, error) {
 			main = list[i]
 			if main.ScriptFiles == nil {
 				main.ScriptFiles = make([]models.File, 0)
+			}
+			if main.RequestFiles == nil {
+				main.RequestFiles = make([]models.File, 0)
 			}
 			break
 		}
@@ -538,14 +543,74 @@ func (s *Api) openapiRegistryFromPath(dirs []string) (*ocompiler.Registry, error
 	return registry, nil
 }
 
-// SCRIPTING FILES API
+// REQUEST FILES API
 
-func (s *Api) CreateScriptFile(workspaceID, name, content string) (models.File, error) {
+func (s *Api) CreateRequestFile(workspaceID, name, content, headers string) (models.File, error) {
 	file := models.File{
 		Id:        uuid.NewString(),
 		Name:      name,
 		CreatedAt: time.Now().UTC().Round(time.Nanosecond),
 		Content:   content,
+		Headers:   headers,
+	}
+
+	ws, err := s.store.GetWorkspace(workspaceID)
+	if err != nil {
+		return file, err
+	}
+
+	ws.RequestFiles = append(ws.RequestFiles, file)
+	err = s.store.SaveWorkspace(ws)
+	return file, err
+}
+
+func (s *Api) RemoveRequestFile(workspaceID, fileID string) ([]models.File, error) {
+	ws, err := s.store.GetWorkspace(workspaceID)
+	if err != nil {
+		return nil, err
+	}
+
+	filtered := make([]models.File, 0, len(ws.RequestFiles))
+	for _, file := range ws.RequestFiles {
+		if file.Id == fileID {
+			continue
+		}
+
+		filtered = append(filtered, file)
+	}
+
+	ws.RequestFiles = filtered
+	err = s.store.SaveWorkspace(ws)
+	return ws.RequestFiles, err
+}
+
+func (s *Api) UpdateRequestFile(workspaceID string, file models.File) error {
+	ws, err := s.store.GetWorkspace(workspaceID)
+	if err != nil {
+		return err
+	}
+
+	for i, f := range ws.RequestFiles {
+		if file.Id == f.Id {
+			ws.RequestFiles[i].Name = file.Name
+			ws.RequestFiles[i].Content = file.Content
+			ws.RequestFiles[i].Headers = file.Headers
+			break
+		}
+	}
+
+	return s.store.SaveWorkspace(ws)
+}
+
+// SCRIPTING FILES API
+
+func (s *Api) CreateScriptFile(workspaceID, name, content, headers string) (models.File, error) {
+	file := models.File{
+		Id:        uuid.NewString(),
+		Name:      name,
+		CreatedAt: time.Now().UTC().Round(time.Nanosecond),
+		Content:   content,
+		Headers:   headers,
 	}
 
 	ws, err := s.store.GetWorkspace(workspaceID)

@@ -6,8 +6,12 @@ export function Context() {
   return window['go']['api']['Api']['Context']();
 }
 
-export function CreateScriptFile(arg1, arg2, arg3) {
-  return window['go']['api']['Api']['CreateScriptFile'](arg1, arg2, arg3);
+export function CreateRequestFile(arg1, arg2, arg3, arg4) {
+  return window['go']['api']['Api']['CreateRequestFile'](arg1, arg2, arg3, arg4);
+}
+
+export function CreateScriptFile(arg1, arg2, arg3, arg4) {
+  return window['go']['api']['Api']['CreateScriptFile'](arg1, arg2, arg3, arg4);
 }
 
 export function CreateWorkspace(arg1, arg2) {
@@ -28,6 +32,10 @@ export function FindProtoFiles() {
 
 export function GetGlobalVars() {
   return window['go']['api']['Api']['GetGlobalVars']();
+}
+
+export function RemoveRequestFile(arg1, arg2) {
+  return window['go']['api']['Api']['RemoveRequestFile'](arg1, arg2);
 }
 
 export function RemoveScriptFile(arg1, arg2) {
@@ -52,6 +60,10 @@ export function SaveGlovalVars(arg1) {
 
 export function SendGrpc(arg1) {
   return window['go']['api']['Api']['SendGrpc'](arg1);
+}
+
+export function UpdateRequestFile(arg1, arg2) {
+  return window['go']['api']['Api']['UpdateRequestFile'](arg1, arg2);
 }
 
 export function UpdateScriptFile(arg1, arg2) {

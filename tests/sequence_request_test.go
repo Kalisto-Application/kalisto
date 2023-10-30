@@ -107,6 +107,52 @@ func (s *SequenceScriptSuite) TestMirrorScripting() {
 	<-closed
 }
 
+func (s *SequenceScriptSuite) TestSequentialRequests() {
+	close, closed, err := server.Run(":9000")
+	s.Require().NoError(err)
+	time.Sleep(time.Millisecond * 200)
+
+	app, err := assembly.NewApp(xdg.DataHome + "/kalisto.db/test-" + s.T().Name())
+	s.Require().NoError(err)
+	api := app.Api
+
+	wd, err := os.Getwd()
+	s.Require().NoError(err)
+	dir := path.Join(wd, "examples/proto/")
+	ws, err := api.CreateWorkspace("name", []string{dir})
+	s.Require().NoError(err)
+
+	response, err := api.SendGrpc(models.Request{
+		Addr:        "localhost:9000",
+		WorkspaceID: ws.ID,
+		Method:      "kalisto.tests.examples.service.BookStore.CreateBook",
+		Body:        `{name: "Some book"}`,
+		Meta:        ``,
+	})
+	s.Require().NoError(err)
+
+	AssertJsObjectsAreEqual(s.T(), response.Body, `{
+		id: '1',
+	  }`)
+
+	response, err = api.SendGrpc(models.Request{
+		Addr:        "localhost:9000",
+		WorkspaceID: ws.ID,
+		Method:      "kalisto.tests.examples.service.BookStore.GetBook",
+		Body:        string(response.Body),
+		Meta:        response.MetaData,
+	})
+	s.Require().NoError(err)
+	AssertJsObjectsAreEqual(s.T(), response.Body, `{
+		id: '1',
+		name: 'Clean Code',
+	  }`)
+
+	close()
+	app.OnShutdown(context.Background())
+	<-closed
+}
+
 func TestSequenceScript(t *testing.T) {
 	suite.Run(t, new(SequenceScriptSuite))
 }

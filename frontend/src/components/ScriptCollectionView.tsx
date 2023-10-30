@@ -34,7 +34,7 @@ const ScriptCollectionView: React.FC = () => {
 
   // Add
   const addFile = (value: string) => {
-    CreateScriptFile(workspace.id, value, '').then((res) => {
+    CreateScriptFile(workspace.id, value, '', '').then((res) => {
       ctx.dispatch({ type: 'addScriptFile', file: res });
     });
   };
@@ -72,7 +72,8 @@ const ScriptCollectionView: React.FC = () => {
     CreateScriptFile(
       workspace.id,
       `${activeScript?.name} copy`,
-      activeScript?.content || ''
+      activeScript?.content || '',
+      activeScript?.headers || ''
     ).then((res) => {
       ctx.dispatch({ type: 'addScriptFile', file: res });
     });
