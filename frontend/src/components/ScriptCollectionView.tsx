@@ -117,7 +117,6 @@ const ScriptCollectionView: React.FC = () => {
     <>
       <NewScript addFile={addFile} />
       <FileList
-        activeWorkspace={ctx.state.activeWorkspace}
         setActiveScript={setActiveScript}
         items={items}
         activeScriptId={activeScript?.id || ''}
@@ -125,8 +124,7 @@ const ScriptCollectionView: React.FC = () => {
         onCloseInput={() => setIsOpenEditInput(false)}
         editFile={renameFile}
         isModeSubMenu={isModeSubMenu}
-        closeSubMenu={() => setIsModeSubMenu('')}
-        openSubMenu={() => setIsModeSubMenu(activeScript?.id || '')}
+        setIsModeSubMenu={(id) => setIsModeSubMenu(id)}
       />
       <DeletePopup
         id={isOpenDeletePopup}

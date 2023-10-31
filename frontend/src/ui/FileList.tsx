@@ -7,16 +7,14 @@ import { Menu } from './Menu';
 import expandIcon from '../../assets/icons/expand.svg';
 
 type fileListtProps = {
-  activeWorkspace?: models.Workspace;
   setActiveScript: (id: string) => void;
   items: itemProps[];
   isOpenEditInput: boolean;
   onCloseInput: () => void;
   editFile: (value: string) => void;
   isModeSubMenu: string;
-  closeSubMenu: () => void;
-  openSubMenu: () => void;
   activeScriptId: string;
+  setIsModeSubMenu: (value: string) => void;
 };
 type itemProps = {
   file: models.File;
@@ -29,16 +27,14 @@ type menuProps = {
 };
 
 const FileList: React.FC<fileListtProps> = ({
-  activeWorkspace,
   setActiveScript,
   items,
   isOpenEditInput,
   onCloseInput,
   editFile,
   isModeSubMenu,
-  closeSubMenu,
-  openSubMenu,
   activeScriptId,
+  setIsModeSubMenu,
 }) => {
   const [isActive, setIsActive] = useState(activeScriptId);
   const [valueEdit, setValueEdit] = useState('');
@@ -84,12 +80,11 @@ const FileList: React.FC<fileListtProps> = ({
             <span className="text-right font-[Inter]">{it.file.name}</span>
           )}
           <SubMenu
-            closeSubMenu={closeSubMenu}
-            openSubMenu={openSubMenu}
             setActiveScript={setActiveScript}
             isModeSubMenu={isModeSubMenu}
             activeScriptId={activeScriptId}
             item={it}
+            setIsModeSubMenu={setIsModeSubMenu}
           />
         </li>
       ))}
@@ -99,8 +94,6 @@ const FileList: React.FC<fileListtProps> = ({
 export default FileList;
 
 type propsSubMenu = {
-  closeSubMenu: () => void;
-  openSubMenu: () => void;
   setActiveScript: (id: string) => void;
   isModeSubMenu: string;
   activeScriptId: string;
@@ -108,26 +101,26 @@ type propsSubMenu = {
     file: models.File;
     menu: menuProps[];
   };
+  setIsModeSubMenu: (value: string) => void;
 };
 
 const SubMenu: React.FC<propsSubMenu> = ({
-  openSubMenu,
-  closeSubMenu,
   setActiveScript,
   activeScriptId,
   isModeSubMenu,
   item,
+  setIsModeSubMenu,
 }) => {
   const subMenuRef = useRef(null);
 
-  useOnClickOutside(subMenuRef, () => closeSubMenu());
+  useOnClickOutside(subMenuRef, () => setIsModeSubMenu(''));
 
   return (
     <>
       {/* button submenu  */}
       <button
         onClick={(e) => {
-          openSubMenu();
+          setIsModeSubMenu(item.file.id);
           setActiveScript(item.file.id);
           e.stopPropagation();
         }}
