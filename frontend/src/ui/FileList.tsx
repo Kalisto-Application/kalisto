@@ -79,27 +79,33 @@ const SubMenu: React.FC<MenuProps> = ({ items }) => {
   useOnClickOutside(subMenuRef, () => setFalse());
 
   return (
-    <>
+    <div ref={subMenuRef}>
       {/* button submenu  */}
-      <button onClick={toggle}>
+      <button
+        onClick={(e) => {
+          toggle();
+          e.stopPropagation();
+        }}
+      >
         <img src={expandIcon} alt="" />
       </button>
       {/* Sub menu */}
       {value && (
-        <div ref={subMenuRef} className="absolute right-2 top-9 w-[70%]">
+        <div className="absolute right-2 top-9 w-[70%]">
           <Menu
             items={items.map((it) => {
               return {
                 ...it,
-                onClick: () => {
+                onClick: (e: React.MouseEvent) => {
+                  e.stopPropagation();
                   toggle();
-                  it.onClick?.();
+                  it.onClick?.(e);
                 },
               };
             })}
           />
         </div>
       )}
-    </>
+    </div>
   );
 };

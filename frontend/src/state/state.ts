@@ -163,7 +163,7 @@ export const reducer = (state: State, action: Action): State => {
         activeWorkspace: new models.Workspace({
           ...state.activeWorkspace,
           scriptFiles: state.activeWorkspace?.scriptFiles.map((it) => {
-            if (it.id !== state.activeScriptFileId) return it;
+            if (it.id !== action.file.id) return it;
             return action.file;
           }),
         }),

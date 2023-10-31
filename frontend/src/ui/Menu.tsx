@@ -19,7 +19,7 @@ export default Menu;
 export interface MenuItemProp {
   text: string;
   icon?: string;
-  onClick?: (e?: React.MouseEvent) => void;
+  onClick?: (e: React.MouseEvent) => void;
 }
 
 export const MenuItem: React.FC<MenuItemProp> = ({ text, icon, onClick }) => {

@@ -41,7 +41,9 @@ const ScriptCollectionView: React.FC = () => {
 
   // Delete
   const deleteFile = () => {
-    RemoveScriptFile(workspace.id, activeScript?.id || '').then((res) => {
+    if (!isOpenDeletePopup) return;
+
+    RemoveScriptFile(workspace.id, isOpenDeletePopup).then((res) => {
       let ws = new models.Workspace({
         ...ctx.state.activeWorkspace,
         scriptFiles: [...res],
@@ -72,11 +74,14 @@ const ScriptCollectionView: React.FC = () => {
 
     if (!file) return;
 
-    CreateScriptFile(workspace.id, `${file.name} copy`, file.content, file.headers).then(
-      (res) => {
-        ctx.dispatch({ type: 'addScriptFile', file: res });
-      }
-    );
+    CreateScriptFile(
+      workspace.id,
+      `${file.name} copy`,
+      file.content,
+      file.headers
+    ).then((res) => {
+      ctx.dispatch({ type: 'addScriptFile', file: res });
+    });
   };
   // sub menu items
   const items = ctx.state.activeWorkspace?.scriptFiles.map((it) => {
@@ -93,7 +98,6 @@ const ScriptCollectionView: React.FC = () => {
             setIsOpenEditInput(it.id);
           },
         },
-
         {
           icon: copyIcon,
           text: 'Copy',
