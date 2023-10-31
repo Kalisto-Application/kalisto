@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 
-interface props {
-  items: itemProps[];
+export interface MenuProps {
+  items: MenuItemProp[];
 }
 
-export const Menu: React.FC<props> = ({ items }) => {
+export const Menu: React.FC<MenuProps> = ({ items }) => {
   return (
     <div className=" relative z-10  cursor-pointer rounded-md border-[1px] border-borderFill bg-primaryFill ">
       {items.map((it, i) => {
@@ -16,13 +16,13 @@ export const Menu: React.FC<props> = ({ items }) => {
 
 export default Menu;
 
-interface itemProps {
+export interface MenuItemProp {
   text: string;
   icon?: string;
-  onClick?: (e: React.MouseEvent) => void;
+  onClick?: (e?: React.MouseEvent) => void;
 }
 
-export const MenuItem: React.FC<itemProps> = ({ text, icon, onClick }) => {
+export const MenuItem: React.FC<MenuItemProp> = ({ text, icon, onClick }) => {
   return (
     <div
       className=" flex gap-x-5  px-4 py-2.5   hover:bg-textBlockFill"

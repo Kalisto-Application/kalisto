@@ -1,47 +1,33 @@
 import { useRef, useState } from 'react';
-import { useOnClickOutside } from 'usehooks-ts';
+import { useBoolean, useOnClickOutside } from 'usehooks-ts';
 
 import { models } from '../../wailsjs/go/models';
-import { Menu } from './Menu';
+import { Menu, MenuItemProp, MenuProps } from './Menu';
 
 import expandIcon from '../../assets/icons/expand.svg';
 
 type fileListtProps = {
-  setActiveScript: (id: string) => void;
   items: itemProps[];
-  isOpenEditInput: boolean;
   onCloseInput: () => void;
   editFile: (value: string) => void;
-  isModeSubMenu: string;
-  activeScriptId: string;
-  setIsModeSubMenu: (value: string) => void;
 };
 type itemProps = {
   file: models.File;
-  menu: menuProps[];
+  inEdit: boolean;
+  isActive: boolean;
+  onClick: () => void;
+  menu: MenuItemProp[];
 };
-type menuProps = {
-  text: string;
-  icon?: string;
-  onClick?: (e: React.MouseEvent) => void;
-};
-
 const FileList: React.FC<fileListtProps> = ({
-  setActiveScript,
   items,
-  isOpenEditInput,
   onCloseInput,
   editFile,
-  isModeSubMenu,
-  activeScriptId,
-  setIsModeSubMenu,
 }) => {
-  const [isActive, setIsActive] = useState(activeScriptId);
   const [valueEdit, setValueEdit] = useState('');
 
   const onKeyDown = (e: React.KeyboardEvent) => {
     if (e.code == 'Enter' && valueEdit !== '') {
-      editFile(valueEdit);
+      editFile(valueEdit.trim());
       onCloseInput();
       setValueEdit('');
     }
@@ -56,19 +42,18 @@ const FileList: React.FC<fileListtProps> = ({
       {items.map((it, indx) => (
         <li
           key={indx}
-          className={`relative flex h-[32px] cursor-pointer justify-between pl-10 pr-4 hover:bg-borderFill ${
-            it.file.id === isActive ? 'bg-textBlockFill' : ''
+          className={`relative flex cursor-pointer justify-between py-1 pl-10 pr-4 hover:bg-borderFill ${
+            it.isActive ? 'bg-textBlockFill' : ''
           }`}
-          onClick={() => {
-            setIsActive(it.file.id);
-          }}
+          onClick={it.onClick}
         >
-          {isOpenEditInput && isActive === it.file.id ? (
+          {it.inEdit ? (
             <input
               className="border-1 w-[75%] border-[1px] border-borderFill bg-textBlockFill px-3 placeholder:text-[14px] placeholder:text-secondaryText"
               type="text"
               onFocus={(e) => {
                 e.target.select();
+                setValueEdit(it.file.name);
               }}
               autoFocus
               value={valueEdit || it.file.name}
@@ -79,13 +64,7 @@ const FileList: React.FC<fileListtProps> = ({
           ) : (
             <span className="text-right font-[Inter]">{it.file.name}</span>
           )}
-          <SubMenu
-            setActiveScript={setActiveScript}
-            isModeSubMenu={isModeSubMenu}
-            activeScriptId={activeScriptId}
-            item={it}
-            setIsModeSubMenu={setIsModeSubMenu}
-          />
+          <SubMenu items={it.menu} />
         </li>
       ))}
     </ul>
@@ -93,46 +72,34 @@ const FileList: React.FC<fileListtProps> = ({
 };
 export default FileList;
 
-type propsSubMenu = {
-  setActiveScript: (id: string) => void;
-  isModeSubMenu: string;
-  activeScriptId: string;
-  item: {
-    file: models.File;
-    menu: menuProps[];
-  };
-  setIsModeSubMenu: (value: string) => void;
-};
-
-const SubMenu: React.FC<propsSubMenu> = ({
-  setActiveScript,
-  activeScriptId,
-  isModeSubMenu,
-  item,
-  setIsModeSubMenu,
-}) => {
+const SubMenu: React.FC<MenuProps> = ({ items }) => {
   const subMenuRef = useRef(null);
+  const { value, toggle, setFalse } = useBoolean(false);
 
-  useOnClickOutside(subMenuRef, () => setIsModeSubMenu(''));
+  useOnClickOutside(subMenuRef, () => setFalse());
 
   return (
     <>
       {/* button submenu  */}
-      <button
-        onClick={(e) => {
-          setIsModeSubMenu(item.file.id);
-          setActiveScript(item.file.id);
-          e.stopPropagation();
-        }}
-      >
+      <button onClick={toggle}>
         <img src={expandIcon} alt="" />
       </button>
       {/* Sub menu */}
-      {isModeSubMenu && activeScriptId === item.file.id ? (
+      {value && (
         <div ref={subMenuRef} className="absolute right-2 top-9 w-[70%]">
-          <Menu items={item.menu} />
+          <Menu
+            items={items.map((it) => {
+              return {
+                ...it,
+                onClick: () => {
+                  toggle();
+                  it.onClick?.();
+                },
+              };
+            })}
+          />
         </div>
-      ) : null}
+      )}
     </>
   );
 };
