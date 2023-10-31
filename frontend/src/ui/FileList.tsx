@@ -18,15 +18,15 @@ type fileListtProps = {
   openSubMenu: () => void;
   activeScriptId: string;
 };
-interface itemProps {
+type itemProps = {
   file: models.File;
   menu: menuProps[];
-}
-interface menuProps {
+};
+type menuProps = {
   text: string;
   icon?: string;
   onClick?: (e: React.MouseEvent) => void;
-}
+};
 
 const FileList: React.FC<fileListtProps> = ({
   activeWorkspace,
@@ -40,11 +40,8 @@ const FileList: React.FC<fileListtProps> = ({
   openSubMenu,
   activeScriptId,
 }) => {
-  const [idSubMenu, setIdSubMenu] = useState(activeScriptId);
+  const [isActive, setIsActive] = useState(activeScriptId);
   const [valueEdit, setValueEdit] = useState('');
-  const subMenuRef = useRef(null);
-
-  useOnClickOutside(subMenuRef, () => closeSubMenu());
 
   const onKeyDown = (e: React.KeyboardEvent) => {
     if (e.code == 'Enter' && valueEdit !== '') {
@@ -64,14 +61,13 @@ const FileList: React.FC<fileListtProps> = ({
         <li
           key={indx}
           className={`relative flex h-[32px] cursor-pointer justify-between pl-10 pr-4 hover:bg-borderFill ${
-            it.file.id === activeScriptId ? 'bg-textBlockFill' : ''
+            it.file.id === isActive ? 'bg-textBlockFill' : ''
           }`}
           onClick={() => {
-            setIdSubMenu(it.file.id);
-            setActiveScript(it.file.id);
+            setIsActive(it.file.id);
           }}
         >
-          {isOpenEditInput && idSubMenu === it.file.id ? (
+          {isOpenEditInput && isActive === it.file.id ? (
             <input
               className="border-1 w-[75%] border-[1px] border-borderFill bg-textBlockFill px-3 placeholder:text-[14px] placeholder:text-secondaryText"
               type="text"
@@ -87,19 +83,63 @@ const FileList: React.FC<fileListtProps> = ({
           ) : (
             <span className="text-right font-[Inter]">{it.file.name}</span>
           )}
-          {/* button submenu  */}
-          <button onClick={openSubMenu}>
-            <img src={expandIcon} alt="" />
-          </button>
-          {/* Sub menu */}
-          {isModeSubMenu && idSubMenu === it.file.id ? (
-            <div ref={subMenuRef} className="absolute right-2 top-9 w-[70%]">
-              <Menu items={it.menu} />
-            </div>
-          ) : null}
+          <SubMenu
+            closeSubMenu={closeSubMenu}
+            openSubMenu={openSubMenu}
+            setActiveScript={setActiveScript}
+            isModeSubMenu={isModeSubMenu}
+            activeScriptId={activeScriptId}
+            item={it}
+          />
         </li>
       ))}
     </ul>
   );
 };
 export default FileList;
+
+type propsSubMenu = {
+  closeSubMenu: () => void;
+  openSubMenu: () => void;
+  setActiveScript: (id: string) => void;
+  isModeSubMenu: string;
+  activeScriptId: string;
+  item: {
+    file: models.File;
+    menu: menuProps[];
+  };
+};
+
+const SubMenu: React.FC<propsSubMenu> = ({
+  openSubMenu,
+  closeSubMenu,
+  setActiveScript,
+  activeScriptId,
+  isModeSubMenu,
+  item,
+}) => {
+  const subMenuRef = useRef(null);
+
+  useOnClickOutside(subMenuRef, () => closeSubMenu());
+
+  return (
+    <>
+      {/* button submenu  */}
+      <button
+        onClick={(e) => {
+          openSubMenu();
+          setActiveScript(item.file.id);
+          e.stopPropagation();
+        }}
+      >
+        <img src={expandIcon} alt="" />
+      </button>
+      {/* Sub menu */}
+      {isModeSubMenu && activeScriptId === item.file.id ? (
+        <div ref={subMenuRef} className="absolute right-2 top-9 w-[70%]">
+          <Menu items={item.menu} />
+        </div>
+      ) : null}
+    </>
+  );
+};
