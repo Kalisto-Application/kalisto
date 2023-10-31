@@ -3,6 +3,7 @@ import { UpdateScriptFile } from '../../wailsjs/go/api/Api';
 import { models } from '../../wailsjs/go/models';
 import { Context } from '../state';
 import { CodeEditor } from '../ui/Editor';
+import { EditorSwitcher } from '../ui/EditorSwitcher';
 
 export const ScriptEditor: React.FC = () => {
   const ctx = useContext(Context);
@@ -14,30 +15,60 @@ export const ScriptEditor: React.FC = () => {
     return <div className="w-1/2 bg-textBlockFill"></div>;
   }
 
-  const saveScript = (content: string) => {
-    if (!ws?.id || !activeFile?.id) {
-      return;
-    }
-    const updatedFile = new models.File({
-      ...activeFile,
-      content: content,
-    });
+  const switchScriptEditor = (i: number) =>
+    void [ctx.dispatch({ type: 'switchScriptEditor', i: i })];
 
-    UpdateScriptFile(ws?.id, updatedFile).then(() => {
-      ctx.dispatch({
-        type: 'updateScriptFile',
-        file: updatedFile,
+  const newSaveScript = (
+    field: 'content' | 'headers'
+  ): ((content: string) => void) => {
+    return (content: string) => {
+      if (!ws?.id || !activeFile?.id) {
+        return;
+      }
+
+      const updateRecord: { [key: string]: any } = {
+        ...activeFile,
+      };
+      updateRecord[field] = content;
+      const updatedFile = new models.File(updateRecord);
+
+      UpdateScriptFile(ws?.id, updatedFile).then(() => {
+        ctx.dispatch({
+          type: 'updateScriptFile',
+          file: updatedFile,
+        });
       });
-    });
+    };
   };
+
+  const saveScriptContent = newSaveScript('content');
+  const saveScriptHeaders = newSaveScript('headers');
+
+  const editors = [
+    <CodeEditor
+      key={0}
+      text={activeFile?.content || ''}
+      fileId={ctx.state.activeScriptFileId}
+      onChange={saveScriptContent}
+    />,
+    <CodeEditor
+      key={1}
+      text={activeFile?.headers || ''}
+      fileId={ctx.state.activeScriptFileId}
+      onChange={saveScriptHeaders}
+    />,
+  ];
 
   return (
     <div className="w-1/2 bg-textBlockFill">
-      <CodeEditor
-        text={activeFile?.content || ''}
-        fileId={ctx.state.activeScriptFileId}
-        onChange={saveScript}
+      <EditorSwitcher
+        items={[
+          { title: 'Script', onClick: switchScriptEditor },
+          { title: 'Headers', onClick: switchScriptEditor },
+        ]}
+        active={ctx.state.activeScriptEditor || 0}
       />
+      {editors[ctx.state.activeScriptEditor] || editors[0]}
     </div>
   );
 };

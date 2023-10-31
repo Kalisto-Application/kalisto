@@ -4,9 +4,7 @@ import { EditorSwitcher } from '../ui/EditorSwitcher';
 
 import { Context } from '../state';
 
-interface RequestEditorProps {}
-
-export const RequestEditor: React.FC<RequestEditorProps> = () => {
+export const RequestEditor: React.FC = () => {
   const ctx = useContext(Context);
   const switchRequestEditor = (i: number) =>
     void [ctx.dispatch({ type: 'switchRequestEditor', i: i })];
@@ -38,7 +36,7 @@ export const RequestEditor: React.FC<RequestEditorProps> = () => {
       <EditorSwitcher
         items={[
           { title: 'Request', onClick: switchRequestEditor },
-          { title: 'Metadata', onClick: switchRequestEditor },
+          { title: 'Headers', onClick: switchRequestEditor },
         ]}
         active={ctx.state.activeRequestEditor || 0}
       />

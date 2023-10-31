@@ -20,7 +20,8 @@ type Action =
   | { type: 'updateWorkspace'; workspace: models.Workspace }
   | { type: 'setActiveScriptId'; id: string }
   | { type: 'updateScriptFile'; file: models.File }
-  | { type: 'addScriptFile'; file: models.File };
+  | { type: 'addScriptFile'; file: models.File }
+  | { type: 'switchScriptEditor'; i: number };
 
 export type State = {
   activeRequestEditor: number;
@@ -37,6 +38,7 @@ export type State = {
   scriptResponse: string;
   scriptError: string;
   activeScriptFileId: string;
+  activeScriptEditor: number;
 };
 
 export const newState = (): State => {
@@ -55,6 +57,7 @@ export const newState = (): State => {
     scriptResponse: '',
     scriptError: '',
     activeScriptFileId: '',
+    activeScriptEditor: 0,
   };
 };
 
@@ -187,6 +190,7 @@ export const reducer = (state: State, action: Action): State => {
       return {
         ...state,
         activeScriptFileId: action.id,
+        activeScriptEditor: 0,
       };
     case 'addScriptFile':
       return {
@@ -198,6 +202,11 @@ export const reducer = (state: State, action: Action): State => {
             action.file,
           ],
         }),
+      };
+    case 'switchScriptEditor':
+      return {
+        ...state,
+        activeScriptEditor: action.i,
       };
 
     default:
