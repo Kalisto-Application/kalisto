@@ -10,6 +10,7 @@ import {
 import { models } from '../../wailsjs/go/models';
 import { Context } from '../state';
 import FileList from '../ui/FileList';
+import NewScript from './../ui/NewScript';
 import DeletePopup from './DeletePopup';
 
 const ScriptCollectionView: React.FC = () => {
@@ -19,8 +20,7 @@ const ScriptCollectionView: React.FC = () => {
   }
 
   const [isOpenDeletePopup, setIsOpenDeletePopup] = useState('');
-  const [isOpenEditInput, setIsOpenEditInput] = useState(false);
-  const [isModeSubMenu, setIsModeSubMenu] = useState('');
+  const [isOpenEditInput, setIsOpenEditInput] = useState('');
 
   const workspace = ctx.state.activeWorkspace;
 
@@ -54,7 +54,7 @@ const ScriptCollectionView: React.FC = () => {
   // Edit
   const renameFile = (name: string) => {
     const renamed = new models.File({
-      ...activeScript,
+      ...workspace.scriptFiles.find((it) => it.id === isOpenEditInput),
       name: name,
     });
 
@@ -67,75 +67,58 @@ const ScriptCollectionView: React.FC = () => {
   };
 
   // Copy
+  const copyFile = (id: string) => {
+    const file = workspace.scriptFiles.find((it) => it.id === id);
 
-  const copyFile = () => {
-    CreateScriptFile(
-      workspace.id,
-      `${activeScript?.name} copy`,
-      activeScript?.content || '',
-      activeScript?.headers || ''
-    ).then((res) => {
-      ctx.dispatch({ type: 'addScriptFile', file: res });
-    });
+    if (!file) return;
+
+    CreateScriptFile(workspace.id, `${file.name} copy`, file.content, file.headers).then(
+      (res) => {
+        ctx.dispatch({ type: 'addScriptFile', file: res });
+      }
+    );
   };
   // sub menu items
-  const items = [
-    {
-      icon: editIcon,
-      text: 'Edit',
-      onClick: () => {
-        setIsOpenEditInput(true);
-        setIsModeSubMenu('');
-      },
-    },
+  const items = ctx.state.activeWorkspace?.scriptFiles.map((it) => {
+    return {
+      file: it,
+      inEdit: it.id === isOpenEditInput,
+      isActive: it.id === activeScript?.id,
+      onClick: () => setActiveScript(it.id),
+      menu: [
+        {
+          icon: editIcon,
+          text: 'Edit',
+          onClick: () => {
+            setIsOpenEditInput(it.id);
+          },
+        },
 
-    {
-      icon: copyIcon,
-      text: 'Copy',
-      onClick: () => {
-        copyFile();
-        setIsModeSubMenu('');
-      },
-    },
-    {
-      icon: deleteIcon,
-      text: 'Delete',
-      onClick: () => {
-        setIsOpenDeletePopup(activeScript?.id || '');
-        setIsModeSubMenu('');
-      },
-    },
-  ];
+        {
+          icon: copyIcon,
+          text: 'Copy',
+          onClick: () => {
+            copyFile(it.id);
+          },
+        },
+        {
+          icon: deleteIcon,
+          text: 'Delete',
+          onClick: () => {
+            setIsOpenDeletePopup(it.id);
+          },
+        },
+      ],
+    };
+  });
 
   return (
     <>
+      <NewScript addFile={addFile} />
       <FileList
-        addFile={addFile}
-        activeWorkspace={ctx.state.activeWorkspace}
-        setActiveScript={setActiveScript}
-        // const items = ctx.state.activeWorkspace?.scriptFiles.map(it => {
-        //   return {
-        //     file: it,
-        //     menu: [
-        //       {
-        //         icon: deleteIcon,
-        //         text: 'Delete',
-        //         onClick: () => {
-        //           setIsOpenDeletePopup(it.id);
-        //           setIsModeSubMenu(false);
-        //         },
-        //       },
-        //     ]
-        //   }
-        // })
         items={items}
-        activeScript={activeScript?.id || ''}
-        isOpenEditInput={isOpenEditInput}
-        onCloseInput={() => setIsOpenEditInput(false)}
+        onCloseInput={() => setIsOpenEditInput('')}
         editFile={renameFile}
-        isModeSubMenu={isModeSubMenu}
-        closeSubMenu={() => setIsModeSubMenu('')}
-        openSubMenu={() => setIsModeSubMenu(activeScript?.id || '')}
       />
       <DeletePopup
         id={isOpenDeletePopup}
