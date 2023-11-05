@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "react-accessible-treeview": "^2.8.0",
+    "react-icons": "^4.11.0"
+  }
+}
