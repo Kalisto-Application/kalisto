@@ -6,6 +6,12 @@ CSS rules to specify families:
     font-family: 'Roboto Mono', monospace;
 */
 
+/* style tree API */
+.tree-node {
+  line-height: 1.5;
+  display: flex;
+}
+
 @import 'react-complex-tree/lib/style-modern.css';
 
 @tailwind base;

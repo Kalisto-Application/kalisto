@@ -1,11 +1,12 @@
 import React, { useContext, useEffect, useState } from 'react';
 import TreeView, {
   flattenTree,
-  ITreeViewOnSelectProps,
+  INodeRendererProps,
 } from 'react-accessible-treeview';
+import expandIcon from '../../assets/icons/expand.svg';
+import addIcon from '../../assets/icons/plus.svg';
 import { models } from '../../wailsjs/go/models';
 import { Context } from '../state';
-
 const findMethod = (
   s: models.Service[] = [],
   serviceName: string,
@@ -28,14 +29,13 @@ type Data = {
   parent?: string;
 };
 
-export const MethodCollection: React.FC<ITreeViewOnSelectProps> = () => {
+export const MethodCollection: React.FC = () => {
   const ctx = useContext(Context);
 
   const services = ctx.state.activeWorkspace?.spec.services;
   const selectedItem = ctx.state.activeMethod?.fullName;
 
   const serviceNames = services?.map((it) => it.fullName) || [];
-  console.log('services', services);
 
   const newFolder = {
     name: '',
@@ -53,23 +53,55 @@ export const MethodCollection: React.FC<ITreeViewOnSelectProps> = () => {
       }) || [],
   };
 
-  console.log('new', newFolder);
-
   const data = flattenTree(newFolder);
 
   return (
-    <div>
-      <div className="directory">
-        <TreeView
-          data={data}
-          aria-label="directory tree"
-          nodeRenderer={({ element, getNodeProps, level }) => (
-            <div {...getNodeProps()} style={{ paddingLeft: 20 * (level - 1) }}>
+    <TreeView
+      data={data}
+      className="pl-4"
+      nodeRenderer={({
+        element,
+        getNodeProps,
+        level,
+        isBranch,
+        isExpanded,
+      }: INodeRendererProps) => {
+        {
+          return (
+            <div
+              {...getNodeProps()}
+              style={{
+                paddingLeft: 30 * (level - 1),
+                marginBottom: '10px',
+                cursor: 'pointer',
+              }}
+            >
+              {isBranch ? (
+                <FolderIcon isOpen={isExpanded} />
+              ) : (
+                <img src={addIcon} className="mr-2" />
+              )}
               {element.name}
             </div>
-          )}
-        />
-      </div>
-    </div>
+          );
+        }
+      }}
+    />
   );
 };
+
+type propsFolder = {
+  isOpen: boolean;
+};
+const FolderIcon: React.FC<propsFolder> = ({ isOpen }) =>
+  isOpen ? (
+    <img
+      src={expandIcon}
+      className="rotate-270 mr-2 transition duration-300 ease-in-out"
+    />
+  ) : (
+    <img
+      src={expandIcon}
+      className="mr-2 -rotate-90 transition duration-300 ease-in-out"
+    />
+  );
