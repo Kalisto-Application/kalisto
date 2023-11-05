@@ -54,7 +54,6 @@ export const MethodCollection: React.FC = () => {
   };
 
   const data = flattenTree(newFolder);
-
   return (
     <TreeView
       data={data}
@@ -90,6 +89,13 @@ export const MethodCollection: React.FC = () => {
   );
 };
 
+/*
+1) заменить либу и понять что работает ✅
+2) научиться отображать фиксированный список в FileList
+3) науиться создавать файлы
+4) отоброжать активный файл на клик
+5) подключить меню
+*/
 type propsFolder = {
   isOpen: boolean;
 };
