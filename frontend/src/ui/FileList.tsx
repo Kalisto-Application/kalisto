@@ -73,8 +73,8 @@ const FileList: React.FC<fileListtProps> = ({
 export default FileList;
 
 const SubMenu: React.FC<MenuProps> = ({ items }) => {
-  const subMenuRef = useRef(null);
   const { value, toggle, setFalse } = useBoolean(false);
+  const subMenuRef = useRef(null);
 
   useOnClickOutside(subMenuRef, () => setFalse());
 
