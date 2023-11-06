@@ -4,11 +4,11 @@ firstRes = SequenceService.First({
 });
 
 secondRes = SequenceService.Second({
-  value: firstRes.value,
-  rpc: firstRes.rpc,
+  value: firstRes.body.value,
+  rpc: firstRes.body.rpc,
 });
 
 thirdRes = SequenceService.Third({
-  value: secondRes.value,
-  rpc: secondRes.rpc,
+  value: secondRes.body.value,
+  rpc: secondRes.body.rpc,
 });

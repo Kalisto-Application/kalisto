@@ -51,7 +51,7 @@ func (ip *Interpreter) Raw(script string) (map[string]interface{}, error) {
 	return ip.ExportValue(script, "script.js")
 }
 
-type requestFunc func(obj interface{}) (map[string]interface{}, error)
+type requestFunc func(obj interface{}, headers map[string]string) (map[string]interface{}, error)
 type apiError string
 
 func (a apiError) Error() string {
@@ -71,13 +71,12 @@ func (ip *Interpreter) RunScript(ctx context.Context, script, meta string, spec 
 	if err != nil {
 		return "", err
 	}
-	ctx = metadata.NewOutgoingContext(ctx, md)
 	var latestCalledMethod models.Method
 
 	for _, service := range spec.Services {
 		jsService := vm.NewObject()
 		for _, method := range service.Methods {
-			jsService.Set(method.Name, newJsFunc(ctx, vm, reg, spec, method, client, render, &latestCalledMethod))
+			jsService.Set(method.Name, ip.newJsFunc(ctx, vm, reg, spec, method, client, render, md, &latestCalledMethod))
 		}
 
 		if err := vm.Set(service.Name, jsService); err != nil {
@@ -94,15 +93,15 @@ func (ip *Interpreter) RunScript(ctx context.Context, script, meta string, spec 
 	if !ok {
 		return "", fmt.Errorf("expected map as a result")
 	}
-	responseText, err := render.MapAsJs(latestCalledMethod.ResponseMessage, response)
+	responseText, err := render.ScriptMapAsJs(latestCalledMethod.ResponseMessage, response)
 	if err != nil {
 		return "", fmt.Errorf("api: failed to marshal response to js: %w", err)
 	}
 	return responseText, nil
 }
 
-func newJsFunc(ctx context.Context, vm *goja.Runtime, reg definitions.Registry, spec models.Spec, method models.Method, client *client.Client, render *render.Renderer, latestCalled *models.Method) requestFunc {
-	return func(obj interface{}) (map[string]interface{}, error) {
+func (ip *Interpreter) newJsFunc(ctx context.Context, vm *goja.Runtime, reg definitions.Registry, spec models.Spec, method models.Method, client *client.Client, render *render.Renderer, scriptMeta metadata.MD, latestCalled *models.Method) requestFunc {
+	return func(obj interface{}, headers map[string]string) (map[string]interface{}, error) {
 		var msg *dynamic.Message
 		var err error
 		switch obj := obj.(type) {
@@ -129,6 +128,9 @@ func newJsFunc(ctx context.Context, vm *goja.Runtime, reg definitions.Registry, 
 		if err != nil {
 			return nil, fmt.Errorf("failed to find method path '%s': %w", method.FullName, err)
 		}
+
+		requestMeta := mergeMeta(scriptMeta, headers)
+		ctx = metadata.NewOutgoingContext(ctx, requestMeta)
 		responseMeta := metadata.MD{}
 		apiErr, err := client.Invoke(ctx, methodPath, msg, resp, &responseMeta)
 		if err != nil {
@@ -139,8 +141,20 @@ func newJsFunc(ctx context.Context, vm *goja.Runtime, reg definitions.Registry, 
 		}
 
 		*latestCalled = method
-		return render.MessageAsMap(method.ResponseMessage, resp)
+		return render.ScriptMessageAsMap(method.ResponseMessage, resp, responseMeta)
 	}
+}
+
+func mergeMeta(md metadata.MD, m map[string]string) metadata.MD {
+	res := make(map[string][]string, len(md))
+	for k, v := range md {
+		res[k] = v
+	}
+	for k, v := range m {
+		res[k] = []string{v}
+	}
+
+	return res
 }
 
 func (ip *Interpreter) ExportValue(script, name string) (map[string]interface{}, error) {

@@ -175,6 +175,7 @@ export const reducer = (state: State, action: Action): State => {
       return {
         ...state,
         scriptResponse: action.response,
+        scriptError: '',
       };
     case 'scriptError':
       return {

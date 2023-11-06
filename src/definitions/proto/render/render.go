@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/jhump/protoreflect/dynamic"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/runtime/protoiface"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -28,6 +29,23 @@ func (f *Renderer) MessageAsJsString(spec models.Message, msg *dynamic.Message) 
 	}
 
 	return f.MapAsJs(spec, msgMap)
+}
+
+func (f *Renderer) ScriptMessageAsMap(spec models.Message, msg *dynamic.Message, meta metadata.MD) (map[string]interface{}, error) {
+	body, err := f.MessageAsMap(spec, msg)
+	if err != nil {
+		return nil, err
+	}
+
+	metaCopy := make(map[string][]string)
+	for k, v := range meta {
+		metaCopy[k] = v
+	}
+
+	return map[string]interface{}{
+		"body": body,
+		"meta": metaCopy,
+	}, nil
 }
 
 func (f *Renderer) MessageAsMap(spec models.Message, msg *dynamic.Message) (map[string]interface{}, error) {
@@ -61,6 +79,46 @@ func (f *Renderer) MessageAsMap(spec models.Message, msg *dynamic.Message) (map[
 
 func (f *Renderer) MapAsJs(m models.Message, val map[string]interface{}) (string, error) {
 	return f.mapAsJs(m, val, 2)
+}
+
+func (f *Renderer) ScriptMapAsJs(m models.Message, val map[string]interface{}) (string, error) {
+	bodyJs, err := f.mapAsJs(m, val["body"].(map[string]interface{}), 4)
+	if err != nil {
+		return "", err
+	}
+	metaJs, err := f.MetaAsJs(val["meta"].(map[string][]string))
+	if err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf("{\n  body: %s,\n  meta: %s\n}", bodyJs, metaJs), nil
+}
+
+func (f *Renderer) MetaAsJs(meta map[string][]string) (string, error) {
+	var buf strings.Builder
+	buf.WriteString("{\n")
+
+	for key, value := range meta {
+		tpl := "    '%s': %s,\n"
+
+		metaValues := make([]interface{}, len(value))
+		for i := range value {
+			metaValues[i] = value[i]
+		}
+		v, err := f.mapAsJsValue(metaValues, 2)
+		if err != nil {
+			return "", fmt.Errorf("failed to present a map as js: %w", err)
+		}
+		if v == "" {
+			continue
+		}
+
+		line := fmt.Sprintf(tpl, key, v)
+		buf.WriteString(line)
+	}
+
+	buf.WriteString("  }")
+	return buf.String(), nil
 }
 
 func (f *Renderer) mapAsJs(m models.Message, val map[string]interface{}, space int) (string, error) {

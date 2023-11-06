@@ -434,6 +434,7 @@ func (a *Api) SendGrpc(request models.Request) (models.Response, error) {
 	if err != nil {
 		return models.Response{}, fmt.Errorf("api: failed to create metadata: %w", err)
 	}
+	ctx = metadata.NewOutgoingContext(ctx, meta)
 
 	outputType, err := reg.GetOutputType(request.Method)
 	if err != nil {
@@ -441,7 +442,6 @@ func (a *Api) SendGrpc(request models.Request) (models.Response, error) {
 	}
 	resp := dynamic.NewMessage(outputType)
 
-	ctx = metadata.NewOutgoingContext(ctx, meta)
 	responseMeta := metadata.MD{}
 	path, err := reg.MethodPath(request.Method)
 	if err != nil {
