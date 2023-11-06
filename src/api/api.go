@@ -159,7 +159,7 @@ func (a *Api) CreateWorkspace(name string, dirs []string) (models.Workspace, err
 		TargetUrl:    "localhost:9000",
 		LastUsage:    time.Now().UTC().Round(time.Nanosecond),
 		ScriptFiles:  make([]models.File, 0),
-		RequestFiles: make([]models.File, 0),
+		RequestFiles: make(map[string][]models.File, 0),
 	}
 	if err := a.store.SaveWorkspace(ws); err != nil {
 		return ws, fmt.Errorf("api: failed to save workspace: %w", err)
@@ -236,7 +236,7 @@ func (a *Api) CreateWorkspaceV2(name string, dirs []string, workspaceKind models
 		TargetUrl:    "localhost:9000",
 		LastUsage:    time.Now().UTC().Round(time.Nanosecond),
 		ScriptFiles:  make([]models.File, 0),
-		RequestFiles: make([]models.File, 0),
+		RequestFiles: make(map[string][]models.File, 0),
 	}
 	if err := a.store.SaveWorkspace(ws); err != nil {
 		return ws, fmt.Errorf("api: failed to save workspace: %w", err)
@@ -290,7 +290,7 @@ func (a *Api) WorkspaceList(id string) (models.WorkspaceList, error) {
 				main.ScriptFiles = make([]models.File, 0)
 			}
 			if main.RequestFiles == nil {
-				main.RequestFiles = make([]models.File, 0)
+				main.RequestFiles = make(map[string][]models.File, 0)
 			}
 			break
 		}
@@ -545,7 +545,7 @@ func (s *Api) openapiRegistryFromPath(dirs []string) (*ocompiler.Registry, error
 
 // REQUEST FILES API
 
-func (s *Api) CreateRequestFile(workspaceID, name, content, headers string) (models.File, error) {
+func (s *Api) CreateRequestFile(workspaceID, methodFullName string, name, content, headers string) (models.File, error) {
 	file := models.File{
 		Id:        uuid.NewString(),
 		Name:      name,
@@ -559,24 +559,36 @@ func (s *Api) CreateRequestFile(workspaceID, name, content, headers string) (mod
 		return file, err
 	}
 
-	ws.RequestFiles = append(ws.RequestFiles, file)
+	if !ws.Spec.MethodExists(models.MethodName(methodFullName)) {
+		return models.File{}, models.ErrMethodNotFound
+	}
+	ws.AddRequestFile(methodFullName, file)
+
 	err = s.store.SaveWorkspace(ws)
 	return file, err
 }
 
-func (s *Api) RemoveRequestFile(workspaceID, fileID string) ([]models.File, error) {
+func (s *Api) RemoveRequestFile(workspaceID, methodName string, fileID string) (map[string][]models.File, error) {
 	ws, err := s.store.GetWorkspace(workspaceID)
 	if err != nil {
 		return nil, err
 	}
+	if !ws.Spec.MethodExists(models.MethodName(methodName)) {
+		return nil, models.ErrMethodNotFound
+	}
 
-	filtered := make([]models.File, 0, len(ws.RequestFiles))
-	for _, file := range ws.RequestFiles {
-		if file.Id == fileID {
-			continue
+	filtered := make(map[string][]models.File, len(ws.RequestFiles))
+	for method, files := range ws.RequestFiles {
+		if method == methodName {
+			for _, file := range files {
+				if file.Id == fileID {
+					continue
+				}
+
+				filtered[method] = append(filtered[method], file)
+			}
 		}
 
-		filtered = append(filtered, file)
 	}
 
 	ws.RequestFiles = filtered
@@ -584,18 +596,23 @@ func (s *Api) RemoveRequestFile(workspaceID, fileID string) ([]models.File, erro
 	return ws.RequestFiles, err
 }
 
-func (s *Api) UpdateRequestFile(workspaceID string, file models.File) error {
+func (s *Api) UpdateRequestFile(workspaceID, methodName string, file models.File) error {
 	ws, err := s.store.GetWorkspace(workspaceID)
 	if err != nil {
 		return err
 	}
+	if !ws.Spec.MethodExists(models.MethodName(methodName)) {
+		return models.ErrMethodNotFound
+	}
 
-	for i, f := range ws.RequestFiles {
-		if file.Id == f.Id {
-			ws.RequestFiles[i].Name = file.Name
-			ws.RequestFiles[i].Content = file.Content
-			ws.RequestFiles[i].Headers = file.Headers
-			break
+	for method, files := range ws.RequestFiles {
+		for i, f := range files {
+			if file.Id == f.Id {
+				ws.RequestFiles[method][i].Name = file.Name
+				ws.RequestFiles[method][i].Content = file.Content
+				ws.RequestFiles[method][i].Headers = file.Headers
+				break
+			}
 		}
 	}
 

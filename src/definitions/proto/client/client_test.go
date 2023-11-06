@@ -3,6 +3,7 @@ package client_test
 import (
 	"context"
 	"kalisto/src/definitions/proto/client"
+	"kalisto/src/models"
 	"testing"
 	"time"
 
@@ -14,5 +15,5 @@ func TestClientTimeout(t *testing.T) {
 	defer cancel()
 
 	_, err := client.NewClient(ctx, client.Config{Addr: ":9000"})
-	assert.ErrorIs(t, err, context.DeadlineExceeded)
+	assert.ErrorIs(t, err, models.ErrorServerUnavailable)
 }

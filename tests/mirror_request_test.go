@@ -57,7 +57,7 @@ func (s *MirrorRequestSuite) TestMirrorRequest() {
 		{name: "request4", req: request4},
 	} {
 		s.Run(tt.name, func() {
-			app, err := assembly.NewApp(xdg.DataHome + "/kalisto.db/test-" + s.T().Name())
+			app, err := assembly.NewApp(xdg.DataHome + "/kalisto/db-test-" + s.T().Name())
 			s.Require().NoError(err)
 			api := app.Api
 

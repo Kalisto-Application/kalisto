@@ -39,7 +39,7 @@ func (s *SequenceScriptSuite) TestScriptSequence() {
 	s.Require().NoError(err)
 	time.Sleep(time.Millisecond * 200)
 
-	app, err := assembly.NewApp(xdg.DataHome + "/kalisto.db/test-" + s.T().Name())
+	app, err := assembly.NewApp(xdg.DataHome + "/kalisto/db-test-" + s.T().Name())
 	s.Require().NoError(err)
 	api := app.Api
 
@@ -70,7 +70,7 @@ func (s *SequenceScriptSuite) TestMirrorScripting() {
 	s.Require().NoError(err)
 	time.Sleep(time.Millisecond * 200)
 
-	app, err := assembly.NewApp(xdg.DataHome + "/kalisto.db/test-" + s.T().Name())
+	app, err := assembly.NewApp(xdg.DataHome + "/kalisto/db-test-" + s.T().Name())
 	s.Require().NoError(err)
 	api := app.Api
 
@@ -116,7 +116,7 @@ func (s *SequenceScriptSuite) TestSequentialRequests() {
 	s.Require().NoError(err)
 	time.Sleep(time.Millisecond * 200)
 
-	app, err := assembly.NewApp(xdg.DataHome + "/kalisto.db/test-" + s.T().Name())
+	app, err := assembly.NewApp(xdg.DataHome + "/kalisto/db-test-" + s.T().Name())
 	s.Require().NoError(err)
 	api := app.Api
 
