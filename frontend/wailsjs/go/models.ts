@@ -283,7 +283,7 @@ export namespace models {
 	    spec: Spec;
 	    lastUsage: Date;
 	    basePath: string[];
-	    requestInstances: {[key: string]: File[]};
+	    requestFiles: {[key: string]: File[]};
 	    scriptFiles: File[];
 	
 	    static createFrom(source: any = {}) {
@@ -298,7 +298,7 @@ export namespace models {
 	        this.spec = this.convertValues(source["spec"], Spec);
 	        this.lastUsage = new Date(source["lastUsage"]);
 	        this.basePath = source["basePath"];
-	        this.requestInstances = source["requestInstances"];
+	        this.requestFiles = source["requestFiles"];
 	        this.scriptFiles = this.convertValues(source["scriptFiles"], File);
 	    }
 	
