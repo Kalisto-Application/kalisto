@@ -8,12 +8,7 @@ type inputProps = {
   placeholder?: string;
 };
 const InputAddItem: React.FC<inputProps> = ({ addItem, text, placeholder }) => {
-  const {
-    value: showInput,
-    setValue: setShowInput,
-    setTrue,
-    setFalse,
-  } = useBoolean(false);
+  const { value: showInput, setTrue, setFalse } = useBoolean(false);
 
   const [inputValue, setInputValue] = useState('');
   const [valueValidate, setValueValidate] = useState(false);
@@ -34,7 +29,7 @@ const InputAddItem: React.FC<inputProps> = ({ addItem, text, placeholder }) => {
   };
 
   return (
-    <div className="mb-3 flex flex-col">
+    <div className=" flex flex-col">
       {showInput ? (
         <>
           <input
@@ -46,7 +41,7 @@ const InputAddItem: React.FC<inputProps> = ({ addItem, text, placeholder }) => {
             className="border-1 mb-1 w-full border-[1px] border-borderFill  bg-textBlockFill px-3 placeholder:text-[14px] placeholder:text-secondaryText"
           />
 
-          <div className="pl-5 text-xs">Push Enter to rename </div>
+          <div className="pl-5 text-xs">Push Enter to save </div>
         </>
       ) : (
         <>
