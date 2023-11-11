@@ -175,7 +175,7 @@ func (s *ApiSuite) TestRequestFiles() {
 	ws, err := app.Api.CreateWorkspace("1", dirs)
 	s.Require().NoError(err)
 
-	methodName := "api.v1.ObservabilityService.GetLogs"
+	methodName := ws.Spec.Services[0].Methods[0].FullName
 
 	_, err = app.Api.CreateRequestFile(ws.ID, "unknown method", "f1", "", "")
 	s.Assert().ErrorIs(err, models.ErrMethodNotFound)
