@@ -107,7 +107,6 @@ export namespace models {
 	    responseMessage: Message;
 	    kind: string;
 	    requestExample: string;
-	    requestInstances: File[];
 	
 	    static createFrom(source: any = {}) {
 	        return new Method(source);
@@ -121,7 +120,6 @@ export namespace models {
 	        this.responseMessage = this.convertValues(source["responseMessage"], Message);
 	        this.kind = source["kind"];
 	        this.requestExample = source["requestExample"];
-	        this.requestInstances = this.convertValues(source["requestInstances"], File);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -285,7 +283,7 @@ export namespace models {
 	    spec: Spec;
 	    lastUsage: Date;
 	    basePath: string[];
-	    requestFiles: File[];
+	    requestInstances: {[key: string]: File[]};
 	    scriptFiles: File[];
 	
 	    static createFrom(source: any = {}) {
@@ -300,7 +298,7 @@ export namespace models {
 	        this.spec = this.convertValues(source["spec"], Spec);
 	        this.lastUsage = new Date(source["lastUsage"]);
 	        this.basePath = source["basePath"];
-	        this.requestFiles = this.convertValues(source["requestFiles"], File);
+	        this.requestInstances = source["requestInstances"];
 	        this.scriptFiles = this.convertValues(source["scriptFiles"], File);
 	    }
 	

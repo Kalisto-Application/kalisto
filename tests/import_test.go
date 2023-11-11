@@ -61,7 +61,7 @@ func (s *ImportSuite) TestImport() {
 		// },
 	} {
 		s.Run(tt.name, func() {
-			app, err := assembly.NewApp(xdg.DataHome + "/kalisto.db/test-" + s.T().Name())
+			app, err := assembly.NewApp(xdg.DataHome + "/kalisto/db-test-" + s.T().Name())
 			s.Require().NoError(err)
 
 			ws, err := app.Api.CreateWorkspaceV2(tt.name, tt.dirs, models.WorkspaceKindOpenapi)

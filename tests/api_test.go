@@ -36,7 +36,7 @@ func (s *ApiSuite) TestList() {
 		path.Join(wd, "examples/buf/workspace/observabilitytypes"),
 	}
 
-	app, err := assembly.NewApp(xdg.DataHome + "/kalisto.db/test-" + s.T().Name())
+	app, err := assembly.NewApp(xdg.DataHome + "/kalisto/db-test-" + s.T().Name())
 	s.Require().NoError(err)
 
 	res, err := app.Api.WorkspaceList("")
@@ -51,14 +51,19 @@ func (s *ApiSuite) TestList() {
 
 	ws1, err := app.Api.CreateWorkspace("1", dirs)
 	s.Require().NoError(err)
+	res, err = app.Api.WorkspaceList("")
+	s.Require().NoError(err)
+	s.Equal(res.List, toShortList([]models.Workspace{ws1}))
 
 	ws2, err := app.Api.CreateWorkspace("2", dirs)
 	s.Require().NoError(err)
+	res, err = app.Api.WorkspaceList("")
+	s.Require().NoError(err)
+	s.Equal(res.List, toShortList([]models.Workspace{ws2, ws1}))
 
 	ws3, err := app.Api.CreateWorkspace("3", dirs)
 	s.Require().NoError(err)
-
-	res, err = app.Api.WorkspaceList("")
+	res, err = app.Api.WorkspaceList(ws3.ID)
 	s.Require().NoError(err)
 	s.Equal(res.List, toShortList([]models.Workspace{ws3, ws2, ws1}))
 
@@ -89,7 +94,7 @@ func (s *ApiSuite) TestScriptFiles() {
 		path.Join(wd, "examples/buf/workspace/observabilitytypes"),
 	}
 
-	app, err := assembly.NewApp(xdg.DataHome + "/kalisto.db/test-" + s.T().Name())
+	app, err := assembly.NewApp(xdg.DataHome + "/kalisto/db-test-" + s.T().Name())
 	s.Require().NoError(err)
 
 	res, err := app.Api.WorkspaceList("")
@@ -154,7 +159,7 @@ func (s *ApiSuite) TestRequestFiles() {
 		path.Join(wd, "examples/buf/workspace/observabilitytypes"),
 	}
 
-	app, err := assembly.NewApp(xdg.DataHome + "/kalisto.db/test-" + s.T().Name())
+	app, err := assembly.NewApp(xdg.DataHome + "/kalisto/db-test-" + s.T().Name())
 	s.Require().NoError(err)
 
 	res, err := app.Api.WorkspaceList("")
@@ -170,45 +175,56 @@ func (s *ApiSuite) TestRequestFiles() {
 	ws, err := app.Api.CreateWorkspace("1", dirs)
 	s.Require().NoError(err)
 
-	newFile, err := app.Api.CreateRequestFile(ws.ID, "f1", "", "")
+	methodName := "api.v1.ObservabilityService.GetLogs"
+
+	_, err = app.Api.CreateRequestFile(ws.ID, "unknown method", "f1", "", "")
+	s.Assert().ErrorIs(err, models.ErrMethodNotFound)
+
+	newFile, err := app.Api.CreateRequestFile(ws.ID, methodName, "f1", "", "")
 	s.Require().NoError(err)
 	s.Equal(newFile.Name, "f1")
 	s.Equal(newFile.Content, "")
 
-	newFile2, err := app.Api.CreateRequestFile(ws.ID, "f2", "content", "headers")
+	newFile2, err := app.Api.CreateRequestFile(ws.ID, methodName, "f2", "content", "headers")
 	s.Require().NoError(err)
 	s.Equal(newFile2.Name, "f2")
 	s.Equal(newFile2.Content, "content")
 	s.Equal(newFile2.Headers, "headers")
 
 	newFile.Name = "f11"
-	err = app.Api.UpdateRequestFile(ws.ID, newFile)
+	err = app.Api.UpdateRequestFile(ws.ID, methodName, newFile)
 	s.Require().NoError(err)
 
 	newFile.Content = "content1"
-	err = app.Api.UpdateRequestFile(ws.ID, newFile)
+	err = app.Api.UpdateRequestFile(ws.ID, methodName, newFile)
 	s.Require().NoError(err)
 
 	newFile2.Name = "f22"
-	err = app.Api.UpdateRequestFile(ws.ID, newFile2)
+	err = app.Api.UpdateRequestFile(ws.ID, methodName, newFile2)
 	s.Require().NoError(err)
 
 	newFile2.Content = "content2"
-	err = app.Api.UpdateRequestFile(ws.ID, newFile2)
+	err = app.Api.UpdateRequestFile(ws.ID, methodName, newFile2)
 	s.Require().NoError(err)
+
+	err = app.Api.UpdateRequestFile(ws.ID, "unknown method", newFile2)
+	s.Assert().ErrorIs(err, models.ErrMethodNotFound)
 
 	wsList, err = app.Api.WorkspaceList(ws.ID)
 	s.Require().NoError(err)
-	s.Equal(wsList.Main.RequestFiles, []models.File{newFile, newFile2})
+	s.Equal(wsList.Main.RequestFiles, map[string][]models.File{methodName: {newFile, newFile2}})
 	s.Len(wsList.Main.ScriptFiles, 0)
 
-	files, err := app.Api.RemoveRequestFile(ws.ID, newFile.Id)
+	files, err := app.Api.RemoveRequestFile(ws.ID, methodName, newFile.Id)
 	s.Require().NoError(err)
-	s.Equal(files, []models.File{newFile2})
+	s.Equal(files, map[string][]models.File{methodName: {newFile2}})
 
-	files, err = app.Api.RemoveRequestFile(ws.ID, newFile2.Id)
+	files, err = app.Api.RemoveRequestFile(ws.ID, methodName, newFile2.Id)
 	s.Require().NoError(err)
 	s.Len(files, 0)
+
+	_, err = app.Api.RemoveRequestFile(ws.ID, "unknown method", newFile2.Id)
+	s.Assert().ErrorIs(err, models.ErrMethodNotFound)
 }
 
 func TestApi(t *testing.T) {

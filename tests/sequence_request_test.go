@@ -39,7 +39,7 @@ func (s *SequenceScriptSuite) TestScriptSequence() {
 	s.Require().NoError(err)
 	time.Sleep(time.Millisecond * 200)
 
-	app, err := assembly.NewApp(xdg.DataHome + "/kalisto.db/test-" + s.T().Name())
+	app, err := assembly.NewApp(xdg.DataHome + "/kalisto/db-test-" + s.T().Name())
 	s.Require().NoError(err)
 	api := app.Api
 
@@ -57,7 +57,7 @@ func (s *SequenceScriptSuite) TestScriptSequence() {
 	})
 	s.Require().NoError(err)
 
-	AssertJsObjectsAreEqual(s.T(), `{"value": 3, "rpc": "Third"}`, response)
+	AssertJsObjectsAreEqual(s.T(), `{body: {"value": 3, "rpc": "Third"}, meta: {"content-type": ['application/grpc'], authorization: ['super token']}}`, response)
 
 	close()
 	app.OnShutdown(context.Background())
@@ -65,12 +65,12 @@ func (s *SequenceScriptSuite) TestScriptSequence() {
 }
 
 func (s *SequenceScriptSuite) TestMirrorScripting() {
-	meta := `{"content-type": 'application/grpc', authorization: 'super token'}`
+	meta := `{"content-type": 'application/grpc', authorization: 'invalid token must be overriden'}`
 	close, closed, err := server.Run(":9000")
 	s.Require().NoError(err)
 	time.Sleep(time.Millisecond * 200)
 
-	app, err := assembly.NewApp(xdg.DataHome + "/kalisto.db/test-" + s.T().Name())
+	app, err := assembly.NewApp(xdg.DataHome + "/kalisto/db-test-" + s.T().Name())
 	s.Require().NoError(err)
 	api := app.Api
 
@@ -100,7 +100,11 @@ func (s *SequenceScriptSuite) TestMirrorScripting() {
 			delete(ex2, k)
 		}
 	}
-	s.EqualValues(ex1, ex2)
+	s.EqualValues(ex1, ex2["body"])
+	s.EqualValues(map[string]interface{}{
+		"content-type":  []interface{}{"application/grpc"},
+		"authorization": []interface{}{"super token"},
+	}, ex2["meta"])
 
 	close()
 	app.OnShutdown(context.Background())
@@ -112,7 +116,7 @@ func (s *SequenceScriptSuite) TestSequentialRequests() {
 	s.Require().NoError(err)
 	time.Sleep(time.Millisecond * 200)
 
-	app, err := assembly.NewApp(xdg.DataHome + "/kalisto.db/test-" + s.T().Name())
+	app, err := assembly.NewApp(xdg.DataHome + "/kalisto/db-test-" + s.T().Name())
 	s.Require().NoError(err)
 	api := app.Api
 

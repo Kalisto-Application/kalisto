@@ -14,6 +14,7 @@ import (
 
 func init() {
 	gob.Register(models.Workspace{})
+	gob.Register(map[string][]models.File{})
 }
 
 const (

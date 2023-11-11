@@ -18,7 +18,7 @@ export const ScriptSender: React.FC = () => {
 
   const action: Action = (url: string) => {
     UpdateWorkspace(
-      new models.Workspace({ ...activeWorkspace, targetUrl: url }),
+      new models.Workspace({ ...activeWorkspace, targetUrl: url })
     ).catch((err) => {
       console.log('failed to save the workspace url: ', err);
     });
@@ -32,19 +32,23 @@ export const ScriptSender: React.FC = () => {
     debouncedUrlUpdate(url);
   };
 
-  const sendRequest = (_: React.SyntheticEvent) => {
-    if (!ctx.state.activeMethod || !activeWorkspace) {
+  const sendRequest = () => {
+    if (!activeWorkspace) {
+      return;
+    }
+
+    const file = activeWorkspace.scriptFiles.find(
+      (it) => it.id === ctx.state.activeScriptFileId
+    );
+    if (!file) {
       return;
     }
 
     RunScript({
       addr: url,
       workspaceId: activeWorkspace.id,
-      body:
-        activeWorkspace.scriptFiles.find(
-          (it) => it.id === ctx.state.activeScriptFileId,
-        )?.content || '',
-      meta: '',
+      body: file.content,
+      meta: file.headers,
     })
       .then((res) => {
         ctx.dispatch({ type: 'scriptResponse', response: res });

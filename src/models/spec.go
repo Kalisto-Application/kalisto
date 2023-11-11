@@ -17,14 +17,22 @@ type WorkspaceShort struct {
 }
 
 type Workspace struct {
-	ID           string    `json:"id"`
-	Name         string    `json:"name"`
-	TargetUrl    string    `json:"targetUrl"`
-	Spec         Spec      `json:"spec"`
-	LastUsage    time.Time `json:"lastUsage" ts_type:"Date" ts_transform:"new Date(__VALUE__)"`
-	BasePath     []string  `json:"basePath"`
-	RequestFiles []File    `json:"requestFiles"`
-	ScriptFiles  []File    `json:"scriptFiles"`
+	ID           string            `json:"id"`
+	Name         string            `json:"name"`
+	TargetUrl    string            `json:"targetUrl"`
+	Spec         Spec              `json:"spec"`
+	LastUsage    time.Time         `json:"lastUsage" ts_type:"Date" ts_transform:"new Date(__VALUE__)"`
+	BasePath     []string          `json:"basePath"`
+	RequestFiles map[string][]File `json:"requestInstances"`
+	ScriptFiles  []File            `json:"scriptFiles"`
+}
+
+func (ws *Workspace) AddRequestFile(methodName string, f File) {
+	if ws.RequestFiles == nil {
+		ws.RequestFiles = make(map[string][]File)
+	}
+
+	ws.RequestFiles[methodName] = append(ws.RequestFiles[methodName], f)
 }
 
 type WorkspaceKind string
@@ -67,6 +75,22 @@ func (s *Spec) FindOutputMessage(serviceName, methodName string) (Message, error
 	return Message{}, fmt.Errorf("output message not found, method=%s", methodName)
 }
 
+func (s *Spec) MethodExists(methodFullName MethodName) bool {
+	serviceName, methodName := methodFullName.ServiceAndShort()
+
+	for _, service := range s.Services {
+		if service.FullName == serviceName {
+			for _, method := range service.Methods {
+				if method.Name == methodName {
+					return true
+				}
+			}
+		}
+	}
+
+	return false
+}
+
 type Service struct {
 	Name        string   `json:"name"`
 	DisplayName string   `json:"displayName"`
@@ -98,13 +122,12 @@ func NewCommunicationKind(isStreamClient, isStreamServer bool) CommunicationKind
 }
 
 type Method struct {
-	Name             string            `json:"name"`
-	FullName         string            `json:"fullName"`
-	RequestMessage   Message           `json:"requestMessage"`
-	ResponseMessage  Message           `json:"responseMessage"`
-	Kind             CommunicationKind `json:"kind"`
-	RequestExample   string            `json:"requestExample"`
-	RequestInstances []File            `json:"requestInstances"`
+	Name            string            `json:"name"`
+	FullName        string            `json:"fullName"`
+	RequestMessage  Message           `json:"requestMessage"`
+	ResponseMessage Message           `json:"responseMessage"`
+	Kind            CommunicationKind `json:"kind"`
+	RequestExample  string            `json:"requestExample"`
 }
 
 type Message struct {

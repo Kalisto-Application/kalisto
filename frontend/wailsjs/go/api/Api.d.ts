@@ -6,7 +6,7 @@ import {runtime} from '../models';
 
 export function Context():Promise<context.Context>;
 
-export function CreateRequestFile(arg1:string,arg2:string,arg3:string,arg4:string):Promise<models.File>;
+export function CreateRequestFile(arg1:string,arg2:string,arg3:string,arg4:string,arg5:string):Promise<models.File>;
 
 export function CreateScriptFile(arg1:string,arg2:string,arg3:string,arg4:string):Promise<models.File>;
 
@@ -20,7 +20,7 @@ export function FindProtoFiles():Promise<models.ProtoDir>;
 
 export function GetGlobalVars():Promise<string>;
 
-export function RemoveRequestFile(arg1:string,arg2:string):Promise<Array<models.File>>;
+export function RemoveRequestFile(arg1:string,arg2:string,arg3:string):Promise<{[key: string]: Array<models.File>}>;
 
 export function RemoveScriptFile(arg1:string,arg2:string):Promise<Array<models.File>>;
 
@@ -34,7 +34,7 @@ export function SaveGlovalVars(arg1:string):Promise<void>;
 
 export function SendGrpc(arg1:models.Request):Promise<models.Response>;
 
-export function UpdateRequestFile(arg1:string,arg2:models.File):Promise<void>;
+export function UpdateRequestFile(arg1:string,arg2:string,arg3:models.File):Promise<void>;
 
 export function UpdateScriptFile(arg1:string,arg2:models.File):Promise<void>;
 
