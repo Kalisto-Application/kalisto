@@ -7,10 +7,10 @@ import deleteIcon from '../../assets/icons/delete.svg';
 import editIcon from '../../assets/icons/edit.svg';
 import expandIcon from '../../assets/icons/expand.svg';
 import addIcon from '../../assets/icons/plus.svg';
-import { CreateRequestFile } from '../../wailsjs/go/api/Api';
+import { CreateRequestFile, UpdateRequestFile } from '../../wailsjs/go/api/Api';
 import { models } from '../../wailsjs/go/models';
 import { Context } from '../state';
-import InputAddItem from '../ui/InputAddItem';
+import CreateItem from '../ui/CreateItem';
 import RequestList from '../ui/RequestList';
 const findMethod = (
   s: models.Service[] = [],
@@ -34,22 +34,16 @@ type Data = {
   parent?: string;
 };
 
-export type dataRequestList = {
-  name: string;
-  id: string;
-};
-
 export const MethodCollection: React.FC = () => {
   const ctx = useContext(Context);
-  const [requestId, setRequestId] = useState('');
+  const [requestId, setRequestId] = useState({ id: '', fullNameMet: '' });
 
-  const workspaceID = ctx.state.activeWorkspace?.id;
+  const workspace = ctx.state.activeWorkspace;
+  const requestFiles = ctx.state.activeWorkspace?.requestFiles;
+
+  const workspaceID = ctx.state.activeWorkspace?.id || '';
   const services = ctx.state.activeWorkspace?.spec.services;
   const selectedItem = ctx.state.activeMethod?.fullName;
-
-  const serviceNames = services?.map((it) => it.fullName) || [];
-  // debugger
-  console.log(services);
 
   // create tree
   const newServicesName = {
@@ -58,64 +52,36 @@ export const MethodCollection: React.FC = () => {
       services?.map((it, indx) => {
         return {
           name: it.displayName,
-          idS: it.fullName,
+
           children:
             it.methods.map((met) => {
               return {
                 name: met.name,
-                children: [{ name: '', idM: met.fullName }],
+                children: [{ name: met.fullName }],
               };
             }) || [],
         };
       }) || [],
   };
-  // list request
-  const files: dataRequestList[] = [
-    { name: 'one', id: '1' },
-    { name: 'one', id: '2' },
-  ];
 
   const data = flattenTree(newServicesName);
 
-  const setActiveRequest = (id: string) => {
-    setRequestId(id);
+  const setActiveRequest = (id: string, fullNameMet: string) => {
+    setRequestId({ id: id, fullNameMet: fullNameMet });
   };
 
   // add Item
-  const addItem = (value: string) => {
-    // CreateRequestFile(workspaceID, method.FullName, value, content, headers);
+  const addItem = (value: string, fullNameMet: string) => {
+    CreateRequestFile(workspaceID, fullNameMet, value, '', '').then((res) => {
+      ctx.dispatch({
+        type: 'addRequestFile',
+        file: {
+          ...requestFiles,
+          [fullNameMet]: [...(requestFiles[fullNameMet] || []), res],
+        },
+      });
+    });
   };
-
-  const items = ctx.state.activeWorkspace?.scriptFiles.map((it) => {
-    return {
-      file: it,
-      // inEdit: it.id === isOpenEditInput,
-      // isActive: it.id === activeScript?.id,
-      onClick: () => setActiveRequest(it.id),
-      menu: [
-        {
-          icon: editIcon,
-          text: 'Edit',
-          onClick: () => {
-            // setIsOpenEditInput(it.id);
-          },
-        },
-
-        {
-          icon: deleteIcon,
-          text: 'Delete',
-          onClick: () => {
-            // setIsOpenDeletePopup(it.id);
-          },
-        },
-      ],
-    };
-  });
-
-  const [servesicID, setServesicID] = useState('');
-  const [NameMethod, setNameMethod] = useState('');
-
-  console.log('servesicID', servesicID);
 
   return (
     <TreeView
@@ -127,7 +93,6 @@ export const MethodCollection: React.FC = () => {
         getNodeProps,
         level,
         isExpanded,
-        handleExpand,
       }: INodeRendererProps) => {
         {
           return (
@@ -140,14 +105,17 @@ export const MethodCollection: React.FC = () => {
                 cursor: 'pointer',
               }}
             >
-              <div className="flex ">
+              <div className="flex">
                 {level <= 2 && <ArrowIcon isOpen={isExpanded} />}
-                {element.name}
+                {level <= 2 && element.name}
               </div>
               {level === 3 && (
                 <div>
-                  <InputAddItem
-                    addItem={(value) => addItem(value)}
+                  <CreateItem
+                    fullNameMet={element.name}
+                    addItem={(value, fullNameMet) =>
+                      addItem(value, fullNameMet || '')
+                    }
                     text="New Request"
                     placeholder="Name request"
                   />
@@ -157,9 +125,10 @@ export const MethodCollection: React.FC = () => {
                     }}
                   >
                     <RequestList
+                      fullNameMet={element.name}
                       setActiveRequest={setActiveRequest}
-                      files={files}
                       requestId={requestId}
+                      requestFiles={requestFiles}
                     />
                     {/* <FileList /> */}
                   </div>
@@ -180,6 +149,8 @@ CreateRequestFile(workspaceID, method.FullName, name, content, headers)
 UpdateRequestFile(workspaceID, method.FullName, models.File)
 Удалить файл по ID
 RemoveRequestFile(workspaceID, method.FullName, file.ID)
+
+
 1) заменить либу и понять что работает ✅
 2) научиться отображать фиксированный список в FileList ✅
 3) науиться создавать файлы ✅

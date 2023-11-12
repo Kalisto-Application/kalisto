@@ -4,10 +4,16 @@ import plusIcon from '../../assets/icons/plus.svg';
 
 type inputProps = {
   text: string;
-  addItem: (value: string) => void;
+  addItem: (value: string, fullNameMet?: string) => void;
   placeholder?: string;
+  fullNameMet?: string;
 };
-const InputAddItem: React.FC<inputProps> = ({ addItem, text, placeholder }) => {
+const CreateItem: React.FC<inputProps> = ({
+  addItem,
+  text,
+  placeholder,
+  fullNameMet,
+}) => {
   const { value: showInput, setTrue, setFalse } = useBoolean(false);
 
   const [inputValue, setInputValue] = useState('');
@@ -16,7 +22,7 @@ const InputAddItem: React.FC<inputProps> = ({ addItem, text, placeholder }) => {
   const onKeyDown = (e: React.KeyboardEvent) => {
     if (e.code == 'Enter' && inputValue !== '') {
       setValueValidate(false);
-      addItem(inputValue);
+      addItem(inputValue, fullNameMet);
       setFalse();
       setInputValue('');
     }
@@ -33,7 +39,7 @@ const InputAddItem: React.FC<inputProps> = ({ addItem, text, placeholder }) => {
       {showInput ? (
         <>
           <input
-            autoFocus
+            // autoFocus
             onKeyDown={onKeyDown}
             type="text"
             placeholder={placeholder}
@@ -62,4 +68,4 @@ const InputAddItem: React.FC<inputProps> = ({ addItem, text, placeholder }) => {
     </div>
   );
 };
-export default InputAddItem;
+export default CreateItem;
