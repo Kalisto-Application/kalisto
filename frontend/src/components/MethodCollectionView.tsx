@@ -36,14 +36,16 @@ type Data = {
 
 export const MethodCollection: React.FC = () => {
   const ctx = useContext(Context);
+
+  if (!ctx.state.activeWorkspace) {
+    return <></>;
+  }
+
   const [requestId, setRequestId] = useState({ id: '', fullNameMet: '' });
 
-  const workspace = ctx.state.activeWorkspace;
   const requestFiles = ctx.state.activeWorkspace?.requestFiles;
-
   const workspaceID = ctx.state.activeWorkspace?.id || '';
   const services = ctx.state.activeWorkspace?.spec.services;
-  const selectedItem = ctx.state.activeMethod?.fullName;
 
   // create tree
   const newServicesName = {

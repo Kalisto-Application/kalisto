@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useStep } from 'usehooks-ts';
 import gIcon from '../../assets/icons/g.svg';
 import { models } from '../../wailsjs/go/models';
@@ -18,9 +18,6 @@ const RequestList: React.FC<RequestList> = ({
   const setKey = () => {
     const keys = Object.keys(requestFiles);
 
-    keys.forEach((key) => {
-      return key;
-    });
     for (let index = 0; index < keys.length; index++) {
       const element = keys[index];
 
@@ -30,22 +27,20 @@ const RequestList: React.FC<RequestList> = ({
 
   return (
     <>
-      {fullNameMet === setKey() &&
-        requestFiles[setKey() || ''].map((it, indx) => {
-          return (
-            <div
-              className="flex items-center gap-2 "
-              onClick={() => setActiveRequest(it.name, requestId.fullNameMet)}
-              key={indx}
-              id={fullNameMet}
-            >
-              <img src={gIcon} />
-              <span className={`${it.id === requestId.id ? 'text-red' : ''}`}>
-                {it.name}
-              </span>
-            </div>
-          );
-        })}
+      {requestFiles[setKey() || ''].map((it, indx) => {
+        return (
+          <div
+            className="flex items-center gap-2 "
+            onClick={() => setActiveRequest(it.name, requestId.fullNameMet)}
+            key={indx}
+          >
+            <img src={gIcon} />
+            <span className={`${it.id === requestId.id ? 'text-red' : ''}`}>
+              {it.name}
+            </span>
+          </div>
+        );
+      })}
     </>
   );
 };
