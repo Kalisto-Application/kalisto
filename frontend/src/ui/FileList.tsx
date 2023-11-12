@@ -14,8 +14,8 @@ type fileListtProps = {
 type itemProps = {
   file: models.File;
   inEdit: boolean;
-  isActive: boolean;
-  onClick: () => void;
+  isActive?: boolean;
+  onClick?: () => void;
   menu: MenuItemProp[];
 };
 const FileList: React.FC<fileListtProps> = ({

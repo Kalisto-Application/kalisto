@@ -11,7 +11,10 @@ import { CreateRequestFile, UpdateRequestFile } from '../../wailsjs/go/api/Api';
 import { models } from '../../wailsjs/go/models';
 import { Context } from '../state';
 import CreateItem from '../ui/CreateItem';
-import RequestList from '../ui/RequestList';
+
+import FileList from './../ui/FileList';
+import DeletePopup from './DeletePopup';
+
 const findMethod = (
   s: models.Service[] = [],
   serviceName: string,
@@ -36,14 +39,16 @@ type Data = {
 
 export const MethodCollection: React.FC = () => {
   const ctx = useContext(Context);
-
+  const [isOpenDeletePopup, setIsOpenDeletePopup] = useState('');
+  const [isOpenEditInput, setIsOpenEditInput] = useState('');
   if (!ctx.state.activeWorkspace) {
     return <></>;
   }
 
-  const [requestId, setRequestId] = useState({ id: '', fullNameMet: '' });
+  const requestFiles = ctx.state.activeWorkspace?.requestFiles
+    ? ctx.state.activeWorkspace?.requestFiles
+    : {};
 
-  const requestFiles = ctx.state.activeWorkspace?.requestFiles;
   const workspaceID = ctx.state.activeWorkspace?.id || '';
   const services = ctx.state.activeWorkspace?.spec.services;
 
@@ -81,17 +86,6 @@ export const MethodCollection: React.FC = () => {
     });
   };
 
-  const setKey = (fullNameMet: string) => {
-    const keys = Object.keys(requestFiles);
-
-    for (let index = 0; index < keys.length; index++) {
-      const element = keys[index];
-
-      if (fullNameMet === element) {
-        return element;
-      }
-    }
-  };
   return (
     <TreeView
       data={data}
@@ -133,12 +127,42 @@ export const MethodCollection: React.FC = () => {
                       paddingLeft: 15 * (level - 1),
                     }}
                   >
-                    <RequestList
-                      fullNameMet={element.name}
-                      requestFiles={requestFiles}
-                      setKey={setKey}
+                    <FileList
+                      items={requestFiles[element.name].map((it) => {
+                        return {
+                          file: it,
+                          inEdit: it.id === isOpenEditInput,
+                          // isActive: it.id === activeScript?.id,
+                          // onClick: () => setActiveScript(it.id),
+                          menu: [
+                            {
+                              icon: editIcon,
+                              text: 'Edit',
+                              onClick: () => {
+                                setIsOpenEditInput(it.id);
+                              },
+                            },
+
+                            {
+                              icon: deleteIcon,
+                              text: 'Delete',
+                              onClick: () => {
+                                setIsOpenDeletePopup(it.id);
+                              },
+                            },
+                          ],
+                        };
+                      })}
+                      onCloseInput={() => setIsOpenEditInput('')}
+                      editFile={() => {}}
                     />
-                    {/* <FileList /> */}
+                    <DeletePopup
+                      id={isOpenDeletePopup}
+                      isOpen={isOpenDeletePopup !== ''}
+                      onClose={() => setIsOpenDeletePopup('')}
+                      deleteScript={() => {}}
+                      title="Delete script?"
+                    />
                   </div>
                 </div>
               )}
