@@ -68,10 +68,6 @@ export const MethodCollection: React.FC = () => {
 
   const data = flattenTree(newServicesName);
 
-  const setActiveRequest = (id: string, fullNameMet: string) => {
-    setRequestId({ id: id, fullNameMet: fullNameMet });
-  };
-
   // add Item
   const addItem = (value: string, fullNameMet: string) => {
     CreateRequestFile(workspaceID, fullNameMet, value, '', '').then((res) => {
@@ -85,6 +81,17 @@ export const MethodCollection: React.FC = () => {
     });
   };
 
+  const setKey = (fullNameMet: string) => {
+    const keys = Object.keys(requestFiles);
+
+    for (let index = 0; index < keys.length; index++) {
+      const element = keys[index];
+
+      if (fullNameMet === element) {
+        return element;
+      }
+    }
+  };
   return (
     <TreeView
       data={data}
@@ -128,9 +135,8 @@ export const MethodCollection: React.FC = () => {
                   >
                     <RequestList
                       fullNameMet={element.name}
-                      setActiveRequest={setActiveRequest}
-                      requestId={requestId}
                       requestFiles={requestFiles}
+                      setKey={setKey}
                     />
                     {/* <FileList /> */}
                   </div>

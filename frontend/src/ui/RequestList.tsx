@@ -8,36 +8,20 @@ type RequestList = {
   requestId: { id: string; fullNameMet: string };
   fullNameMet: string;
   requestFiles: { [key: string]: models.File[] };
+  setKey: (fullNameMet: string) => string;
 };
 const RequestList: React.FC<RequestList> = ({
-  setActiveRequest,
-  requestId,
   requestFiles,
   fullNameMet,
+  setKey,
 }) => {
-  const setKey = () => {
-    const keys = Object.keys(requestFiles);
-
-    for (let index = 0; index < keys.length; index++) {
-      const element = keys[index];
-
-      if (fullNameMet === element) return element;
-    }
-  };
-
   return (
     <>
-      {requestFiles[setKey() || ''].map((it, indx) => {
+      {requestFiles[setKey(fullNameMet)].map((it, indx) => {
         return (
-          <div
-            className="flex items-center gap-2 "
-            onClick={() => setActiveRequest(it.name, requestId.fullNameMet)}
-            key={indx}
-          >
+          <div className="flex items-center gap-2 " key={indx}>
             <img src={gIcon} />
-            <span className={`${it.id === requestId.id ? 'text-red' : ''}`}>
-              {it.name}
-            </span>
+            <span>{it.name}</span>
           </div>
         );
       })}
