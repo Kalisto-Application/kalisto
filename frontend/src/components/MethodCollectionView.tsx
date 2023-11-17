@@ -78,8 +78,8 @@ export const MethodCollection: React.FC = () => {
   const data = flattenTree(newServicesName);
 
   //  active request
-  const setActiveRequest = (id: string) => {
-    ctx.dispatch({ type: 'setActiveRequestId', id });
+  const setActiveRequest = (id: string, metName: string) => {
+    ctx.dispatch({ type: 'setActiveRequest', id, metName });
   };
 
   // add request
@@ -175,7 +175,7 @@ export const MethodCollection: React.FC = () => {
                         file: it,
                         inEdit: it.id === isOpenEditInput,
                         isActive: it.id === activeRequestID,
-                        onClick: () => setActiveRequest(it.id),
+                        onClick: () => setActiveRequest(it.id, element.name),
                         menu: [
                           {
                             icon: editIcon,
@@ -225,12 +225,6 @@ UpdateRequestFile(workspaceID, method.FullName, models.File)
 Удалить файл по ID
 RemoveRequestFile(workspaceID, method.FullName, file.ID)
 
-
-1) заменить либу и понять что работает ✅
-2) научиться отображать фиксированный список в FileList ✅
-3) науиться создавать файлы ✅
-4) отоброжать активный файл на клик
-5) подключить меню
 */
 type propsArrowIcon = {
   isOpen: boolean;

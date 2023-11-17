@@ -70,7 +70,7 @@ const Editor: React.FC<props> = ({ value, onChange, readonly }) => {
             if (onChange) {
               onChange(ed.getModel()?.getValue() || '');
             }
-          }),
+          })
         );
 
         return ed;
