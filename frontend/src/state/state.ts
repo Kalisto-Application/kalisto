@@ -229,7 +229,9 @@ case 'addRequestFile':
       
     })
   };
-  case 'updateRequestFile':
+  case 'updateRequestFile':{
+
+
     return {
       ...state,
       activeWorkspace: new models.Workspace({
@@ -240,7 +242,7 @@ case 'addRequestFile':
           return it
         })},
       })
-    };
+    }};
     case 'setActiveRequest':
     return{
       ...state,

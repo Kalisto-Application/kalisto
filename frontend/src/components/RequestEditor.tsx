@@ -38,7 +38,7 @@ export const RequestEditor: React.FC = () => {
       updateRecord[field] = content;
       const updatedFile = new models.File(updateRecord);
 
-      UpdateRequestFile(workSpaceID, activeRequestMetName, activeFile).then(
+      UpdateRequestFile(workSpaceID, activeRequestMetName, updatedFile).then(
         () => {
           ctx.dispatch({
             type: 'updateRequestFile',
