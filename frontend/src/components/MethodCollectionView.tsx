@@ -52,9 +52,9 @@ export const MethodCollection: React.FC = () => {
   const requestFiles = ctx.state.activeWorkspace?.requestFiles
     ? ctx.state.activeWorkspace?.requestFiles
     : {};
-  // debugger;
   const workspaceID = ctx.state.activeWorkspace?.id || '';
   const services = ctx.state.activeWorkspace?.spec.services;
+  const activeRequestID = ctx.state.activeRequestFileId;
 
   // create tree
   const newServicesName = {
@@ -78,7 +78,9 @@ export const MethodCollection: React.FC = () => {
   const data = flattenTree(newServicesName);
 
   //  active request
-  const setActiveRequest = (i: string) => {};
+  const setActiveRequest = (id: string) => {
+    ctx.dispatch({ type: 'setActiveRequestId', id });
+  };
 
   // add request
   const addItem = (value: string, fullNameMet: string) => {
@@ -166,50 +168,45 @@ export const MethodCollection: React.FC = () => {
                     text="New Request"
                     placeholder="Name request"
                   />
-                  <div
-                    style={{
-                      paddingLeft: 15 * (level - 1),
-                    }}
-                  >
-                    <FileList
-                      items={(requestFiles[element.name] || []).map((it) => {
-                        return {
-                          file: it,
-                          inEdit: it.id === isOpenEditInput,
-                          // isActive: it.id === activeScript?.id,
-                          onClick: () => setActiveRequest(it.id),
-                          menu: [
-                            {
-                              icon: editIcon,
-                              text: 'Edit',
-                              onClick: () => {
-                                setIsOpenEditInput(it.id);
-                              },
-                            },
 
-                            {
-                              icon: deleteIcon,
-                              text: 'Delete',
-                              onClick: () => {
-                                setIsOpenDeletePopup(it.id);
-                              },
+                  <FileList
+                    items={(requestFiles[element.name] || []).map((it) => {
+                      return {
+                        file: it,
+                        inEdit: it.id === isOpenEditInput,
+                        isActive: it.id === activeRequestID,
+                        onClick: () => setActiveRequest(it.id),
+                        menu: [
+                          {
+                            icon: editIcon,
+                            text: 'Edit',
+                            onClick: () => {
+                              setIsOpenEditInput(it.id);
                             },
-                          ],
-                        };
-                      })}
-                      onCloseInput={() => setIsOpenEditInput('')}
-                      editFile={(id: string) => renameRequest(id, element.name)}
-                    />
-                    <DeletePopup
-                      id={isOpenDeletePopup}
-                      isOpen={isOpenDeletePopup !== ''}
-                      onClose={() => setIsOpenDeletePopup('')}
-                      deleteScript={() => {
-                        deleteRequest(element.name);
-                      }}
-                      title="Delete script?"
-                    />
-                  </div>
+                          },
+
+                          {
+                            icon: deleteIcon,
+                            text: 'Delete',
+                            onClick: () => {
+                              setIsOpenDeletePopup(it.id);
+                            },
+                          },
+                        ],
+                      };
+                    })}
+                    onCloseInput={() => setIsOpenEditInput('')}
+                    editFile={(id: string) => renameRequest(id, element.name)}
+                  />
+                  <DeletePopup
+                    id={isOpenDeletePopup}
+                    isOpen={isOpenDeletePopup !== ''}
+                    onClose={() => setIsOpenDeletePopup('')}
+                    deleteScript={() => {
+                      deleteRequest(element.name);
+                    }}
+                    title="Delete script?"
+                  />
                 </div>
               )}
             </div>

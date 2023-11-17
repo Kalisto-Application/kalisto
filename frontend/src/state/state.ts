@@ -24,7 +24,8 @@ type Action =
   | { type: 'addScriptFile'; file: models.File }
   | { type: 'switchScriptEditor'; i: number }
   | { type:'addRequestFile'; file?:{ [key: string]: models.File[] }}
-  | { type: 'updateRequestFile'; file: models.File ,metName:string};
+  | { type: 'updateRequestFile'; file: models.File ,metName:string}
+  | {type:'setActiveRequestId';id:string};
 
 export type State = {
   activeRequestEditor: number;
@@ -41,6 +42,8 @@ export type State = {
   scriptResponse: string;
   scriptError: string;
   activeScriptFileId: string;
+  activeRequestFileId: string;
+
   activeScriptEditor: number;
 };
 
@@ -60,6 +63,7 @@ export const newState = (): State => {
     scriptResponse: '',
     scriptError: '',
     activeScriptFileId: '',
+    activeRequestFileId:'',
     activeScriptEditor: 0,
   };
 };
@@ -235,6 +239,11 @@ case 'addRequestFile':
           return it
         })},
       })
+    };
+    case 'setActiveRequestId':
+    return{
+      ...state,
+      activeRequestFileId:action.id
     };
     default:
       return state;

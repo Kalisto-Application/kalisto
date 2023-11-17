@@ -38,18 +38,18 @@ const FileList: React.FC<fileListtProps> = ({
   };
 
   return (
-    <ul className="flex-1">
+    <ul className="">
       {items.map((it, indx) => (
         <li
           key={indx}
-          className={`relative flex cursor-pointer justify-between py-1 pl-10 pr-4 hover:bg-borderFill ${
-            it.isActive ? 'bg-textBlockFill' : ''
+          className={`relative mx-2 flex cursor-pointer justify-between px-4 py-1 hover:bg-borderFill  hover:rounded-3xl${
+            it.isActive ? ' rounded-3xl bg-textBlockFill ' : ''
           }`}
           onClick={it.onClick}
         >
           {it.inEdit ? (
             <input
-              className="border-1 w-[75%] border-[1px] border-borderFill bg-textBlockFill px-3 placeholder:text-[14px] placeholder:text-secondaryText"
+              className="border-1 w-[100%] border-[1px] border-borderFill bg-textBlockFill px-3 placeholder:text-[14px] placeholder:text-secondaryText"
               type="text"
               onFocus={(e) => {
                 e.target.select();
@@ -62,7 +62,7 @@ const FileList: React.FC<fileListtProps> = ({
               onKeyDown={onKeyDown}
             />
           ) : (
-            <span className="text-right font-[Inter]">{it.file.name}</span>
+            <span className=" font-[Inter] ">{it.file.name}</span>
           )}
           <SubMenu items={it.menu} />
         </li>
@@ -76,10 +76,10 @@ const SubMenu: React.FC<MenuProps> = ({ items }) => {
   const { value, toggle, setFalse } = useBoolean(false);
   const subMenuRef = useRef(null);
 
-  useOnClickOutside(subMenuRef, () => setFalse());
+  // useOnClickOutside(subMenuRef, () => setFalse());
 
   return (
-    <div ref={subMenuRef}>
+    <div className="ml-1 w-3" ref={subMenuRef}>
       {/* button submenu  */}
       <button
         onClick={(e) => {
@@ -91,7 +91,7 @@ const SubMenu: React.FC<MenuProps> = ({ items }) => {
       </button>
       {/* Sub menu */}
       {value && (
-        <div className="absolute right-2 top-9 w-[70%]">
+        <div className="absolute right-2 top-9 w-[70%] ">
           <Menu
             items={items.map((it) => {
               return {
