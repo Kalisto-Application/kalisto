@@ -7,7 +7,11 @@ import deleteIcon from '../../assets/icons/delete.svg';
 import editIcon from '../../assets/icons/edit.svg';
 import expandIcon from '../../assets/icons/expand.svg';
 import addIcon from '../../assets/icons/plus.svg';
-import { CreateRequestFile, UpdateRequestFile } from '../../wailsjs/go/api/Api';
+import {
+  CreateRequestFile,
+  RemoveRequestFile,
+  UpdateRequestFile,
+} from '../../wailsjs/go/api/Api';
 import { models } from '../../wailsjs/go/models';
 import { Context } from '../state';
 import CreateItem from '../ui/CreateItem';
@@ -48,7 +52,7 @@ export const MethodCollection: React.FC = () => {
   const requestFiles = ctx.state.activeWorkspace?.requestFiles
     ? ctx.state.activeWorkspace?.requestFiles
     : {};
-
+  // debugger;
   const workspaceID = ctx.state.activeWorkspace?.id || '';
   const services = ctx.state.activeWorkspace?.spec.services;
 
@@ -73,7 +77,10 @@ export const MethodCollection: React.FC = () => {
 
   const data = flattenTree(newServicesName);
 
-  // add Item
+  //  active request
+  const setActiveRequest = (i: string) => {};
+
+  // add request
   const addItem = (value: string, fullNameMet: string) => {
     CreateRequestFile(workspaceID, fullNameMet, value, '', '').then((res) => {
       ctx.dispatch({
@@ -82,6 +89,43 @@ export const MethodCollection: React.FC = () => {
           ...requestFiles,
           [fullNameMet]: [...(requestFiles[fullNameMet] || []), res],
         },
+      });
+    });
+  };
+
+  // delete request
+  const deleteRequest = (metName: string) => {
+    if (!isOpenDeletePopup) return;
+    console.log(
+      'ctx.state.activeWorkspace?.requestFiles[metName]',
+      ctx.state.activeWorkspace?.requestFiles[metName]
+    );
+
+    RemoveRequestFile(workspaceID, metName, isOpenDeletePopup).then((res) => {
+      let ws = new models.Workspace({
+        ...ctx.state.activeWorkspace,
+        requestFiles: {
+          [metName]: [...res[metName]],
+        },
+      });
+
+      ctx.dispatch({ type: 'updateWorkspace', workspace: ws });
+    });
+  };
+  // Edit
+  const renameRequest = (name: string, metName: string) => {
+    const renamed = new models.File({
+      ...ctx.state.activeWorkspace?.requestFiles[metName].find(
+        (it) => it.id === isOpenEditInput
+      ),
+      name: name,
+    });
+
+    UpdateRequestFile(workspaceID, metName, renamed).then((res) => {
+      ctx.dispatch({
+        type: 'updateRequestFile',
+        file: renamed,
+        metName,
       });
     });
   };
@@ -128,12 +172,12 @@ export const MethodCollection: React.FC = () => {
                     }}
                   >
                     <FileList
-                      items={requestFiles[element.name].map((it) => {
+                      items={(requestFiles[element.name] || []).map((it) => {
                         return {
                           file: it,
                           inEdit: it.id === isOpenEditInput,
                           // isActive: it.id === activeScript?.id,
-                          // onClick: () => setActiveScript(it.id),
+                          onClick: () => setActiveRequest(it.id),
                           menu: [
                             {
                               icon: editIcon,
@@ -154,13 +198,15 @@ export const MethodCollection: React.FC = () => {
                         };
                       })}
                       onCloseInput={() => setIsOpenEditInput('')}
-                      editFile={() => {}}
+                      editFile={(id: string) => renameRequest(id, element.name)}
                     />
                     <DeletePopup
                       id={isOpenDeletePopup}
                       isOpen={isOpenDeletePopup !== ''}
                       onClose={() => setIsOpenDeletePopup('')}
-                      deleteScript={() => {}}
+                      deleteScript={() => {
+                        deleteRequest(element.name);
+                      }}
                       title="Delete script?"
                     />
                   </div>

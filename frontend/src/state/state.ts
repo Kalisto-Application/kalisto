@@ -23,7 +23,8 @@ type Action =
   | { type: 'updateScriptFile'; file: models.File }
   | { type: 'addScriptFile'; file: models.File }
   | { type: 'switchScriptEditor'; i: number }
-  | {type:'addRequestFile'; file?:{ [key: string]: models.File[] }};
+  | { type:'addRequestFile'; file?:{ [key: string]: models.File[] }}
+  | { type: 'updateRequestFile'; file: models.File ,metName:string};
 
 export type State = {
   activeRequestEditor: number;
@@ -173,6 +174,7 @@ export const reducer = (state: State, action: Action): State => {
           }),
         }),
       };
+  
     case 'scriptResponse':
       return {
         ...state,
@@ -221,7 +223,19 @@ case 'addRequestFile':
       }
       
     })
-  }
+  };
+  case 'updateRequestFile':
+    return {
+      ...state,
+      activeWorkspace: new models.Workspace({
+        ...state.activeWorkspace,
+        requestFiles: {...state.activeWorkspace?.requestFiles,[action.metName]:state.activeWorkspace?.requestFiles[action.metName].map((it) => {
+     
+          if (it.id === action.file.id) return action.file;
+          return it
+        })},
+      })
+    };
     default:
       return state;
   }
