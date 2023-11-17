@@ -91,7 +91,7 @@ const SubMenu: React.FC<MenuProps> = ({ items }) => {
       </button>
       {/* Sub menu */}
       {value && (
-        <div className="absolute right-2 top-9 w-[70%] ">
+        <div className="absolute right-2 top-9  ">
           <Menu
             items={items.map((it) => {
               return {
