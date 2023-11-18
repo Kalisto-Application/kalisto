@@ -95,7 +95,7 @@ const SubMenu: React.FC<MenuProps> = ({ items }) => {
           e.stopPropagation();
         }}
       >
-        <ArrowIcon isOpen={value} />
+        <img src={expandIcon} alt="" />
       </button>
       {/* Sub menu */}
       {value && (
@@ -117,18 +117,3 @@ const SubMenu: React.FC<MenuProps> = ({ items }) => {
     </div>
   );
 };
-type propsArrowIcon = {
-  isOpen: boolean;
-};
-const ArrowIcon: React.FC<propsArrowIcon> = ({ isOpen }) =>
-  isOpen ? (
-    <img
-      src={expandIcon}
-      className="rotate-270 mr-2 transition duration-300 ease-in-out"
-    />
-  ) : (
-    <img
-      src={expandIcon}
-      className="mr-2 rotate-90 transition duration-300 ease-in-out"
-    />
-  );
