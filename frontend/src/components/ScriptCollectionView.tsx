@@ -9,8 +9,8 @@ import {
 } from '../../wailsjs/go/api/Api';
 import { models } from '../../wailsjs/go/models';
 import { Context } from '../state';
+import CreateItem from '../ui/CreateItem';
 import FileList from '../ui/FileList';
-import NewScript from './../ui/NewScript';
 import DeletePopup from './DeletePopup';
 
 const ScriptCollectionView: React.FC = () => {
@@ -118,7 +118,13 @@ const ScriptCollectionView: React.FC = () => {
 
   return (
     <>
-      <NewScript addFile={addFile} />
+      <div className="px-3 py-1 ">
+        <CreateItem
+          text="Add Script"
+          addItem={(value) => addFile(value)}
+          placeholder="Name script"
+        />
+      </div>
       <FileList
         items={items}
         onCloseInput={() => setIsOpenEditInput('')}
