@@ -56,7 +56,7 @@ const CreateItem: React.FC<inputProps> = ({
             onClick={setTrue}
           >
             <img src={plusIcon} alt="" />
-            <span className="text-lg">{text}</span>
+            <span className="whitespace-nowrap text-lg">{text}</span>
           </button>
         </>
       )}

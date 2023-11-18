@@ -10,8 +10,8 @@ import TabList from '../ui/TabList';
 
 export const ApiPage: React.FC = () => {
   return (
-    <div className="flex flex-1 w-full">
-      <div className="flex flex-[0_0_220px] justify-items-start flex-col">
+    <div className="flex w-full flex-1">
+      <div className="flex flex-[0_0_220px] flex-col justify-items-start">
         <WorkspaceList />
         <SearchBox />
         <MethodCollection />

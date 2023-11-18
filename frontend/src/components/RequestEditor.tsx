@@ -10,7 +10,7 @@ export const RequestEditor: React.FC = () => {
   const ctx = useContext(Context);
   const workSpaceID = ctx.state.activeWorkspace?.id;
   const activeRequestID = ctx.state.activeRequestFileId;
-  const activeRequestMetName = ctx.state.activeRequestFileMetName;
+  const activeRequestMetName = ctx.state.activeMethod?.fullName || '';
 
   const requestFiles = ctx.state.activeWorkspace?.requestFiles
     ? ctx.state.activeWorkspace?.requestFiles

@@ -6,7 +6,8 @@ import TreeView, {
 import deleteIcon from '../../assets/icons/delete.svg';
 import editIcon from '../../assets/icons/edit.svg';
 import expandIcon from '../../assets/icons/expand.svg';
-import addIcon from '../../assets/icons/plus.svg';
+import gIcon from '../../assets/icons/g.svg';
+
 import {
   CreateRequestFile,
   RemoveRequestFile,
@@ -16,18 +17,20 @@ import { models } from '../../wailsjs/go/models';
 import { Context } from '../state';
 import CreateItem from '../ui/CreateItem';
 
-import FileList from './../ui/FileList';
+import FileList from '../ui/FileList';
 import DeletePopup from './DeletePopup';
 
 const findMethod = (
   s: models.Service[] = [],
   serviceName: string,
-  name: string
+  metName: string
 ): models.Method | undefined => {
+  console.log(metName);
+  // debugger;
   for (const service of s) {
     if (service.fullName == serviceName) {
       for (const method of service.methods) {
-        if (method.fullName == name) {
+        if (method.fullName == metName) {
           return method;
         }
       }
@@ -45,6 +48,7 @@ export const MethodCollection: React.FC = () => {
   const ctx = useContext(Context);
   const [isOpenDeletePopup, setIsOpenDeletePopup] = useState('');
   const [isOpenEditInput, setIsOpenEditInput] = useState('');
+
   if (!ctx.state.activeWorkspace) {
     return <></>;
   }
@@ -60,7 +64,7 @@ export const MethodCollection: React.FC = () => {
   const newServicesName = {
     name: '',
     children:
-      services?.map((it, indx) => {
+      services?.map((it) => {
         return {
           name: it.displayName,
 
@@ -79,7 +83,19 @@ export const MethodCollection: React.FC = () => {
 
   //  active request
   const setActiveRequest = (id: string, metName: string) => {
-    ctx.dispatch({ type: 'setActiveRequest', id, metName });
+    ctx.dispatch({ type: 'setActiveRequest', id });
+
+    const servesActive = services.find((it) => {
+      if (metName.includes(it.fullName)) return it;
+    });
+
+    const method = findMethod(
+      services,
+      servesActive?.fullName || '',
+      metName || ''
+    );
+
+    ctx.dispatch({ type: 'activeMethod', activeMethod: method! });
   };
 
   // add request
@@ -98,10 +114,6 @@ export const MethodCollection: React.FC = () => {
   // delete request
   const deleteRequest = (metName: string) => {
     if (!isOpenDeletePopup) return;
-    console.log(
-      'ctx.state.activeWorkspace?.requestFiles[metName]',
-      ctx.state.activeWorkspace?.requestFiles[metName]
-    );
 
     RemoveRequestFile(workspaceID, metName, isOpenDeletePopup).then((res) => {
       let ws = new models.Workspace({
@@ -136,22 +148,25 @@ export const MethodCollection: React.FC = () => {
     <TreeView
       data={data}
       className="pl-4"
-      onExpand={() => {}}
+      defaultExpandedIds={data[0].children}
       nodeRenderer={({
         element,
         getNodeProps,
         level,
         isExpanded,
+        isBranch,
       }: INodeRendererProps) => {
         {
           return (
             <div
+              onKeyDown={(e) => e.stopPropagation()}
               {...getNodeProps({})}
               style={{
                 paddingLeft: 30 * (level <= 2 ? level - 1 : 1.3),
                 paddingRight: '30px',
                 marginBottom: '10px',
                 cursor: 'pointer',
+                width: '100%',
               }}
             >
               <div className="flex">
@@ -197,6 +212,7 @@ export const MethodCollection: React.FC = () => {
                     })}
                     onCloseInput={() => setIsOpenEditInput('')}
                     editFile={(id: string) => renameRequest(id, element.name)}
+                    gIcon={gIcon}
                   />
                   <DeletePopup
                     id={isOpenDeletePopup}
@@ -217,15 +233,6 @@ export const MethodCollection: React.FC = () => {
   );
 };
 
-/*
-Создать файл
-CreateRequestFile(workspaceID, method.FullName, name, content, headers)
-Обновить созданный файл
-UpdateRequestFile(workspaceID, method.FullName, models.File)
-Удалить файл по ID
-RemoveRequestFile(workspaceID, method.FullName, file.ID)
-
-*/
 type propsArrowIcon = {
   isOpen: boolean;
 };

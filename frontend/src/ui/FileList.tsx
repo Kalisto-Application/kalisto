@@ -10,6 +10,7 @@ type fileListtProps = {
   items: itemProps[];
   onCloseInput: () => void;
   editFile: (value: string) => void;
+  gIcon?: string;
 };
 type itemProps = {
   file: models.File;
@@ -22,6 +23,7 @@ const FileList: React.FC<fileListtProps> = ({
   items,
   onCloseInput,
   editFile,
+  gIcon,
 }) => {
   const [valueEdit, setValueEdit] = useState('');
 
@@ -42,7 +44,9 @@ const FileList: React.FC<fileListtProps> = ({
       {items.map((it, indx) => (
         <li
           key={indx}
-          className={`relative mx-2 flex cursor-pointer justify-between px-4 py-1 hover:bg-borderFill  hover:rounded-3xl${
+          className={`relative ${
+            gIcon ? '' : 'mx-2'
+          } flex     cursor-pointer px-4 py-1 hover:bg-borderFill  hover:rounded-3xl${
             it.isActive ? ' rounded-3xl bg-textBlockFill ' : ''
           }`}
           onClick={it.onClick}
@@ -62,7 +66,11 @@ const FileList: React.FC<fileListtProps> = ({
               onKeyDown={onKeyDown}
             />
           ) : (
-            <span className=" font-[Inter] ">{it.file.name}</span>
+            <>
+              {' '}
+              {gIcon && <img src={gIcon} className="mr-2.5" />}{' '}
+              <div className=" w-full font-[Inter]">{it.file.name}</div>
+            </>
           )}
           <SubMenu items={it.menu} />
         </li>
@@ -76,10 +84,10 @@ const SubMenu: React.FC<MenuProps> = ({ items }) => {
   const { value, toggle, setFalse } = useBoolean(false);
   const subMenuRef = useRef(null);
 
-  // useOnClickOutside(subMenuRef, () => setFalse());
+  useOnClickOutside(subMenuRef, () => setFalse());
 
   return (
-    <div className="ml-1 w-3" ref={subMenuRef}>
+    <div className="ml-1 flex w-[22px] justify-end" ref={subMenuRef}>
       {/* button submenu  */}
       <button
         onClick={(e) => {

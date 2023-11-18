@@ -11,12 +11,15 @@ import { Context } from '../state';
 const findMethod = (
   s: models.Service[] = [],
   serviceName: string,
-  name: string
+  metName: string
 ): models.Method | undefined => {
+  console.log(metName);
+  debugger;
+
   for (const service of s) {
     if (service.fullName == serviceName) {
       for (const method of service.methods) {
-        if (method.fullName == name) {
+        if (method.fullName == metName) {
           return method;
         }
       }
