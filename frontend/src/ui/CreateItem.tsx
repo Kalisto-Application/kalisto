@@ -39,7 +39,7 @@ const CreateItem: React.FC<inputProps> = ({
       {showInput ? (
         <>
           <input
-            // autoFocus
+            autoFocus
             onKeyDown={onKeyDown}
             type="text"
             placeholder={placeholder}

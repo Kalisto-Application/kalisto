@@ -58,7 +58,7 @@ export const MethodCollection: React.FC = () => {
   const services = ctx.state.activeWorkspace?.spec.services;
   const activeRequestID = ctx.state.activeRequestFileId;
 
-  // создания массива для дерева
+  // creatign a data tree
   const newServicesName = {
     name: '',
     children:
@@ -76,29 +76,40 @@ export const MethodCollection: React.FC = () => {
         };
       }) || [],
   };
-  // create tree
   const data = flattenTree(newServicesName);
 
   //  active request and activeMethod
-  const setActiveRequestMethod = (id: string, metName: string) => {
+  const setActiveRequestMethod = (id: string, fullNameMet: string) => {
     ctx.dispatch({ type: 'setActiveRequest', id });
 
     const servesActive = services.find((it) => {
-      if (metName.includes(it.fullName)) return it;
+      if (fullNameMet.startsWith(it.fullName)) return it;
     });
 
-    const method = findMethod(
-      services,
-      servesActive?.fullName || '',
-      metName || ''
-    );
+    if (!servesActive) return;
+
+    const method = findMethod(services, servesActive.fullName, fullNameMet);
 
     ctx.dispatch({ type: 'activeMethod', activeMethod: method! });
   };
 
   // add request
   const addItem = (value: string, fullNameMet: string) => {
-    CreateRequestFile(workspaceID, fullNameMet, value, '', '').then((res) => {
+    const servesActive = services.find((it) => {
+      if (fullNameMet.startsWith(it.fullName)) return it;
+    });
+    if (!servesActive) return;
+
+    const met = findMethod(services, servesActive.fullName, fullNameMet);
+    if (!met) return;
+
+    CreateRequestFile(
+      workspaceID,
+      fullNameMet,
+      value,
+      met?.requestExample,
+      ''
+    ).then((res) => {
       ctx.dispatch({
         type: 'addRequestFile',
         file: {
@@ -117,7 +128,7 @@ export const MethodCollection: React.FC = () => {
       let ws = new models.Workspace({
         ...ctx.state.activeWorkspace,
         requestFiles: {
-          [metName]: [...res[metName]],
+          [metName]: [...(res[metName] || [])],
         },
       });
 
@@ -198,7 +209,6 @@ export const MethodCollection: React.FC = () => {
                               setIsOpenEditInput(it.id);
                             },
                           },
-
                           {
                             icon: deleteIcon,
                             text: 'Delete',

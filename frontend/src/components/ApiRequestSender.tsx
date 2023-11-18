@@ -18,7 +18,7 @@ export const ApiRequestSender: React.FC = () => {
 
   const action: Action = (url: string) => {
     UpdateWorkspace(
-      new models.Workspace({ ...activeWorkspace, targetUrl: url }),
+      new models.Workspace({ ...activeWorkspace, targetUrl: url })
     ).catch((err) => {
       console.log('failed to save the workspace url: ', err);
     });
@@ -37,12 +37,19 @@ export const ApiRequestSender: React.FC = () => {
       return;
     }
 
+    const file = ctx.state.activeWorkspace?.requestFiles[
+      ctx.state.activeMethod.fullName
+    ].find((it) => {
+      return it.id === ctx.state.activeRequestFileId;
+    });
+    if (!file) return;
+
     SendGrpc({
       addr: url,
       workspaceId: activeWorkspace.id,
       method: ctx.state.activeMethod.fullName,
-      body: ctx.state.requestText,
-      meta: ctx.state.requestMetaText,
+      body: file.content,
+      meta: file.headers,
     })
       .then((res) => {
         ctx.dispatch({ type: 'apiResponse', response: res });

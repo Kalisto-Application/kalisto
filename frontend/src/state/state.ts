@@ -1,7 +1,6 @@
 import { createContext, Dispatch } from 'react';
 import { models } from '../../wailsjs/go/models';
 
-
 type Action =
   | { type: 'switchRequestEditor'; i: number }
   | { type: 'switchResponseEditor'; i: number }
@@ -23,9 +22,9 @@ type Action =
   | { type: 'updateScriptFile'; file: models.File }
   | { type: 'addScriptFile'; file: models.File }
   | { type: 'switchScriptEditor'; i: number }
-  | { type:'addRequestFile'; file?:{ [key: string]: models.File[] }}
-  | { type: 'updateRequestFile'; file: models.File ,metName:string}
-  | {type:'setActiveRequest';id:string;};
+  | { type: 'addRequestFile'; file: { [key: string]: models.File[] } }
+  | { type: 'updateRequestFile'; file: models.File; metName: string }
+  | { type: 'setActiveRequest'; id: string };
 
 export type State = {
   activeRequestEditor: number;
@@ -62,8 +61,8 @@ export const newState = (): State => {
     scriptResponse: '',
     scriptError: '',
     activeScriptFileId: '',
-    activeRequestFileId:'',
-  
+    activeRequestFileId: '',
+
     activeScriptEditor: 0,
   };
 };
@@ -178,7 +177,7 @@ export const reducer = (state: State, action: Action): State => {
           }),
         }),
       };
-  
+
     case 'scriptResponse':
       return {
         ...state,
@@ -217,37 +216,40 @@ export const reducer = (state: State, action: Action): State => {
         ...state,
         activeScriptEditor: action.i,
       };
-case 'addRequestFile':
-  return{
-    ...state,
-    activeWorkspace: new models.Workspace({
-      ...state.activeWorkspace,
-      requestFiles:{
-       ...action.file
-      }
-      
-    })
-  };
-  case 'updateRequestFile':{
+    case 'addRequestFile':
+      return {
+        ...state,
+        activeWorkspace: new models.Workspace({
+          ...state.activeWorkspace,
+          requestFiles: {
+            ...action.file,
+          },
+        }),
+      };
 
+    case 'updateRequestFile': {
+      return {
+        ...state,
+        activeWorkspace: new models.Workspace({
+          ...state.activeWorkspace,
+          requestFiles: {
+            ...state.activeWorkspace?.requestFiles,
 
-    return {
-      ...state,
-      activeWorkspace: new models.Workspace({
-        ...state.activeWorkspace,
-        requestFiles: {...state.activeWorkspace?.requestFiles,[action.metName]:state.activeWorkspace?.requestFiles[action.metName].map((it) => {
-     
-          if (it.id === action.file.id) return action.file;
-          return it
-        })},
-      })
-    }};
+            [action.metName]: state.activeWorkspace?.requestFiles[
+              action.metName
+            ].map((it) => {
+              if (it.id === action.file.id) return action.file;
+              return it;
+            }),
+          },
+        }),
+      };
+    }
     case 'setActiveRequest':
-    return{
-      ...state,
-      activeRequestFileId:action.id,
-     
-    };
+      return {
+        ...state,
+        activeRequestFileId: action.id,
+      };
     default:
       return state;
   }
