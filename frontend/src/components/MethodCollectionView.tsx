@@ -60,7 +60,7 @@ export const MethodCollection: React.FC = () => {
   const services = ctx.state.activeWorkspace?.spec.services;
   const activeRequestID = ctx.state.activeRequestFileId;
 
-  // create tree
+  // создания массива для дерева
   const newServicesName = {
     name: '',
     children:
@@ -78,11 +78,11 @@ export const MethodCollection: React.FC = () => {
         };
       }) || [],
   };
-
+  // create tree
   const data = flattenTree(newServicesName);
 
-  //  active request
-  const setActiveRequest = (id: string, metName: string) => {
+  //  active request and activeMethod
+  const setActiveRequestMethod = (id: string, metName: string) => {
     ctx.dispatch({ type: 'setActiveRequest', id });
 
     const servesActive = services.find((it) => {
@@ -126,7 +126,7 @@ export const MethodCollection: React.FC = () => {
       ctx.dispatch({ type: 'updateWorkspace', workspace: ws });
     });
   };
-  // Edit
+  // Edit request
   const renameRequest = (name: string, metName: string) => {
     const renamed = new models.File({
       ...ctx.state.activeWorkspace?.requestFiles[metName].find(
@@ -174,7 +174,7 @@ export const MethodCollection: React.FC = () => {
                 {level <= 2 && element.name}
               </div>
               {level === 3 && (
-                <div>
+                <div className="flex-[0_1_100%]">
                   <CreateItem
                     fullNameMet={element.name}
                     addItem={(value, fullNameMet) =>
@@ -190,7 +190,8 @@ export const MethodCollection: React.FC = () => {
                         file: it,
                         inEdit: it.id === isOpenEditInput,
                         isActive: it.id === activeRequestID,
-                        onClick: () => setActiveRequest(it.id, element.name),
+                        onClick: () =>
+                          setActiveRequestMethod(it.id, element.name),
                         menu: [
                           {
                             icon: editIcon,
