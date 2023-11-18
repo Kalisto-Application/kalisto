@@ -25,8 +25,6 @@ const findMethod = (
   serviceName: string,
   metName: string
 ): models.Method | undefined => {
-  console.log(metName);
-  // debugger;
   for (const service of s) {
     if (service.fullName == serviceName) {
       for (const method of service.methods) {
