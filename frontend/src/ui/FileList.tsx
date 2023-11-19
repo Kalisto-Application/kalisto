@@ -46,8 +46,8 @@ const FileList: React.FC<fileListtProps> = ({
           key={indx}
           className={`relative ${
             gIcon ? '' : 'mx-2'
-          } flex     cursor-pointer px-4 py-1 hover:bg-borderFill  hover:rounded-3xl${
-            it.isActive ? ' rounded-3xl bg-textBlockFill ' : ''
+          } flex cursor-pointer px-4 py-1 hover:bg-borderFill ${
+            it.isActive ? 'bg-textBlockFill' : ''
           }`}
           onClick={it.onClick}
         >

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import TreeView, {
   flattenTree,
   INodeRendererProps,
@@ -34,12 +34,6 @@ const findMethod = (
       }
     }
   }
-};
-
-type Data = {
-  display: string;
-  isMethod: boolean;
-  parent?: string;
 };
 
 export const MethodCollection: React.FC = () => {
@@ -178,7 +172,7 @@ export const MethodCollection: React.FC = () => {
                 width: '100%',
               }}
             >
-              <div className="flex">
+              <div className="relative flex hover:bg-borderFill">
                 {level <= 2 && <ArrowIcon isOpen={isExpanded} />}
                 {level <= 2 && element.name}
               </div>

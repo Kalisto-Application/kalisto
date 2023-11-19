@@ -20,17 +20,15 @@ type Tag struct {
 	Name string `json:"name"`
 }
 
-func NewUpdater(current, platform, token string) *Update {
+func NewUpdater(current, platform string) *Update {
 	return &Update{
 		current:  current,
-		token:    token,
 		platform: platform,
 	}
 }
 
 type Update struct {
 	current  string
-	token    string
 	platform string
 }
 
@@ -38,13 +36,12 @@ func (u *Update) Run() (bool, error) {
 	if u.current == "" {
 		return false, nil
 	}
-	r, err := http.NewRequest(http.MethodGet, "https://api.github.com/repos/Kalisto-Application/kalisto-app/tags", nil)
+	r, err := http.NewRequest(http.MethodGet, "https://api.github.com/repos/Kalisto-Application/kalisto/tags", nil)
 	if err != nil {
 		return false, err
 	}
 
 	r.Header.Set("Accept", "application/vnd.github+json")
-	r.Header.Set("Authorization", fmt.Sprintf("Bearer %s", u.token))
 	r.Header.Set("X-GitHub-Api-Version", "2022-11-28")
 
 	resp, err := http.DefaultClient.Do(r)
