@@ -56,14 +56,14 @@ export const ScriptSender: React.FC = () => {
       .catch((err) => {
         if (err?.Code == 'SYNTAX_ERROR') {
           ctx.dispatch({ type: 'scriptError', value: err.Value });
+        } else if (err?.Code == 'SERVER_UNAVAILABLE') {
+          ctx.dispatch({ type: 'scriptError', value: 'Server unavailable' });
         }
         console.log('failed to get response: ', err);
       });
   };
 
   return (
-    <React.Fragment>
       <UrlInput value={url} setValue={onSetUrl} onClick={sendRequest} />
-    </React.Fragment>
   );
 };

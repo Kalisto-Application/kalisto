@@ -43,11 +43,7 @@ export const ContextProvider: React.FC<ContextProps> = ({ children }) => {
   }, []);
 
   return (
-    <Sentry.ErrorBoundary
-      beforeCapture={(scope) => {
-        scope.setExtra('state', state);
-      }}
-    >
+    <Sentry.ErrorBoundary>
       <Context.Provider value={{ state, dispatch }}>
         {children}
       </Context.Provider>

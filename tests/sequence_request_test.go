@@ -24,6 +24,9 @@ var script []byte
 //go:embed testdata/scriptMirror.js
 var scriptMirror []byte
 
+//go:embed testdata/scriptHeaders.js
+var scriptHeaders []byte
+
 type SequenceScriptSuite struct {
 	suite.Suite
 
@@ -151,6 +154,45 @@ func (s *SequenceScriptSuite) TestSequentialRequests() {
 		id: '1',
 		name: 'Clean Code',
 	  }`)
+
+	close()
+	app.OnShutdown(context.Background())
+	<-closed
+}
+
+func (s *SequenceScriptSuite) TestHeadersInheritanceOrder() {
+	close, closed, err := server.Run(":9000")
+	s.Require().NoError(err)
+	time.Sleep(time.Millisecond * 200)
+
+	app, err := assembly.NewApp(xdg.DataHome + "/kalisto/db-test-" + s.T().Name())
+	s.Require().NoError(err)
+	api := app.Api
+
+	wd, err := os.Getwd()
+	s.Require().NoError(err)
+	dir := path.Join(wd, "examples/proto/")
+	ws, err := api.CreateWorkspace("name", []string{dir})
+	s.Require().NoError(err)
+
+	response, err := api.RunScript(models.ScriptCall{
+		Addr:        "localhost:9000",
+		WorkspaceID: ws.ID,
+		Body:        string(scriptHeaders),
+		Meta: `  {
+			authorization: 'token',
+			'x-ray': 'vawe',
+		  }`,
+	})
+	s.Require().NoError(err)
+
+	ip := interpreter.NewInterpreter("")
+	ex1, err := ip.ExportValue(response, "")
+	s.Require().NoError(err)
+	ex2, err := ip.ExportValue("{'authorization': ['super token'], 'x-ray': ['vawe'], 'content-type': ['application/grpc']}", "")
+	s.Require().NoError(err)
+
+	s.EqualValues(ex1["meta"], ex2)
 
 	close()
 	app.OnShutdown(context.Background())

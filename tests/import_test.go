@@ -20,6 +20,7 @@ func (s *ImportSuite) TestImport() {
 	type testCase struct {
 		name  string
 		dirs  []string
+		kind  models.WorkspaceKind
 		err   error
 		errAs error
 	}
@@ -31,10 +32,12 @@ func (s *ImportSuite) TestImport() {
 		// {
 		// 	name: "proto1",
 		// 	dirs: []string{path.Join(wd, "examples/proto")},
+		// 	kind: models.WorkspaceKindProto,
 		// },
 		// {
 		// 	name: "buf",
 		// 	dirs: []string{path.Join(wd, "examples/buf/workspace")},
+		// 	kind: models.WorkspaceKindProto,
 		// },
 		// {
 		// 	name: "stupid links, but all the files",
@@ -42,6 +45,7 @@ func (s *ImportSuite) TestImport() {
 		// 		path.Join(wd, "examples/buf/workspace/observabilityapi/api/v2"),
 		// 		path.Join(wd, "examples/buf/workspace/observabilitytypes"),
 		// 	},
+		// 	kind: models.WorkspaceKindProto,
 		// },
 		// {
 		// 	name: "no buf, just direct links",
@@ -49,22 +53,49 @@ func (s *ImportSuite) TestImport() {
 		// 		path.Join(wd, "examples/buf/workspace/observabilityapi"),
 		// 		path.Join(wd, "examples/buf/workspace/observabilitytypes"),
 		// 	},
+		// 	kind: models.WorkspaceKindProto,
+		// },
+		// {
+		// 	name: "openapi",
+		// 	dirs: []string{path.Join(wd, "examples/openapi/petstore.json")},
+		// 	kind: models.WorkspaceKindOpenapi,
+		// },
+		// {
+		// 	name: "openapi uber",
+		// 	dirs: []string{path.Join(wd, "examples/openapi/uber.json")},
+		// 	kind: models.WorkspaceKindOpenapi,
+		// },
+		// {
+		// 	name: "openapi minimal",
+		// 	dirs: []string{path.Join(wd, "examples/openapi/petstore-minimal.json")},
+		// 	kind: models.WorkspaceKindOpenapi,
 		// },
 		{
-			name: "openapi",
-			dirs: []string{path.Join(wd, "examples/openapi/swagger.yaml")},
+			name: "openapi expanded",
+			dirs: []string{path.Join(wd, "examples/openapi/petstore-expanded.json")},
+			kind: models.WorkspaceKindOpenapi,
 		},
 		// {
-		// 	name:  "openapi dir",
-		// 	dirs:  []string{path.Join(wd, "examples/openapi")},
-		// 	errAs: &models.ErrorOpenapiFileCantBeDir{File: "examples/openapi"},
+		// 	name: "openapi simple",
+		// 	dirs: []string{path.Join(wd, "examples/openapi/petstore-simple.json")},
+		// 	kind: models.WorkspaceKindOpenapi,
+		// },
+		// {
+		// 	name: "openapi with external docs",
+		// 	dirs: []string{path.Join(wd, "examples/openapi/petstore-with-external-docs.json")},
+		// 	kind: models.WorkspaceKindOpenapi,
+		// },
+		// {
+		// 	name: "openapi directory",
+		// 	dirs: []string{path.Join(wd, "examples/openapi/petstore/spec/swagger.json")},
+		// 	kind: models.WorkspaceKindOpenapi,
 		// },
 	} {
 		s.Run(tt.name, func() {
 			app, err := assembly.NewApp(xdg.DataHome + "/kalisto/db-test-" + s.T().Name())
 			s.Require().NoError(err)
 
-			ws, err := app.Api.CreateWorkspaceV2(tt.name, tt.dirs, models.WorkspaceKindOpenapi)
+			ws, err := app.Api.CreateWorkspaceV2(tt.name, tt.dirs, tt.kind)
 			if tt.err != nil {
 				s.ErrorIs(err, tt.err)
 			} else if tt.errAs != nil {

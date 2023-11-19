@@ -192,6 +192,15 @@ func (r *Registry) makeFieldFromParam(param *openapi3.Parameter) (models.Field, 
 func (r *Registry) makeFieldFromSchema(name string, schemaRef *openapi3.SchemaRef) (models.Field, error) {
 	switch schemaRef.Value.Type {
 	case "object":
+		if schemaRef.Value.AdditionalProperties.Schema != nil && schemaRef.Value.AdditionalProperties.Schema.Value != nil {
+			return models.Field{
+				Name:     name,
+				FullName: name,
+				Type:     models.DataTypeStruct,
+				MapKey:   &models.Field{},
+			}, nil
+		}
+
 		fields := make([]models.Field, 0)
 
 		for name, prop := range schemaRef.Value.Properties {
@@ -258,6 +267,12 @@ func (r *Registry) makeFieldFromSchema(name string, schemaRef *openapi3.SchemaRe
 				Type:     models.DataTypeInt64,
 			}, nil
 		}
+
+	// oneof
+	// allof
+	// anyof
+	// enum
+	// maps (additionalProperties)
 
 	case "array":
 		return r.makeFieldFromSchema(name, schemaRef.Value.Items)
