@@ -2,8 +2,34 @@
 
 ## About
 
-You can configure the project by editing `wails.json`. More information about the project settings can be found
-here: https://wails.io/docs/reference/project-config
+Kalisto is a grpc(http in progress) client.
+
+### Why is it special?
+There are a few issues with the grpc graphic clients:
+1. it makes you to describe a request using json. It might be ok for a regular REST api, later you can reuse the request or fill it based on your project's fixtures. But it doesn't go well for a binary protocol.
+2. The api navigation is hard. it doesn't allow to use well experienced technic like folder structure.
+3. It doesn't help to describe a request since some tools don't even know what kind of request you send.
+4. There are no tools with a real scripting. There are some features are named "post scirpt" that introduce a side effect and state to the application.
+
+I'm here to fix it.
+
+### Download
+http://kalisto.app
+
+### Demo
+![demo gif](./demo.gif)
+
+### Report a bug
+[Here](https://github.com/Kalisto-Application/kalisto/issues/new)
+
+### Roadmap
+[Here](https://github.com/orgs/Kalisto-Application/projects/1)
+
+### Discord
+[Link](https://discord.gg/XPDGPkMR4x)
+
+
+# Development guide
 
 ## Live Development 
 
@@ -29,7 +55,6 @@ Install mockery: `go install github.com/vektra/mockery/v2@v2.29.0`
 
 ## Get stared
 
-- `git submodule update --init`
 - `cd frontend`
 - `npm i && npm run build`
 - `cd ../`
@@ -40,4 +65,12 @@ Install mockery: `go install github.com/vektra/mockery/v2@v2.29.0`
 ## Troubleshooting
 
 Node runtime may fail due to lack of memory.
-For such case set a var NODE_OPTIONS="--max-old-space-size=4096"
+For such case set a var NODE_OPTIONS="--max-old-space-size=4096" or even more memory.
+
+# Contribution guide
+
+Most of api doesn't promise backward compatibility. 
+Please, discuss your plans in advance first.
+
+###### tags
+kalisto grpc client gui scripting automation qa
