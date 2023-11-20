@@ -2,17 +2,20 @@ import { useState } from 'react';
 import { useBoolean } from 'usehooks-ts';
 import plusIcon from '../../assets/icons/plus.svg';
 
-type inputProps = {
+type CreateItem = {
   text: string;
   addItem: (value: string, fullNameMet?: string) => void;
   placeholder?: string;
   fullNameMet?: string;
+  btnClassName?: string;
 };
-const CreateItem: React.FC<inputProps> = ({
+
+const CreateItem: React.FC<CreateItem> = ({
   addItem,
   text,
   placeholder,
   fullNameMet,
+  btnClassName,
 }) => {
   const { value: showInput, setTrue, setFalse } = useBoolean(false);
 
@@ -34,6 +37,10 @@ const CreateItem: React.FC<inputProps> = ({
     setInputValue(value);
   };
 
+  const btnClass = `flex w-full items-center gap-x-2 border-borderFill bg-primaryFill hover:bg-borderFill ${
+    btnClassName || ''
+  }`;
+
   return (
     <div className="flex w-full flex-col">
       {showInput ? (
@@ -51,10 +58,7 @@ const CreateItem: React.FC<inputProps> = ({
         </>
       ) : (
         <>
-          <button
-            className="flex items-center gap-x-2 border-borderFill bg-primaryFill hover:bg-borderFill"
-            onClick={setTrue}
-          >
+          <button className={btnClass} onClick={setTrue}>
             <img src={plusIcon} alt="" />
             <span className="whitespace-nowrap text-lg">{text}</span>
           </button>

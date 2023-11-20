@@ -182,7 +182,7 @@ export const MethodCollection: React.FC = () => {
                 </div>
               )}
               {level === 3 && (
-                <div className="w-full flex-[0_1_100%] flex-col pl-[22px]">
+                <div className="w-full flex-[0_1_100%] flex-col">
                   <CreateItem
                     fullNameMet={element.name}
                     addItem={(value, fullNameMet) =>
@@ -190,6 +190,7 @@ export const MethodCollection: React.FC = () => {
                     }
                     text="New Request"
                     placeholder="Name request"
+                    btnClassName="pl-[22px]"
                   />
 
                   <FileList
