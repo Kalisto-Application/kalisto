@@ -39,17 +39,19 @@ const FileList: React.FC<fileListtProps> = ({
     setValueEdit(e.target.value);
   };
 
+  const [showIcon, setShowIcon] = useState(-1);
+
   return (
-    <ul className="">
+    <ul>
       {items.map((it, indx) => (
         <li
           key={indx}
-          className={`relative ${
-            gIcon ? '' : 'mx-2'
-          } flex cursor-pointer px-4 py-1 hover:bg-borderFill ${
+          className={`relative flex cursor-pointer py-1 pl-8 pr-4 hover:bg-borderFill ${
             it.isActive ? 'bg-textBlockFill' : ''
           }`}
           onClick={it.onClick}
+          onMouseEnter={() => setShowIcon(indx)}
+          onMouseLeave={() => setShowIcon(-1)}
         >
           {it.inEdit ? (
             <input
@@ -67,12 +69,11 @@ const FileList: React.FC<fileListtProps> = ({
             />
           ) : (
             <>
-              {' '}
-              {gIcon && <img src={gIcon} className="mr-2.5" />}{' '}
+              {gIcon && <img src={gIcon} className="mr-2.5" />}
               <div className=" w-full font-[Inter]">{it.file.name}</div>
             </>
           )}
-          <SubMenu items={it.menu} />
+          <SubMenu showIcon={indx === showIcon} items={it.menu} />
         </li>
       ))}
     </ul>
@@ -80,25 +81,28 @@ const FileList: React.FC<fileListtProps> = ({
 };
 export default FileList;
 
-const SubMenu: React.FC<MenuProps> = ({ items }) => {
-  const { value, toggle, setFalse } = useBoolean(false);
+type SubMenuProps = MenuProps & {
+  showIcon: boolean;
+};
+const SubMenu: React.FC<SubMenuProps> = ({ items, showIcon }) => {
+  const [show, setShow] = useState(false);
   const subMenuRef = useRef(null);
-
-  useOnClickOutside(subMenuRef, () => setFalse());
+  useOnClickOutside(subMenuRef, () => setShow(false));
 
   return (
     <div className="ml-1 flex w-[22px] justify-end" ref={subMenuRef}>
       {/* button submenu  */}
       <button
         onClick={(e) => {
-          toggle();
+          setShow((prev) => !prev);
           e.stopPropagation();
         }}
+        style={{ visibility: showIcon ? undefined : 'hidden' }}
       >
         <img src={expandIcon} alt="" />
       </button>
       {/* Sub menu */}
-      {value && (
+      {show && (
         <div className="absolute right-2 top-9  ">
           <Menu
             items={items.map((it) => {
@@ -106,7 +110,7 @@ const SubMenu: React.FC<MenuProps> = ({ items }) => {
                 ...it,
                 onClick: (e: React.MouseEvent) => {
                   e.stopPropagation();
-                  toggle();
+                  setShow((prev) => !prev);
                   it.onClick?.(e);
                 },
               };

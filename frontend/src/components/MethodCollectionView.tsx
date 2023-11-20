@@ -147,10 +147,11 @@ export const MethodCollection: React.FC = () => {
     });
   };
 
+  const paddingSteps = [0, 8, 16];
+
   return (
     <TreeView
       data={data}
-      className="pl-4"
       defaultExpandedIds={data[0].children}
       nodeRenderer={({
         element,
@@ -165,19 +166,23 @@ export const MethodCollection: React.FC = () => {
               onKeyDown={(e) => e.stopPropagation()}
               {...getNodeProps({})}
               style={{
-                paddingLeft: 30 * (level <= 2 ? level - 1 : 1.3),
-                paddingRight: '30px',
-                marginBottom: '10px',
                 cursor: 'pointer',
                 width: '100%',
+                height: '32px',
+                display: 'inline-block',
               }}
             >
-              <div className="relative flex hover:bg-borderFill">
-                {level <= 2 && <ArrowIcon isOpen={isExpanded} />}
-                {level <= 2 && element.name}
-              </div>
+              {level <= 2 && (
+                <div
+                  style={{ paddingLeft: ` ${paddingSteps[level]}px` }}
+                  className="flex w-full hover:bg-borderFill"
+                >
+                  {level <= 2 && <ArrowIcon isOpen={isExpanded} />}
+                  {level <= 2 && element.name}
+                </div>
+              )}
               {level === 3 && (
-                <div className="flex-[0_1_100%]">
+                <div className="w-full flex-[0_1_100%] flex-col">
                   <CreateItem
                     fullNameMet={element.name}
                     addItem={(value, fullNameMet) =>
@@ -185,6 +190,7 @@ export const MethodCollection: React.FC = () => {
                     }
                     text="New Request"
                     placeholder="Name request"
+                    btnClassName="pl-[22px]"
                   />
 
                   <FileList

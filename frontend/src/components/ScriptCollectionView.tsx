@@ -117,14 +117,12 @@ const ScriptCollectionView: React.FC = () => {
   });
 
   return (
-    <>
-      <div className="px-3 py-1 ">
-        <CreateItem
-          text="Add Script"
-          addItem={(value) => addFile(value)}
-          placeholder="Name script"
-        />
-      </div>
+    <div>
+      <CreateItem
+        text="Add Script"
+        addItem={(value) => addFile(value)}
+        placeholder="Name script"
+      />
       <FileList
         items={items}
         onCloseInput={() => setIsOpenEditInput('')}
@@ -137,7 +135,7 @@ const ScriptCollectionView: React.FC = () => {
         deleteScript={() => deleteFile()}
         title="Delete script?"
       />
-    </>
+    </div>
   );
 };
 

@@ -1,3 +1,0 @@
-[submodule "subrepos/wails"]
-	path = subrepos/wails
-	url = https://github.com/wailsapp/wails

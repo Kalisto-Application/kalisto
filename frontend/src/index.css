@@ -6,10 +6,10 @@ CSS rules to specify families:
     font-family: 'Roboto Mono', monospace;
 */
 
-/* style tree API */
-.tree-node {
-  line-height: 1.5;
-  display: flex;
+.basic.tree {
+  list-style: none;
+  margin: 0;
+  padding: 20px;
 }
 
 @tailwind base;
