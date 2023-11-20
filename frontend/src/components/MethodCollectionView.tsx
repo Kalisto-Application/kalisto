@@ -147,7 +147,7 @@ export const MethodCollection: React.FC = () => {
     });
   };
 
-  const paddingSteps = [0, 0, 15];
+  const paddingSteps = [0, 8, 16];
 
   return (
     <TreeView
@@ -166,10 +166,10 @@ export const MethodCollection: React.FC = () => {
               onKeyDown={(e) => e.stopPropagation()}
               {...getNodeProps({})}
               style={{
-                paddingLeft: '5px',
                 cursor: 'pointer',
                 width: '100%',
                 height: '32px',
+                display: 'inline-block',
               }}
             >
               {level <= 2 && (
@@ -182,7 +182,7 @@ export const MethodCollection: React.FC = () => {
                 </div>
               )}
               {level === 3 && (
-                <div className="flex-[0_1_100%]">
+                <div className="w-full flex-[0_1_100%] flex-col pl-[22px]">
                   <CreateItem
                     fullNameMet={element.name}
                     addItem={(value, fullNameMet) =>

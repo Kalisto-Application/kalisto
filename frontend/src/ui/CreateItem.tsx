@@ -35,7 +35,7 @@ const CreateItem: React.FC<inputProps> = ({
   };
 
   return (
-    <div className=" flex flex-col">
+    <div className="flex w-full flex-col">
       {showInput ? (
         <>
           <input
@@ -52,7 +52,7 @@ const CreateItem: React.FC<inputProps> = ({
       ) : (
         <>
           <button
-            className="flex items-center gap-x-2  rounded-md border-borderFill bg-primaryFill  transition duration-500 ease-in-out hover:bg-textBlockFill"
+            className="flex items-center gap-x-2 border-borderFill bg-primaryFill hover:bg-borderFill"
             onClick={setTrue}
           >
             <img src={plusIcon} alt="" />
