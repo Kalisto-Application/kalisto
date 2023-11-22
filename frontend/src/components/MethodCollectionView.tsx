@@ -221,7 +221,7 @@ export const MethodCollection: React.FC = () => {
                     })}
                     onCloseInput={() => setIsOpenEditInput('')}
                     editFile={(id: string) => renameRequest(id, element.name)}
-                    gIcon={gIcon}
+                    itemIcon={gIcon}
                   />
                   <DeletePopup
                     id={isOpenDeletePopup}
