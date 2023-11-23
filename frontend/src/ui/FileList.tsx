@@ -10,7 +10,7 @@ type fileListtProps = {
   items: itemProps[];
   onCloseInput: () => void;
   editFile: (value: string) => void;
-  gIcon?: string;
+  itemIcon?: string;
 };
 type itemProps = {
   file: models.File;
@@ -23,7 +23,7 @@ const FileList: React.FC<fileListtProps> = ({
   items,
   onCloseInput,
   editFile,
-  gIcon,
+  itemIcon: gIcon,
 }) => {
   const [valueEdit, setValueEdit] = useState('');
 

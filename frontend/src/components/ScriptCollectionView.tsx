@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react';
 import copyIcon from '../../assets/icons/copy.svg';
 import deleteIcon from '../../assets/icons/delete.svg';
 import editIcon from '../../assets/icons/edit.svg';
+import gIcon from '../../assets/icons/g.svg';
 import {
   CreateScriptFile,
   RemoveScriptFile,
@@ -127,6 +128,7 @@ const ScriptCollectionView: React.FC = () => {
         items={items}
         onCloseInput={() => setIsOpenEditInput('')}
         editFile={renameFile}
+        itemIcon={gIcon}
       />
       <DeletePopup
         id={isOpenDeletePopup}
