@@ -80,5 +80,5 @@ const Editor: React.FC<props> = ({ value, onChange, readonly }) => {
     return clean;
   }, [monacoEl.current]);
 
-  return <div className="h-[600px] w-full" ref={monacoEl}></div>;
+  return <div className="h-[77.4vh] w-full" ref={monacoEl}></div>;
 };

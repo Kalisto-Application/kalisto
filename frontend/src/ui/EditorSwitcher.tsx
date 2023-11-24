@@ -25,7 +25,7 @@ export const EditorSwitcher: React.FC<props> = ({
 
   return (
     <div className="ustify-between flex">
-      <div className="flex h-[40px] flex-1  ">
+      <div className="flex h-[40px] flex-1  font-['Roboto_Mono']">
         {items.map((it, i) => (
           <div
             className={`${makeClassName(i)} cursor-pointer`}
