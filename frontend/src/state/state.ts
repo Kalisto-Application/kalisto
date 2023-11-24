@@ -62,7 +62,6 @@ export const newState = (): State => {
     scriptError: '',
     activeScriptFileId: '',
     activeRequestFileId: '',
-
     activeScriptEditor: 0,
   };
 };

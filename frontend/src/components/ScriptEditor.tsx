@@ -11,9 +11,20 @@ export const ScriptEditor: React.FC = () => {
   const activeFile = ws?.scriptFiles.find(
     (it) => it.id === ctx.state.activeScriptFileId
   );
+
+  const numberEditor = ctx.state.activeScriptEditor;
+
   if (!activeFile) {
     return <div className="w-1/2 bg-textBlockFill"></div>;
   }
+
+  const contentEditor =
+    numberEditor === 0
+      ? activeFile?.content
+      : numberEditor === 1
+      ? activeFile?.headers
+      : '';
+  console.log(contentEditor);
 
   const switchScriptEditor = (i: number) =>
     void [ctx.dispatch({ type: 'switchScriptEditor', i: i })];
@@ -67,6 +78,7 @@ export const ScriptEditor: React.FC = () => {
           { title: 'Headers', onClick: switchScriptEditor },
         ]}
         active={ctx.state.activeScriptEditor || 0}
+        onClickCopy={() => navigator.clipboard.writeText(contentEditor || '')}
       />
       {editors[ctx.state.activeScriptEditor] || editors[0]}
     </div>
