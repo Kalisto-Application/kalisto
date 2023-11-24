@@ -9,7 +9,11 @@ export const ScriptResponse: React.FC = () => {
   return (
     <div className="w-1/2 bg-textBlockFill">
       <div className="p-[5.5px] text-right">
-        <button>
+        <button
+          onClick={() =>
+            navigator.clipboard.writeText(ctx.state.scriptResponse || '')
+          }
+        >
           <img src={iconCopy} />
         </button>
       </div>

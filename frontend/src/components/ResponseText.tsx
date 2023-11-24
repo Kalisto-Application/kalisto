@@ -11,6 +11,15 @@ export const ResponseText: React.FC = () => {
   const bodyKey = `${ctx.state.activeMethod?.fullName}:${ctx.state.response?.body}`;
   const metaKey = `${ctx.state.activeMethod?.fullName}:${ctx.state.response?.metaData}`;
 
+  const numberEditor = ctx.state.activeResponseEditor;
+
+  const contentEditor =
+    numberEditor === 0
+      ? ctx.state.response?.body
+      : numberEditor === 1
+      ? ctx.state.response?.metaData
+      : '';
+
   const editors = [
     <CodeViewer
       key={bodyKey}
@@ -32,6 +41,7 @@ export const ResponseText: React.FC = () => {
           { title: 'Metadata', onClick: switchResponseEditor },
         ]}
         active={ctx.state.activeResponseEditor || 0}
+        onClickCopy={() => navigator.clipboard.writeText(contentEditor || '')}
       />
       {editors[ctx.state.activeResponseEditor] || editors[0]}
     </div>
