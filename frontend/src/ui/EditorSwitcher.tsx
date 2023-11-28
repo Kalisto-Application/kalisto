@@ -1,5 +1,6 @@
 import React, { useContext, useRef, useState } from 'react';
 import copyIcon from '../../assets/icons/copy.svg';
+import PopoverUI from './Popover';
 
 interface props {
   items: item[];
@@ -18,17 +19,15 @@ export const EditorSwitcher: React.FC<props> = ({
   onClickCopy,
 }) => {
   const makeClassName = (i: number): string => {
-    return active === i
-      ? 'pt-[8px] px-[16px]'
-      : 'pt-[8px] px-[16px] text-secondaryText ';
+    return active === i ? ' ' : '  text-secondaryText ';
   };
 
   return (
-    <div className="ustify-between flex">
-      <div className="flex h-[40px] flex-1  font-['Roboto_Mono']">
+    <div className="relative  z-10 flex  py-2">
+      <div className="flex  flex-1  font-['Roboto_Mono']">
         {items.map((it, i) => (
           <div
-            className={`${makeClassName(i)} cursor-pointer`}
+            className={`${makeClassName(i)} cursor-pointer px-4`}
             key={i}
             onClick={() => it.onClick(i)}
           >
@@ -36,9 +35,13 @@ export const EditorSwitcher: React.FC<props> = ({
           </div>
         ))}
       </div>
-      <button onClick={onClickCopy}>
-        <img src={copyIcon} />
-      </button>
+      <div className="flex">
+        <PopoverUI nameButton="ss" text="Copy">
+          <button className="self-center" onClick={onClickCopy}>
+            <img src={copyIcon} />
+          </button>
+        </PopoverUI>
+      </div>
     </div>
   );
 };

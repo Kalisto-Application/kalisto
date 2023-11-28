@@ -117,7 +117,6 @@ export const MethodCollection: React.FC = () => {
   // delete request
   const deleteRequest = (metName: string) => {
     if (!isOpenDeletePopup) return;
-    debugger;
 
     RemoveRequestFile(workspaceID, metName, isOpenDeletePopup).then((res) => {
       let ws = new models.Workspace({

@@ -21,6 +21,13 @@ export const RequestEditor: React.FC = () => {
     (it) => it.id === activeRequestID
   );
 
+  // const contentEditor =
+  //   numberEditor === 0
+  //     ? activeFile?.content
+  //     : numberEditor === 1
+  //     ? activeFile?.headers
+  //     : '';
+
   const contentEditor =
     numberEditor === 0
       ? activeFile?.content

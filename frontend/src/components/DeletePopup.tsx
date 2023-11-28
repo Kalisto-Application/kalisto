@@ -16,8 +16,6 @@ const DeletePopup: React.FC<propsDeletePopup> = ({
   deleteScript,
   title,
 }) => {
-  console.log(deleteScript);
-
   return (
     <Popup onClose={onClose} isOpen={isOpen} title={title}>
       <>
