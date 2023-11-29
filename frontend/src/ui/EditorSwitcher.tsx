@@ -23,7 +23,7 @@ export const EditorSwitcher: React.FC<props> = ({
   };
 
   return (
-    <div className="relative  z-10 flex  py-2">
+    <div className="relative  z-10 flex  border-l-2 border-borderFill py-2">
       <div className="flex  flex-1  font-['Roboto_Mono']">
         {items.map((it, i) => (
           <div
@@ -35,9 +35,9 @@ export const EditorSwitcher: React.FC<props> = ({
           </div>
         ))}
       </div>
-      <div className="flex">
+      <div className="mr-8 flex">
         <PopoverUI nameButton="ss" text="Copy">
-          <button className="self-center" onClick={onClickCopy}>
+          <button className="self-center" onClick={() => onClickCopy()}>
             <img src={copyIcon} />
           </button>
         </PopoverUI>

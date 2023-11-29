@@ -167,14 +167,16 @@ export const MethodCollection: React.FC = () => {
               style={{
                 cursor: 'pointer',
                 width: '100%',
-                height: '32px',
                 display: 'inline-block',
               }}
             >
               {level <= 2 && (
                 <div
                   style={{ paddingLeft: ` ${paddingSteps[level]}px` }}
-                  className="flex w-full hover:bg-borderFill"
+                  className=" flex w-full
+                   
+                   hover:bg-borderFill
+                   "
                 >
                   {level <= 2 && <ArrowIcon isOpen={isExpanded} />}
                   {level <= 2 && element.name}

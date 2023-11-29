@@ -97,7 +97,11 @@ export const RequestEditor: React.FC = () => {
           },
         ]}
         active={ctx.state.activeRequestEditor || 0}
-        onClickCopy={() => navigator.clipboard.writeText(contentEditor || '')}
+        onClickCopy={() => {
+          console.log(contentEditor);
+
+          navigator.clipboard.writeText(contentEditor || '');
+        }}
       />
       {editors[ctx.state.activeRequestEditor] || editors[0]}
     </div>
