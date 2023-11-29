@@ -62,6 +62,7 @@ const Editor: React.FC<props> = ({ value, onChange, readonly }) => {
           language: 'javascript',
           theme: 'vs-dark',
           minimap: { enabled: false },
+          overviewRulerLanes: 0,
           readOnly: readonly,
           scrollBeyondLastLine: false,
         });

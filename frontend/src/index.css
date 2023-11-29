@@ -41,6 +41,3 @@ ul li {
   border-bottom-width: 1px;
   border-color: theme('colors.borderFill');
 }
-.decorationsOverviewRuler {
-  visibility: hidden;
-}

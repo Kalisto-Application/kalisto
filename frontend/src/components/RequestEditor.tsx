@@ -21,13 +21,6 @@ export const RequestEditor: React.FC = () => {
     (it) => it.id === activeRequestID
   );
 
-  // const contentEditor =
-  //   numberEditor === 0
-  //     ? activeFile?.content
-  //     : numberEditor === 1
-  //     ? activeFile?.headers
-  //     : '';
-
   const contentEditor =
     numberEditor === 0
       ? activeFile?.content
@@ -98,8 +91,6 @@ export const RequestEditor: React.FC = () => {
         ]}
         active={ctx.state.activeRequestEditor || 0}
         onClickCopy={() => {
-          console.log(contentEditor);
-
           navigator.clipboard.writeText(contentEditor || '');
         }}
       />

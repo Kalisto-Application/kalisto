@@ -19,7 +19,7 @@ export const EditorSwitcher: React.FC<props> = ({
   onClickCopy,
 }) => {
   const makeClassName = (i: number): string => {
-    return active === i ? ' ' : '  text-secondaryText ';
+    return active === i ? '' : 'text-secondaryText';
   };
 
   return (
@@ -36,7 +36,7 @@ export const EditorSwitcher: React.FC<props> = ({
         ))}
       </div>
       <div className="mr-8 flex">
-        <PopoverUI nameButton="ss" text="Copy">
+        <PopoverUI text="Copied">
           <button className="self-center" onClick={() => onClickCopy()}>
             <img src={copyIcon} />
           </button>

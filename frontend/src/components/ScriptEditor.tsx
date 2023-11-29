@@ -24,7 +24,6 @@ export const ScriptEditor: React.FC = () => {
       : numberEditor === 1
       ? activeFile?.headers
       : '';
-  console.log(contentEditor);
 
   const switchScriptEditor = (i: number) =>
     void [ctx.dispatch({ type: 'switchScriptEditor', i: i })];
