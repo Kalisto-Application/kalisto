@@ -36,7 +36,7 @@ export const Dropdown: React.FC<DropdownProps> = ({ main, items }) => {
         <p className="">{mainText}</p>
         {main.tip && <div className="ml-auto">{main.tip}</div>}
       </Menu.Button>
-      <div className="relative mt-2 flex">
+      <div className="relative z-20 mt-2 flex">
         <Transition
           as={Fragment}
           enter="transition ease-out duration-300"
@@ -46,7 +46,7 @@ export const Dropdown: React.FC<DropdownProps> = ({ main, items }) => {
           leaveFrom="transform opacity-100 scale-100"
           leaveTo="transform opacity-0 scale-95"
         >
-          <Menu.Items className="absolute z-10 flex cursor-pointer flex-col content-normal items-center justify-center rounded-md border-[1px] border-borderFill bg-primaryFill px-0 py-1">
+          <Menu.Items className=" absolute flex cursor-pointer flex-col content-normal items-center justify-center rounded-md border-[1px] border-borderFill bg-primaryFill px-0 py-1">
             {items.map((it, i) => (
               <DropdownItem key={i} {...it} />
             ))}
