@@ -11,6 +11,7 @@ export const RequestEditor: React.FC = () => {
   const workSpaceID = ctx.state.activeWorkspace?.id;
   const activeRequestID = ctx.state.activeRequestFileId;
   const activeRequestMetName = ctx.state.activeMethod?.fullName || '';
+  const numberEditor = ctx.state.activeRequestEditor;
 
   const requestFiles = ctx.state.activeWorkspace?.requestFiles
     ? ctx.state.activeWorkspace?.requestFiles
@@ -19,6 +20,13 @@ export const RequestEditor: React.FC = () => {
   const activeFile = requestFiles[activeRequestMetName]?.find(
     (it) => it.id === activeRequestID
   );
+
+  const contentEditor =
+    numberEditor === 0
+      ? activeFile?.content
+      : numberEditor === 1
+      ? activeFile?.headers
+      : '';
 
   const switchRequestEditor = (i: number) =>
     void [ctx.dispatch({ type: 'switchRequestEditor', i: i })];
@@ -72,10 +80,19 @@ export const RequestEditor: React.FC = () => {
     <div className="w-1/2 bg-textBlockFill">
       <EditorSwitcher
         items={[
-          { title: 'Request', onClick: switchRequestEditor },
-          { title: 'Headers', onClick: switchRequestEditor },
+          {
+            title: 'Request',
+            onClick: switchRequestEditor,
+          },
+          {
+            title: 'Headers',
+            onClick: switchRequestEditor,
+          },
         ]}
         active={ctx.state.activeRequestEditor || 0}
+        onClickCopy={() => {
+          navigator.clipboard.writeText(contentEditor || '');
+        }}
       />
       {editors[ctx.state.activeRequestEditor] || editors[0]}
     </div>

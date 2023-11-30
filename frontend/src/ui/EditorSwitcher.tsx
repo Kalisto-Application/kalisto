@@ -1,9 +1,11 @@
-import React, { useContext } from 'react';
-import { Context } from '../state/state';
+import React, { useContext, useRef, useState } from 'react';
+import copyIcon from '../../assets/icons/copy.svg';
+import PopoverUI from './Popover';
 
 interface props {
   items: item[];
   active: number;
+  onClickCopy: () => void;
 }
 
 type item = {
@@ -11,24 +13,35 @@ type item = {
   onClick: (i: number) => void;
 };
 
-export const EditorSwitcher: React.FC<props> = ({ items, active }) => {
+export const EditorSwitcher: React.FC<props> = ({
+  items,
+  active,
+  onClickCopy,
+}) => {
   const makeClassName = (i: number): string => {
-    return active === i
-      ? 'pt-[8px] px-[16px]'
-      : 'pt-[8px] px-[16px] text-secondaryText ';
+    return active === i ? '' : 'text-secondaryText';
   };
 
   return (
-    <div className="flex h-[40px] flex-1 justify-start ">
-      {items.map((it, i) => (
-        <div
-          className={`${makeClassName(i)} cursor-pointer`}
-          key={i}
-          onClick={() => it.onClick(i)}
-        >
-          {it.title}
-        </div>
-      ))}
+    <div className="relative  z-10 flex  border-l-2 border-borderFill py-2">
+      <div className="flex  flex-1  font-['Roboto_Mono']">
+        {items.map((it, i) => (
+          <div
+            className={`${makeClassName(i)} cursor-pointer px-4`}
+            key={i}
+            onClick={() => it.onClick(i)}
+          >
+            {it.title}
+          </div>
+        ))}
+      </div>
+      <div className="mr-8 flex">
+        <PopoverUI text="Copied">
+          <button className="self-center" onClick={() => onClickCopy()}>
+            <img src={copyIcon} />
+          </button>
+        </PopoverUI>
+      </div>
     </div>
   );
 };
