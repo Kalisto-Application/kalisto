@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState } from 'react';
+import React from 'react';
 import copyIcon from '../../assets/icons/copy.svg';
 import PopoverUI from './Popover';
 

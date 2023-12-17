@@ -16,61 +16,66 @@ import DeletePopup from './DeletePopup';
 
 const ScriptCollectionView: React.FC = () => {
   const ctx = useContext(Context);
-  if (!ctx.state.activeWorkspace) {
+  const workspace = ctx.state.activeWorkspace;
+  if (!workspace) {
     return <></>;
   }
 
-  const [isOpenDeletePopup, setIsOpenDeletePopup] = useState('');
+  const [isOpenDeletePopup, setIsOpenDeletePopup] = useState<string | null>('');
   const [isOpenEditInput, setIsOpenEditInput] = useState('');
-
-  const workspace = ctx.state.activeWorkspace;
 
   const activeScript = workspace.scriptFiles.find(
     (it) => it.id === ctx.state.activeScriptFileId
   );
 
-  const setActiveScript = (id: string) => {
+  const setActiveScript = (id: string): void => {
     ctx.dispatch({ type: 'setActiveScriptId', id });
   };
 
   // Add
-  const addFile = (value: string) => {
-    CreateScriptFile(workspace.id, value, '', '').then((res) => {
-      ctx.dispatch({ type: 'addScriptFile', file: res });
-    });
+  const addFile = (value: string): void => {
+    CreateScriptFile(workspace.id, value, '', '')
+      .then((res) => {
+        ctx.dispatch({ type: 'addScriptFile', file: res });
+      })
+      .catch(() => {});
   };
 
   // Delete
-  const deleteFile = () => {
-    if (!isOpenDeletePopup) return;
+  const deleteFile = (): void => {
+    if (isOpenDeletePopup != null) return;
 
-    RemoveScriptFile(workspace.id, isOpenDeletePopup).then((res) => {
-      let ws = new models.Workspace({
-        ...ctx.state.activeWorkspace,
-        scriptFiles: [...res],
-      });
+    RemoveScriptFile(workspace.id, isOpenDeletePopup != null)
+      .then((res) => {
+        let ws = new models.Workspace({
+          ...ctx.state.activeWorkspace,
+          scriptFiles: [...res],
+        });
 
-      ctx.dispatch({ type: 'updateWorkspace', workspace: ws });
-    });
+        ctx.dispatch({ type: 'updateWorkspace', workspace: ws });
+      })
+      .catch(() => {});
   };
 
   // Edit
-  const renameFile = (name: string) => {
+  const renameFile = (name: string): void => {
     const renamed = new models.File({
       ...workspace.scriptFiles.find((it) => it.id === isOpenEditInput),
       name: name,
     });
 
-    UpdateScriptFile(workspace.id, renamed).then((res) =>
-      ctx.dispatch({
-        type: 'updateScriptFile',
-        file: renamed,
-      })
-    );
+    UpdateScriptFile(workspace.id, renamed)
+      .then((res) =>
+        ctx.dispatch({
+          type: 'updateScriptFile',
+          file: renamed,
+        })
+      )
+      .catch(() => {});
   };
 
   // Copy
-  const copyFile = (id: string) => {
+  const copyFile = (id: string): void => {
     const file = workspace.scriptFiles.find((it) => it.id === id);
 
     if (!file) return;
@@ -80,9 +85,11 @@ const ScriptCollectionView: React.FC = () => {
       `${file.name} copy`,
       file.content,
       file.headers
-    ).then((res) => {
-      ctx.dispatch({ type: 'addScriptFile', file: res });
-    });
+    )
+      .then((res) => {
+        ctx.dispatch({ type: 'addScriptFile', file: res });
+      })
+      .catch(() => {});
   };
   // sub menu items
   const items = ctx.state.activeWorkspace?.scriptFiles.map((it) => {

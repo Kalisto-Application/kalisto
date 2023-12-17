@@ -14,6 +14,7 @@ import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker'
 self.MonacoEnvironment = {
   getWorker(_: any, label: string) {
     if (label === 'json') {
+      /* eslint new-cap: "off" */
       return new jsonWorker();
     }
     if (label === 'css' || label === 'scss' || label === 'less') {
@@ -34,5 +35,5 @@ monaco.languages.typescript.typescriptDefaults.setEagerModelSync(true);
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <App />
-  </React.StrictMode>,
+  </React.StrictMode>
 );
