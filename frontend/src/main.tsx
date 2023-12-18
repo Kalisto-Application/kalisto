@@ -10,11 +10,11 @@ import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
 import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
 import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
 
+/* eslint new-cap: "off" */
 // @ts-ignore
 self.MonacoEnvironment = {
   getWorker(_: any, label: string) {
     if (label === 'json') {
-      /* eslint new-cap: "off" */
       return new jsonWorker();
     }
     if (label === 'css' || label === 'scss' || label === 'less') {

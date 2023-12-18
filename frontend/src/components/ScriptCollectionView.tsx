@@ -17,11 +17,11 @@ import DeletePopup from './DeletePopup';
 const ScriptCollectionView: React.FC = () => {
   const ctx = useContext(Context);
   const workspace = ctx.state.activeWorkspace;
-  if (!workspace) {
+  if (workspace === undefined) {
     return <></>;
   }
 
-  const [isOpenDeletePopup, setIsOpenDeletePopup] = useState<string | null>('');
+  const [isOpenDeletePopup, setIsOpenDeletePopup] = useState<string>('');
   const [isOpenEditInput, setIsOpenEditInput] = useState('');
 
   const activeScript = workspace.scriptFiles.find(
@@ -43,11 +43,11 @@ const ScriptCollectionView: React.FC = () => {
 
   // Delete
   const deleteFile = (): void => {
-    if (isOpenDeletePopup != null) return;
+    if (isOpenDeletePopup !== '') return;
 
-    RemoveScriptFile(workspace.id, isOpenDeletePopup != null)
+    RemoveScriptFile(workspace.id, isOpenDeletePopup)
       .then((res) => {
-        let ws = new models.Workspace({
+        const ws = new models.Workspace({
           ...ctx.state.activeWorkspace,
           scriptFiles: [...res],
         });
@@ -78,7 +78,7 @@ const ScriptCollectionView: React.FC = () => {
   const copyFile = (id: string): void => {
     const file = workspace.scriptFiles.find((it) => it.id === id);
 
-    if (!file) return;
+    if (file === undefined) return;
 
     CreateScriptFile(
       workspace.id,

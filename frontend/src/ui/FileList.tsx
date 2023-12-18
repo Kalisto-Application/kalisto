@@ -1,13 +1,13 @@
 import { useRef, useState } from 'react';
-import { useBoolean, useOnClickOutside } from 'usehooks-ts';
+import { useOnClickOutside } from 'usehooks-ts';
 
-import { models } from '../../wailsjs/go/models';
-import { Menu, MenuItemProp, MenuProps } from './Menu';
+import type { models } from '../../wailsjs/go/models';
+import { Menu, type MenuItemProp, type MenuProps } from './Menu';
 
 import expandIcon from '../../assets/icons/expand.svg';
 
 type fileListtProps = {
-  items: itemProps[];
+  items?: itemProps[];
   onCloseInput: () => void;
   editFile: (value: string) => void;
   itemIcon?: string;
@@ -27,15 +27,15 @@ const FileList: React.FC<fileListtProps> = ({
 }) => {
   const [valueEdit, setValueEdit] = useState('');
 
-  const onKeyDown = (e: React.KeyboardEvent) => {
-    if (e.code == 'Enter' && valueEdit !== '') {
+  const onKeyDown = (e: React.KeyboardEvent): void => {
+    if (e.code === 'Enter' && valueEdit !== '') {
       editFile(valueEdit.trim());
       onCloseInput();
       setValueEdit('');
     }
   };
 
-  const updateValueEdit = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const updateValueEdit = (e: React.ChangeEvent<HTMLInputElement>): void => {
     setValueEdit(e.target.value);
   };
 
@@ -43,39 +43,40 @@ const FileList: React.FC<fileListtProps> = ({
 
   return (
     <ul>
-      {items.map((it, indx) => (
-        <li
-          key={indx}
-          className={`relative flex cursor-pointer py-1 pl-8 pr-4 hover:bg-borderFill ${
-            it.isActive ? 'bg-textBlockFill' : ''
-          }`}
-          onClick={it.onClick}
-          onMouseEnter={() => setShowIcon(indx)}
-          onMouseLeave={() => setShowIcon(-1)}
-        >
-          {it.inEdit ? (
-            <input
-              className="border-1 w-[100%] border-[1px] border-borderFill bg-textBlockFill px-3 placeholder:text-[14px] placeholder:text-secondaryText"
-              type="text"
-              onFocus={(e) => {
-                e.target.select();
-                setValueEdit(it.file.name);
-              }}
-              autoFocus
-              value={valueEdit || it.file.name}
-              onChange={updateValueEdit}
-              onBlur={onCloseInput}
-              onKeyDown={onKeyDown}
-            />
-          ) : (
-            <>
-              {gIcon && <img src={gIcon} className="mr-2.5" />}
-              <div className=" w-full font-[Inter]">{it.file.name}</div>
-            </>
-          )}
-          <SubMenu showIcon={indx === showIcon} items={it.menu} />
-        </li>
-      ))}
+      {items === undefined ||
+        items.map((it, indx) => (
+          <li
+            key={indx}
+            className={`relative flex cursor-pointer py-1 pl-8 pr-4 hover:bg-borderFill ${
+              it.isActive !== false ? 'bg-textBlockFill' : ''
+            }`}
+            onClick={it.onClick}
+            onMouseEnter={() => setShowIcon(indx)}
+            onMouseLeave={() => setShowIcon(-1)}
+          >
+            {it.inEdit ? (
+              <input
+                className="border-1 w-[100%] border-[1px] border-borderFill bg-textBlockFill px-3 placeholder:text-[14px] placeholder:text-secondaryText"
+                type="text"
+                onFocus={(e) => {
+                  e.target.select();
+                  setValueEdit(it.file.name);
+                }}
+                autoFocus
+                value={valueEdit || it.file.name}
+                onChange={updateValueEdit}
+                onBlur={onCloseInput}
+                onKeyDown={onKeyDown}
+              />
+            ) : (
+              <>
+                {gIcon !== null && <img src={gIcon} className="mr-2.5" />}
+                <div className=" w-full font-[Inter]">{it.file.name}</div>
+              </>
+            )}
+            <SubMenu showIcon={indx === showIcon} items={it.menu} />
+          </li>
+        ))}
     </ul>
   );
 };

@@ -22,8 +22,8 @@ const CreateItem: React.FC<CreateItem> = ({
   const [inputValue, setInputValue] = useState('');
   const [valueValidate, setValueValidate] = useState(false);
 
-  const onKeyDown = (e: React.KeyboardEvent) => {
-    if (e.code == 'Enter' && inputValue !== '') {
+  const onKeyDown = (e: React.KeyboardEvent): void => {
+    if (e.code === 'Enter' && inputValue !== '') {
       setValueValidate(false);
       addItem(inputValue, fullNameMet);
       setFalse();
@@ -31,14 +31,14 @@ const CreateItem: React.FC<CreateItem> = ({
     }
   };
 
-  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let value = e.target.value;
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    const value = e.target.value;
     setValueValidate(false);
     setInputValue(value);
   };
 
   const btnClass = `flex w-full items-center gap-x-2 border-borderFill bg-primaryFill hover:bg-borderFill ${
-    btnClassName || ''
+    btnClassName !== '' ? btnClassName : ''
   }`;
 
   return (

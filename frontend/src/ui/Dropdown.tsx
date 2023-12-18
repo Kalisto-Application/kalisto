@@ -1,6 +1,6 @@
 import { Menu, Transition } from '@headlessui/react';
-import React, { ChangeEvent, Fragment, useRef, useState } from 'react';
-import { Menu as M, MenuItem } from './Menu';
+import React, { Fragment, useState } from 'react';
+import { Menu as M } from './Menu';
 
 export type DropdownProps = {
   main: DropdownItemProps;
@@ -32,9 +32,9 @@ export const Dropdown: React.FC<DropdownProps> = ({ main, items }) => {
   return (
     <Menu>
       <Menu.Button className="flex h-[48px] shrink-0 flex-wrap content-center items-center gap-3 border-[1px] border-borderFill px-4 py-2.5">
-        {main.icon && <img className="" src={main.icon} />}
+        {main.icon !== null && <img className="" src={main.icon} />}
         <p className="">{mainText}</p>
-        {main.tip && <div className="ml-auto">{main.tip}</div>}
+        {main.tip !== null && <div className="ml-auto">{main.tip}</div>}
       </Menu.Button>
       <div className="relative z-20 mt-2 flex">
         <Transition
@@ -69,20 +69,20 @@ const DropdownItem: React.FC<DropdownItemProps> = ({
   return (
     <Menu.Item as={Fragment}>
       {(render) => {
-        if (edit?.inEdit) {
+        if (edit?.inEdit !== undefined) {
           return <EditableItem value={text} onDone={edit?.onEditDone} />;
         }
-        let el = (
+        const el = (
           <div
             onClick={onClick}
             className="ui-active:text-white relative flex h-11 w-[259.5px] flex-row items-center gap-x-[42px] px-4 py-2.5  ui-active:bg-textBlockFill"
           >
-            {icon && <img src={icon} />}
+            {icon !== null && <img src={icon} />}
             <a>{text}</a>
             {tip}
             {render.active && (
               <div className="absolute left-[200px] top-0 z-20 w-1/2">
-                {menu && (
+                {menu !== undefined && (
                   <M
                     items={menu.map((menu) => ({
                       text: menu.text,
@@ -95,7 +95,7 @@ const DropdownItem: React.FC<DropdownItemProps> = ({
             )}
           </div>
         );
-        return divide ? <div className="divide">{el}</div> : el;
+        return divide !== undefined ? <div className="divide">{el}</div> : el;
       }}
     </Menu.Item>
   );
@@ -111,12 +111,12 @@ interface EditableItemProps {
 const EditableItem: React.FC<EditableItemProps> = ({ value, onDone }) => {
   const [editing, setEditing] = useState(value);
 
-  const onKeyDown = (e: React.KeyboardEvent) => {
-    if (e.code == 'Space') {
+  const onKeyDown = (e: React.KeyboardEvent): void => {
+    if (e.code === 'Space') {
       e.preventDefault();
       setEditing((prev) => prev + ' ');
     }
-    if (e.code == 'Enter') {
+    if (e.code === 'Enter') {
       onDone(editing);
     }
   };

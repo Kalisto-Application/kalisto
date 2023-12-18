@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 export interface MenuProps {
   items: MenuItemProp[];
@@ -28,7 +28,7 @@ export const MenuItem: React.FC<MenuItemProp> = ({ text, icon, onClick }) => {
       className=" flex gap-x-5  px-4 py-2.5   hover:bg-textBlockFill"
       onClick={onClick}
     >
-      {icon && <img src={icon} className="w-[18px]" />}
+      {icon !== null && <img src={icon} className="w-[18px]" />}
       <span>{text}</span>
     </div>
   );
