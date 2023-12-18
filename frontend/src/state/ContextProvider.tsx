@@ -1,10 +1,10 @@
 import * as Sentry from '@sentry/react';
-import { ReactNode, useEffect, useReducer } from 'react';
+import { useEffect, useReducer, type ReactNode } from 'react';
 
 import { Context, newState, reducer } from './state';
 
 import { GetGlobalVars, WorkspaceList } from '../../wailsjs/go/api/Api';
-import { models } from '../../wailsjs/go/models';
+import type { models } from '../../wailsjs/go/models';
 
 type ContextProps = {
   children?: ReactNode;
@@ -28,7 +28,7 @@ export const ContextProvider: React.FC<ContextProps> = ({ children }) => {
         };
 
         const fristMethod = getFirstMethod();
-        if (fristMethod) {
+        if (fristMethod !== undefined) {
           dispatch({ type: 'activeMethod', activeMethod: fristMethod });
         }
         dispatch({ type: 'workspaceList', workspaceList: res });
