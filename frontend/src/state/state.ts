@@ -1,4 +1,4 @@
-import { createContext, Dispatch } from 'react';
+import  {  createContext, type Dispatch } from 'react';
 import { models } from '../../wailsjs/go/models';
 
 type Action =
@@ -99,8 +99,8 @@ export const reducer = (state: State, action: Action): State => {
         ),
         activeWorkspace: action.workspace,
       };
-    case 'removeWorkspace':
-      const filtered = state.workspaceList?.filter((it) => it.id != action.id);
+    case 'removeWorkspace':{
+      const filtered = state.workspaceList?.filter((it) => it.id !== action.id);
       return {
         ...state,
         workspaceList: filtered,
@@ -109,7 +109,8 @@ export const reducer = (state: State, action: Action): State => {
             ? undefined
             : state.activeWorkspace,
       };
-    case 'renameWorkspace':
+    }
+    case 'renameWorkspace':{
       let ws = state.activeWorkspace;
       if (state.activeWorkspace && state.activeWorkspace?.id === action.id) {
         ws = new models.Workspace({
@@ -117,6 +118,7 @@ export const reducer = (state: State, action: Action): State => {
           name: action.name,
         });
       }
+    
       return {
         ...state,
         activeWorkspace: ws,
@@ -126,12 +128,13 @@ export const reducer = (state: State, action: Action): State => {
           }
           return it;
         }),
-      };
+      }
+    }
     case 'workspaceList':
       return {
         ...state,
         workspaceList: action.workspaceList.list,
-        activeWorkspace: action.workspaceList.main.id
+        activeWorkspace: action.workspaceList.main.id !== ''
           ? action.workspaceList.main
           : undefined,
       };

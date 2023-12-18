@@ -42,15 +42,16 @@ const Editor: React.FC<props> = ({ value, onChange, readonly }) => {
   const [sub, setSub] = useState<monaco.IDisposable | undefined>();
   const monacoEl = useRef(null);
 
-  const clean = () => {
+  const clean = (): void => {
     sub?.dispose();
     editor?.dispose();
   };
 
   useEffect(() => {
-    if (monacoEl) {
+    if (monacoEl !== undefined) {
       setEditor((editor) => {
-        if (editor && (!editor.getModel()?.isDisposed() || true)) return editor;
+        if (editor !== null && (!editor.getModel()?.isDisposed() || true))
+          return editor;
 
         monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
           // noSemanticValidation: true,
@@ -68,7 +69,7 @@ const Editor: React.FC<props> = ({ value, onChange, readonly }) => {
         });
         setSub(
           ed.getModel()?.onDidChangeContent((e) => {
-            if (onChange) {
+            if (onChange !== undefined) {
               onChange(ed.getModel()?.getValue() || '');
             }
           })

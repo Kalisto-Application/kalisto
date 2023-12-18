@@ -1,4 +1,4 @@
-import React, { SyntheticEvent } from 'react';
+import React, { type SyntheticEvent } from 'react';
 
 interface UrlInputProps {
   value: string;
@@ -11,7 +11,7 @@ export const UrlInput: React.FC<UrlInputProps> = ({
   value,
   setValue,
 }) => {
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     setValue(e.target.value);
   };
 
