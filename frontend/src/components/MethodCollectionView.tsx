@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import TreeView, {
   flattenTree,
-  INodeRendererProps,
+  type INodeRendererProps,
 } from 'react-accessible-treeview';
 import deleteIcon from '../../assets/icons/delete.svg';
 import editIcon from '../../assets/icons/edit.svg';
@@ -26,9 +26,9 @@ const findMethod = (
   metName: string
 ): models.Method | undefined => {
   for (const service of s) {
-    if (service.fullName == serviceName) {
+    if (service.fullName === serviceName) {
       for (const method of service.methods) {
-        if (method.fullName == metName) {
+        if (method.fullName === metName) {
           return method;
         }
       }
@@ -73,29 +73,36 @@ export const MethodCollection: React.FC = () => {
   const data = flattenTree(newServicesName);
 
   //  active request and activeMethod
-  const setActiveRequestMethod = (id: string, fullNameMet: string) => {
+  const setActiveRequestMethod = (id: string, fullNameMet: string): void => {
     ctx.dispatch({ type: 'setActiveRequest', id });
 
     const servesActive = services.find((it) => {
-      if (fullNameMet.startsWith(it.fullName)) return it;
+      // if (fullNameMet.startsWith(it.fullName)) {
+      //   return it;
+      // }
+      // return false;
+
+      return fullNameMet.startsWith(it.fullName);
     });
 
-    if (!servesActive) return;
+    if (servesActive === undefined) return;
 
     const method = findMethod(services, servesActive.fullName, fullNameMet);
 
-    ctx.dispatch({ type: 'activeMethod', activeMethod: method! });
+    if (method === undefined) return;
+
+    ctx.dispatch({ type: 'activeMethod', activeMethod: method });
   };
 
   // add request
-  const addItem = (value: string, fullNameMet: string) => {
+  const addItem = (value: string, fullNameMet: string): void => {
     const servesActive = services.find((it) => {
-      if (fullNameMet.startsWith(it.fullName)) return it;
+      return fullNameMet.startsWith(it.fullName);
     });
-    if (!servesActive) return;
+    if (servesActive === undefined) return;
 
     const met = findMethod(services, servesActive.fullName, fullNameMet);
-    if (!met) return;
+    if (met === undefined) return;
 
     CreateRequestFile(
       workspaceID,
@@ -103,34 +110,40 @@ export const MethodCollection: React.FC = () => {
       value,
       met?.requestExample,
       ''
-    ).then((res) => {
-      ctx.dispatch({
-        type: 'addRequestFile',
-        file: {
-          ...requestFiles,
-          [fullNameMet]: [...(requestFiles[fullNameMet] || []), res],
-        },
-      });
-    });
+    ).then(
+      (res) => {
+        ctx.dispatch({
+          type: 'addRequestFile',
+          file: {
+            ...requestFiles,
+            [fullNameMet]: [...(requestFiles[fullNameMet] || []), res],
+          },
+        });
+      },
+      () => {}
+    );
   };
 
   // delete request
-  const deleteRequest = (metName: string) => {
+  const deleteRequest = (metName: string): void => {
     if (!isOpenDeletePopup) return;
 
-    RemoveRequestFile(workspaceID, metName, isOpenDeletePopup).then((res) => {
-      let ws = new models.Workspace({
-        ...ctx.state.activeWorkspace,
-        requestFiles: {
-          [metName]: [...(res[metName] || [])],
-        },
-      });
+    RemoveRequestFile(workspaceID, metName, isOpenDeletePopup).then(
+      (res) => {
+        const ws = new models.Workspace({
+          ...ctx.state.activeWorkspace,
+          requestFiles: {
+            [metName]: [...(res[metName] || [])],
+          },
+        });
 
-      ctx.dispatch({ type: 'updateWorkspace', workspace: ws });
-    });
+        ctx.dispatch({ type: 'updateWorkspace', workspace: ws });
+      },
+      () => {}
+    );
   };
   // Edit request
-  const renameRequest = (name: string, metName: string) => {
+  const renameRequest = (name: string, metName: string): void => {
     const renamed = new models.File({
       ...ctx.state.activeWorkspace?.requestFiles[metName].find(
         (it) => it.id === isOpenEditInput
@@ -138,13 +151,16 @@ export const MethodCollection: React.FC = () => {
       name: name,
     });
 
-    UpdateRequestFile(workspaceID, metName, renamed).then((res) => {
-      ctx.dispatch({
-        type: 'updateRequestFile',
-        file: renamed,
-        metName,
-      });
-    });
+    UpdateRequestFile(workspaceID, metName, renamed).then(
+      (res) => {
+        ctx.dispatch({
+          type: 'updateRequestFile',
+          file: renamed,
+          metName,
+        });
+      },
+      () => {}
+    );
   };
 
   const paddingSteps = [0, 8, 16];
@@ -159,85 +175,83 @@ export const MethodCollection: React.FC = () => {
         level,
         isExpanded,
       }: INodeRendererProps) => {
-        {
-          return (
-            <div
-              onKeyDown={(e) => e.stopPropagation()}
-              {...getNodeProps({})}
-              style={{
-                cursor: 'pointer',
-                width: '100%',
-                display: 'inline-block',
-              }}
-            >
-              {level <= 2 && (
-                <div
-                  style={{ paddingLeft: ` ${paddingSteps[level]}px` }}
-                  className=" flex w-full
+        return (
+          <div
+            onKeyDown={(e) => e.stopPropagation()}
+            {...getNodeProps({})}
+            style={{
+              cursor: 'pointer',
+              width: '100%',
+              display: 'inline-block',
+            }}
+          >
+            {level <= 2 && (
+              <div
+                style={{ paddingLeft: ` ${paddingSteps[level]}px` }}
+                className=" flex w-full
                    
                    hover:bg-borderFill
                    "
-                >
-                  {level <= 2 && <ArrowIcon isOpen={isExpanded} />}
-                  {level <= 2 && element.name}
-                </div>
-              )}
-              {level === 3 && (
-                <div className="w-full flex-[0_1_100%] flex-col">
-                  <CreateItem
-                    fullNameMet={element.name}
-                    addItem={(value, fullNameMet) =>
-                      addItem(value, fullNameMet || '')
-                    }
-                    text="New Request"
-                    placeholder="Name request"
-                    btnClassName="pl-[22px]"
-                  />
+              >
+                {level <= 2 && <ArrowIcon isOpen={isExpanded} />}
+                {level <= 2 && element.name}
+              </div>
+            )}
+            {level === 3 && (
+              <div className="w-full flex-[0_1_100%] flex-col">
+                <CreateItem
+                  fullNameMet={element.name}
+                  addItem={(value, fullNameMet) =>
+                    addItem(value, fullNameMet ?? '')
+                  }
+                  text="New Request"
+                  placeholder="Name request"
+                  btnClassName="pl-[22px]"
+                />
 
-                  <FileList
-                    items={(requestFiles[element.name] || []).map((it) => {
-                      return {
-                        file: it,
-                        inEdit: it.id === isOpenEditInput,
-                        isActive: it.id === activeRequestID,
-                        onClick: () =>
-                          setActiveRequestMethod(it.id, element.name),
-                        menu: [
-                          {
-                            icon: editIcon,
-                            text: 'Edit',
-                            onClick: () => {
-                              setIsOpenEditInput(it.id);
-                            },
+                <FileList
+                  items={(requestFiles[element.name] || []).map((it) => {
+                    return {
+                      file: it,
+                      inEdit: it.id === isOpenEditInput,
+                      isActive: it.id === activeRequestID,
+                      onClick: () =>
+                        setActiveRequestMethod(it.id, element.name),
+                      menu: [
+                        {
+                          icon: editIcon,
+                          text: 'Edit',
+                          onClick: () => {
+                            setIsOpenEditInput(it.id);
                           },
-                          {
-                            icon: deleteIcon,
-                            text: 'Delete',
-                            onClick: () => {
-                              setIsOpenDeletePopup(it.id);
-                            },
+                        },
+                        {
+                          icon: deleteIcon,
+                          text: 'Delete',
+                          onClick: () => {
+                            setIsOpenDeletePopup(it.id);
                           },
-                        ],
-                      };
-                    })}
-                    onCloseInput={() => setIsOpenEditInput('')}
-                    editFile={(id: string) => renameRequest(id, element.name)}
-                    itemIcon={gIcon}
-                  />
-                  <DeletePopup
-                    id={isOpenDeletePopup}
-                    isOpen={isOpenDeletePopup !== ''}
-                    onClose={() => setIsOpenDeletePopup('')}
-                    deleteScript={() => {
-                      deleteRequest(element.name);
-                    }}
-                    title="Delete script?"
-                  />
-                </div>
-              )}
-            </div>
-          );
-        }
+                        },
+                      ],
+                    };
+                  })}
+                  onCloseInput={() => setIsOpenEditInput('')}
+                  editFile={(id: string) => renameRequest(id, element.name)}
+                  itemIcon={gIcon}
+                />
+                <DeletePopup
+                  id={isOpenDeletePopup}
+                  isOpen={isOpenDeletePopup !== ''}
+                  onClose={() => setIsOpenDeletePopup('')}
+                  deleteScript={() => {
+                    deleteRequest(element.name);
+                  }}
+                  title="Delete script?"
+                />
+              </div>
+            )}
+          </div>
+        );
       }}
     />
   );

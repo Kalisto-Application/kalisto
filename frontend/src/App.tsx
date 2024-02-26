@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/react';
+import * as Sezntry from '@sentry/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import config from './config';
 import MainLayout from './layout';

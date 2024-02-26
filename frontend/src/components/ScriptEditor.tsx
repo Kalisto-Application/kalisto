@@ -25,9 +25,8 @@ export const ScriptEditor: React.FC = () => {
       ? activeFile?.headers
       : '';
 
-  const switchScriptEditor = (i: number) =>
-    void [ctx.dispatch({ type: 'switchScriptEditor', i: i })];
-
+  const switchScriptEditor = (i: number): void =>
+    ctx.dispatch({ type: 'switchScriptEditor', i: i });
   const newSaveScript = (
     field: 'content' | 'headers'
   ): ((content: string) => void) => {
@@ -36,18 +35,21 @@ export const ScriptEditor: React.FC = () => {
         return;
       }
 
-      const updateRecord: { [key: string]: any } = {
+      const updateRecord: Record<string, any> = {
         ...activeFile,
       };
       updateRecord[field] = content;
       const updatedFile = new models.File(updateRecord);
 
-      UpdateScriptFile(ws?.id, updatedFile).then(() => {
-        ctx.dispatch({
-          type: 'updateScriptFile',
-          file: updatedFile,
-        });
-      });
+      UpdateScriptFile(ws?.id, updatedFile).then(
+        () => {
+          ctx.dispatch({
+            type: 'updateScriptFile',
+            file: updatedFile,
+          });
+        },
+        () => {}
+      );
     };
   };
 
@@ -77,6 +79,7 @@ export const ScriptEditor: React.FC = () => {
           { title: 'Headers', onClick: switchScriptEditor },
         ]}
         active={ctx.state.activeScriptEditor || 0}
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises, @typescript-eslint/promise-function-async
         onClickCopy={() => navigator.clipboard.writeText(contentEditor || '')}
       />
       {editors[ctx.state.activeScriptEditor] || editors[0]}

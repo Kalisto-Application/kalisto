@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useMemo, useState } from 'react';
 
 import { RunScript, UpdateWorkspace } from '../../wailsjs/go/api/Api';
 import { models } from '../../wailsjs/go/models';
-import { Action, debounce } from '../pkg';
+import { debounce, type Action } from '../pkg';
 import { Context } from '../state';
 import { UrlInput } from '../ui/UrlInput';
 
@@ -10,10 +10,10 @@ export const ScriptSender: React.FC = () => {
   const ctx = useContext(Context);
 
   const activeWorkspace = ctx.state.activeWorkspace;
-  const [url, setUrl] = useState(activeWorkspace?.targetUrl || '');
+  const [url, setUrl] = useState(activeWorkspace?.targetUrl ?? '');
 
   useEffect(() => {
-    setUrl(activeWorkspace?.targetUrl || '');
+    setUrl(activeWorkspace?.targetUrl ?? '');
   }, [activeWorkspace]);
 
   const action: Action = (url: string) => {
@@ -23,16 +23,16 @@ export const ScriptSender: React.FC = () => {
       console.log('failed to save the workspace url: ', err);
     });
   };
-  let debouncedUrlUpdate = useMemo<Action>(() => {
+  const debouncedUrlUpdate = useMemo<Action>(() => {
     return debounce(action, 400);
   }, [activeWorkspace]);
 
-  const onSetUrl = (url: string) => {
+  const onSetUrl = (url: string): void => {
     setUrl(url);
     debouncedUrlUpdate(url);
   };
 
-  const sendRequest = () => {
+  const sendRequest = (): void => {
     if (!activeWorkspace) {
       return;
     }
@@ -54,16 +54,14 @@ export const ScriptSender: React.FC = () => {
         ctx.dispatch({ type: 'scriptResponse', response: res });
       })
       .catch((err) => {
-        if (err?.Code == 'SYNTAX_ERROR') {
+        if (err?.Code === 'SYNTAX_ERROR') {
           ctx.dispatch({ type: 'scriptError', value: err.Value });
-        } else if (err?.Code == 'SERVER_UNAVAILABLE') {
+        } else if (err?.Code === 'SERVER_UNAVAILABLE') {
           ctx.dispatch({ type: 'scriptError', value: 'Server unavailable' });
         }
         console.log('failed to get response: ', err);
       });
   };
 
-  return (
-      <UrlInput value={url} setValue={onSetUrl} onClick={sendRequest} />
-  );
+  return <UrlInput value={url} setValue={onSetUrl} onClick={sendRequest} />;
 };

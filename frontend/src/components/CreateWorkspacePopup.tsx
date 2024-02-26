@@ -3,7 +3,7 @@ import close from '../../assets/icons/close.svg';
 import file from '../../assets/icons/file.svg';
 import folder from '../../assets/icons/folder.svg';
 import upload from '../../assets/icons/upload.svg';
-import { models } from '../../wailsjs/go/models';
+import type { models } from '../../wailsjs/go/models';
 import { Context } from '../state';
 import Button from '../ui/Button';
 import Popup from '../ui/Popup';
@@ -38,23 +38,26 @@ const CreateWorkspaceComponets: React.FC<propsCreateWorkspace> = ({
 
   const [data, setData] = useState([] as models.ProtoDir[]);
 
-  const pushDir = (dir: models.ProtoDir) => {
+  const pushDir = (dir: models.ProtoDir): void => {
     setData((prev) => prev.concat(dir));
   };
 
-  const updateTextValueInp = (e: React.FormEvent<HTMLInputElement>) => {
-    let newValue = e.currentTarget.value;
+  const updateTextValueInp = (e: React.FormEvent<HTMLInputElement>): void => {
+    const newValue = e.currentTarget.value;
     setName(newValue);
   };
 
-  const createNewWorkspace = () => {
+  const createNewWorkspace = (): void => {
     CreateWorkspace(
       name,
-      data.map((it) => it.dir),
-    ).then((res) => {
-      ctx.dispatch({ type: 'newWorkspace', workspace: res });
-      onClose();
-    });
+      data.map((it) => it.dir)
+    ).then(
+      (res) => {
+        ctx.dispatch({ type: 'newWorkspace', workspace: res });
+        onClose();
+      },
+      () => {}
+    );
   };
 
   return (
@@ -103,7 +106,7 @@ interface propsUpload {
 const Upload: React.FC<propsUpload> = ({ data, clearState, pushDir }) => {
   const [disabledUpload, setDisabledUpload] = useState(false);
 
-  const findFiles = () => {
+  const findFiles = (): void => {
     setDisabledUpload(true);
     FindProtoFiles()
       .then((res) => {
@@ -133,10 +136,10 @@ const Upload: React.FC<propsUpload> = ({ data, clearState, pushDir }) => {
   );
 };
 
-interface UploadedDirProps {
+type UploadedDirProps = {
   dirs: models.ProtoDir[];
-  clear(i: number): void;
-}
+  clear: (i: number) => void;
+};
 
 const UploadedDir: React.FC<UploadedDirProps> = ({ dirs, clear }) => {
   return (

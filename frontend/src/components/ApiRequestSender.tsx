@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useMemo, useState } from 'react';
 
 import { SendGrpc, UpdateWorkspace } from '../../wailsjs/go/api/Api';
 import { models } from '../../wailsjs/go/models';
-import { Action, debounce } from '../pkg';
+import { debounce, type Action } from '../pkg';
 import { Context } from '../state';
 import { UrlInput } from '../ui/UrlInput';
 
@@ -10,10 +10,10 @@ export const ApiRequestSender: React.FC = () => {
   const ctx = useContext(Context);
 
   const activeWorkspace = ctx.state.activeWorkspace;
-  const [url, setUrl] = useState(activeWorkspace?.targetUrl || '');
+  const [url, setUrl] = useState(activeWorkspace?.targetUrl ?? '');
 
   useEffect(() => {
-    setUrl(activeWorkspace?.targetUrl || '');
+    setUrl(activeWorkspace?.targetUrl ?? '');
   }, [activeWorkspace]);
 
   const action: Action = (url: string) => {
@@ -23,16 +23,16 @@ export const ApiRequestSender: React.FC = () => {
       console.log('failed to save the workspace url: ', err);
     });
   };
-  let debouncedUrlUpdate: Action = useMemo<Action>(() => {
+  const debouncedUrlUpdate: Action = useMemo<Action>(() => {
     return debounce(action, 400);
   }, [activeWorkspace?.id]);
 
-  const onSetUrl = (url: string) => {
+  const onSetUrl = (url: string): void => {
     setUrl(url);
     debouncedUrlUpdate(url);
   };
 
-  const sendRequest = (_: React.SyntheticEvent) => {
+  const sendRequest = (_: React.SyntheticEvent):void => {
     if (!ctx.state.activeMethod || !activeWorkspace) {
       return;
     }
@@ -42,7 +42,7 @@ export const ApiRequestSender: React.FC = () => {
     ].find((it) => {
       return it.id === ctx.state.activeRequestFileId;
     });
-    if (!file) return;
+    if (file === undefined) return;
 
     SendGrpc({
       addr: url,
@@ -55,9 +55,9 @@ export const ApiRequestSender: React.FC = () => {
         ctx.dispatch({ type: 'apiResponse', response: res });
       })
       .catch((err) => {
-        if (err?.Code == 'SYNTAX_ERROR') {
+        if (err?.Code === 'SYNTAX_ERROR') {
           ctx.dispatch({ type: 'apiError', value: err.Value });
-        } else if (err?.Code == 'SERVER_UNAVAILABLE') {
+        } else if (err?.Code === 'SERVER_UNAVAILABLE') {
           ctx.dispatch({ type: 'apiError', value: 'Server unavailable' });
         }
         console.log('failed to get response: ', err);

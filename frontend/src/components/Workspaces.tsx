@@ -7,7 +7,7 @@ import {
   WorkspaceList as GetWorkspaceList,
 } from '../../wailsjs/go/api/Api';
 
-import Dropdown, { DropdownItemProps } from './../ui/Dropdown';
+import Dropdown, { type DropdownItemProps } from './../ui/Dropdown';
 import CreateWorkspacePopup from './CreateWorkspacePopup';
 import DeletePopup from './DeletePopup';
 
@@ -32,7 +32,7 @@ export const WorkspaceList: React.FC = () => {
     }
   }, [items]);
 
-  const renameWorkspace = (id: string, name: string) => {
+  const renameWorkspace = (id: string, name: string): void => {
     RenameWorkspace(id, name)
       .then((_) => {
         setRenameI(-1);
@@ -40,18 +40,18 @@ export const WorkspaceList: React.FC = () => {
       })
       .catch((err) => {
         console.log(
-          `failed to rename workspace id=${id}, new name=${name}: ${err}`,
+          `failed to rename workspace id=${id}, new name=${name}: ${err}`
         );
       });
   };
 
-  const setActiveWorkspace = (id: string) => {
+  const setActiveWorkspace = (id: string): void => {
     GetWorkspaceList(id)
       .then((res) => {
         ctx.dispatch({ type: 'workspaceList', workspaceList: res });
       })
       .catch((err) =>
-        console.log(`failed to get active workspace, id==${id}: ${err}`),
+        console.log(`failed to get active workspace, id==${id}: ${err}`)
       );
   };
 
@@ -105,12 +105,16 @@ export const WorkspaceList: React.FC = () => {
           },
         ],
       };
-    }) || []),
+    }) ?? []),
   ]);
 
-  const main = menuItems.shift();
+  const main = menuItems.shift() ?? {
+    text: 'No workspace found',
+    icon: folderIcon,
+    tip: <img src={dropdownIcon} />,
+  };
 
-  const deleteRequest = (id: string) => {
+  const deleteRequest = (id: string): void => {
     DeleteWorkspace(id)
       .then((_) => {
         ctx.dispatch({ type: 'removeWorkspace', id: id });
@@ -142,7 +146,8 @@ export const WorkspaceList: React.FC = () => {
         deleteScript={() => deleteRequest(isOpenDeletePopup)}
         title="Delete workspase?"
       />
-      <Dropdown main={main!} items={menuItems} />
+
+      <Dropdown main={main} items={menuItems} />
     </>
   );
 };

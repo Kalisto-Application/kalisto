@@ -10,7 +10,7 @@ export const RequestEditor: React.FC = () => {
   const ctx = useContext(Context);
   const workSpaceID = ctx.state.activeWorkspace?.id;
   const activeRequestID = ctx.state.activeRequestFileId;
-  const activeRequestMetName = ctx.state.activeMethod?.fullName || '';
+  const activeRequestMetName = ctx.state.activeMethod?.fullName ?? '';
   const numberEditor = ctx.state.activeRequestEditor;
 
   const requestFiles = ctx.state.activeWorkspace?.requestFiles
@@ -28,8 +28,8 @@ export const RequestEditor: React.FC = () => {
       ? activeFile?.headers
       : '';
 
-  const switchRequestEditor = (i: number) =>
-    void [ctx.dispatch({ type: 'switchRequestEditor', i: i })];
+  const switchRequestEditor = (i: number): void =>
+    ctx.dispatch({ type: 'switchRequestEditor', i: i });
 
   const newSaveScript = (
     field: 'content' | 'headers'
@@ -39,7 +39,7 @@ export const RequestEditor: React.FC = () => {
         return;
       }
 
-      const updateRecord: { [key: string]: any } = {
+      const updateRecord: Record<string, any> = {
         ...activeFile,
       };
 
@@ -53,7 +53,8 @@ export const RequestEditor: React.FC = () => {
             file: updatedFile,
             metName: activeRequestMetName,
           });
-        }
+        },
+        () => {}
       );
     };
   };
@@ -64,13 +65,13 @@ export const RequestEditor: React.FC = () => {
   const editors = [
     <CodeEditor
       key={0}
-      text={activeFile?.content || ''}
+      text={activeFile?.content ?? ''}
       fileId={activeRequestID}
       onChange={saveScriptContent}
     />,
     <CodeEditor
       key={1}
-      text={activeFile?.headers || ''}
+      text={activeFile?.headers ?? ''}
       fileId={activeRequestID}
       onChange={saveScriptHeaders}
     />,
@@ -91,7 +92,8 @@ export const RequestEditor: React.FC = () => {
         ]}
         active={ctx.state.activeRequestEditor || 0}
         onClickCopy={() => {
-          navigator.clipboard.writeText(contentEditor || '');
+          // eslint-disable-next-line @typescript-eslint/no-floating-promises
+          navigator.clipboard.writeText(contentEditor ?? '');
         }}
       />
       {editors[ctx.state.activeRequestEditor] || editors[0]}

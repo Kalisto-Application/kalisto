@@ -70,7 +70,7 @@ const Editor: React.FC<props> = ({ value, onChange, readonly }) => {
         setSub(
           ed.getModel()?.onDidChangeContent((e) => {
             if (onChange !== undefined) {
-              onChange(ed.getModel()?.getValue() || '');
+              onChange(ed.getModel()?.getValue() ?? '');
             }
           })
         );

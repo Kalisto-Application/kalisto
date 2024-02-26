@@ -6,7 +6,7 @@ import { CodeEditor } from '../ui/Editor';
 export const VariablesEditor: React.FC = () => {
   const ctx = useContext(Context);
 
-  const saveGlobalVariables = (vars: string) => {
+  const saveGlobalVariables = (vars: string): void => {
     SaveGlovalVars(vars)
       .then(() => {
         ctx.dispatch({ type: 'changeVariables', text: vars });

@@ -22,7 +22,7 @@ type Action =
   | { type: 'updateScriptFile'; file: models.File }
   | { type: 'addScriptFile'; file: models.File }
   | { type: 'switchScriptEditor'; i: number }
-  | { type: 'addRequestFile'; file: { [key: string]: models.File[] } }
+  | { type: 'addRequestFile'; file: Record<string, models.File[]> }
   | { type: 'updateRequestFile'; file: models.File; metName: string }
   | { type: 'setActiveRequest'; id: string };
 
@@ -74,12 +74,12 @@ export const reducer = (state: State, action: Action): State => {
     case 'switchRequestEditor':
       return {
         ...state,
-        activeRequestEditor: action.i as number,
+        activeRequestEditor: action.i ,
       };
     case 'switchResponseEditor':
       return {
         ...state,
-        activeResponseEditor: action.i as number,
+        activeResponseEditor: action.i ,
       };
     case 'changeRequestText':
       return {
@@ -95,7 +95,7 @@ export const reducer = (state: State, action: Action): State => {
       return {
         ...state,
         workspaceList: [action.workspace as models.WorkspaceShort].concat(
-          state.workspaceList || []
+          state.workspaceList ?? [] 
         ),
         activeWorkspace: action.workspace,
       };
@@ -203,12 +203,13 @@ export const reducer = (state: State, action: Action): State => {
         activeScriptEditor: 0,
       };
     case 'addScriptFile':
+ 
       return {
         ...state,
         activeWorkspace: new models.Workspace({
           ...state.activeWorkspace,
           scriptFiles: [
-            ...(state.activeWorkspace?.scriptFiles || []),
+            ...(state.activeWorkspace?.scriptFiles ?? []),
             action.file,
           ],
         }),
@@ -262,4 +263,4 @@ type AppContext = {
   dispatch: Dispatch<Action>;
 };
 
-export const Context = createContext<AppContext>({} as AppContext);
+export const Context = createContext<AppContext>({state: newState(), dispatch: (() => undefined)} );

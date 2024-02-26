@@ -21,9 +21,9 @@ export const ContextProvider: React.FC<ContextProps> = ({ children }) => {
 
         const getFirstMethod = (): models.Method | undefined => {
           for (const service of res.main.spec.services) {
-            for (const m of service.methods) {
-              return m;
-            }
+            if (service.methods.length === 0) continue;
+
+            return service.methods[0];
           }
         };
 

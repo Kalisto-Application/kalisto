@@ -10,8 +10,9 @@ export const ScriptResponse: React.FC = () => {
     <div className="w-1/2 bg-textBlockFill">
       <div className="p-[5.5px] text-right">
         <button
+          // eslint-disable-next-line @typescript-eslint/no-misused-promises, @typescript-eslint/promise-function-async
           onClick={() =>
-            navigator.clipboard.writeText(ctx.state.scriptResponse || '')
+            navigator.clipboard.writeText(ctx.state.scriptResponse ?? '')
           }
         >
           <img src={iconCopy} />
